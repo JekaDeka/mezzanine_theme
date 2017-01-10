@@ -8,7 +8,7 @@ local_settings.py
 fabfile.py
 manage.py
 __init__.py
-/static
-/deploy
-/HelloDjango
-/templates
+static/
+deploy/
+HelloDjango/
+templates/
