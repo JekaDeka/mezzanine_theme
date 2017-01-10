@@ -1,0 +1,14 @@
+*.pyc
+*.pyo
+*.db
+*.txt
+.DS_Store
+.coverage
+local_settings.py
+fabfile.py
+manage.py
+__init__.py
+/static
+/deploy
+/HelloDjango
+/templates
