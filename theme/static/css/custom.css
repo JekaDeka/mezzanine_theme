@@ -1,0 +1,16 @@
+/** Your theme modifications here **/
+
+#top ul.menu > li {
+	color: white;
+}
+
+footer {
+	position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0 0 0 0;
+}
+
+.nav-footer {
+	display: flex;
+}

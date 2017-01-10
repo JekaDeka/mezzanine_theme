@@ -1,0 +1,3 @@
+python manage.py runserver
+
+set /p DUMMY=Hit ENTER to continue...
