@@ -5,12 +5,122 @@
 }
 
 footer {
-	position: absolute;
-    bottom: 0;
+    background: #e0e0e0;
     width: 100%;
     padding: 0 0 0 0;
 }
 
+footer ul {
+  padding-left: 0;
+  list-style: none;
+}
+footer ul a {
+  color: #999999;
+  padding-left: 7px;
+
+}
+footer ul li:first-child a{
+	font-family: inherit;
+    font-weight: 500;
+    line-height: 1.1;
+    color: inherit;
+    font-size: 18px;
+    padding-left: 0;
+}
+footer .social {
+  text-align: left;
+}
+footer .social a {
+  margin: 0 10px 0 0;
+  color: #fff;
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  border-radius: 15px;
+  line-height: 26px;
+  font-size: 15px;
+  text-align: center;
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+  vertical-align: bottom;
+  background-color: #555555;
+}
+
+footer .social a i {
+  vertical-align: bottom;
+  line-height: 30px;
+}
+footer .social a.facebook:hover {
+  background-color: #4460ae;
+}
+footer .social a.gplus:hover {
+  background-color: #c21f25;
+}
+footer .social a.twitter:hover {
+  background-color: #3cf;
+}
+footer .social a.instagram:hover {
+  background-color: #cd4378;
+}
+footer .social a.email:hover {
+  background-color: #4a7f45;
+}
+
 .nav-footer {
-	display: flex;
+	padding: 15px;
+}
+
+.nav-footer > ul > li {
+	padding: 2px 0;
+}
+
+.box.slideshow {
+	padding: 15px 30px 0px 30px;
+}
+
+.nav-list .active > a {
+  background-color: #4fbfa8;
+  color: #ffffff;
+}
+
+.navlist-menu-level-0 {
+  padding: 10px;
+}
+
+.navlist-menu-level-1 {
+  padding: 5px 0px 5px 15px;
+}
+
+.navlist-menu-level-1 a {
+  color: #999999;
+}
+
+.form-actions {
+  background-color: #ffffff;
+  border-top: #ffffff;
+}
+
+.comment-author {
+  background-color: #effffa;
+}
+
+#content #productMain .buttons .btn {
+  margin-right: 5px;
+  max-width: 100%;
+  white-space: normal;
+}
+.form-group > input[type="number"] {
+  display: inline;
+  margin: 7px;
+  width: auto;
+  max-width: 100%;
+}
+
+.const_width {
+  width: 100%;
+}
+
+#comments, .rating {
+  margin: 0 0;
 }

@@ -6,23 +6,33 @@
 <link rel="stylesheet" href="{% static "mezzanine/css/magnific-popup.css" %}">
 {% endblock extra_css %}
 
+{% block title %}{% endblock %}
+
 {% block main %}
-{{ block.super }}
+<div class="col-md-9">
+    <div class="box">
+    {% if page %}
+    {% editable page.title %} 
+        <h1>{{ page.title }}</h1>
+    {% endeditable %}
+    {% endif %}
 
-{% editable page.gallery.content %}
-{{ page.gallery.content|richtext_filters|safe }}
-{% endeditable %}
-
-<div class="gallery row">
-{% with page.gallery.images.all as images %}
-{% for image in images %}
-<div class="col-xs-4 col-sm-3">
-    <a class="thumbnail" rel="#image-{{ image.id }}" title="{{ image.description }}" href="{{ image.file.url }}">
-        <img class="img-responsive" src="{{ MEDIA_URL }}{% thumbnail image.file 131 75 %}">
-    </a>
-</div>
-{% endfor %}
-{% endwith %}
+    {{ block.super }}
+    {% editable page.gallery.content %}
+        <p> {{ page.gallery.content|richtext_filters|safe }} </p>
+    {% endeditable %}
+    </div>
+    <div class="gallery row box">
+    {% with page.gallery.images.all as images %}
+    {% for image in images %}
+    <div class="col-xs-4 col-sm-3">
+        <a class="thumbnail" rel="#image-{{ image.id }}" title="{{ image.description }}" href="{{ image.file.url }}">
+            <img class="img-responsive" src="{{ MEDIA_URL }}{% thumbnail image.file 131 75 %}">
+        </a>
+    </div>
+    {% endfor %}
+    {% endwith %}
+    </div>
 </div>
 {% endblock %}
 

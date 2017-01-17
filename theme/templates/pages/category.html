@@ -1,12 +1,37 @@
 {% extends "pages/page.html" %}
 
-{% load mezzanine_tags shop_tags i18n %}
+{% load mezzanine_tags shop_tags i18n theme_tags %}
 {% block body_id %}category{% endblock %}
 
-{% block main %}{{ block.super }}
+{% block title %}
+{% endblock %}
+
+{% block left_panel %}
+{# {% shop_menu_categories as categories %} #}
+<div class="col-md-3">
+    {# {% if categories %} #}
+        <div class="panel panel-default sidebar-menu">
+            <div class="panel-heading">
+                <h3 class="panel-title">{% trans "Categories" %}</h3>
+            </div>
+            <div class="panel-body">
+                {% shop_menu "pages/menus/shop_tree.html" %}
+            </div>
+        </div>
+    {# {% endif %} #}
+</div>
+{% endblock %}
+
+
+{% block main %}
+<div class="col-md-9">
+<div class="box">
+    <h1>{{ page.title }}</h1>
+
+{{ block.super }}
 
 {% editable page.category.content %}
-{{ page.category.content|safe }}
+<p>{{ page.category.content|safe }} </p>
 {% endeditable %}
 
 {% if child_categories %}
@@ -37,55 +62,82 @@
 {% endif %}
 </div>
 {% endif %}
+</div>
 
 {% if products.paginator.count != 0 %}
 
-<form class="product-sorting" role="form">
-    <div class="form-group">
-    <label class="control-label" for="sorting-select">{% trans "Sort by" %}</label>
-        <select onchange="location.href = this[this.selectedIndex].value;" class="form-control" id="sorting-select">
-        {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
-        {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
-        <option{% if option == products.sort_by %} selected{% endif %}
-            value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
-            {{ name }}
-        </option>
-        {% endif %}
-        {% endfor %}
-        </select>
-    </div>
-</form>
-
-<div class="row product-list">
-{% for product in products.object_list %}
-    <div class="col-xs-6 col-sm-4 col-lg-3 product-thumb">
-    <a href="{{ product.get_absolute_url }}" class="thumbnail">
-        {% if product.image %}
-        <img src="{{ MEDIA_URL }}{% thumbnail product.image 148 148 %}">
-        {% else %}
-        <div class="placeholder"></div>
-        {% endif %}
-        <div class="caption">
-        <h6>{{ product }}</h6>
-        <div class="price-info">
-        {% if product.has_price %}
-            {% if product.on_sale %}
-            <span class="old-price">{{ product.unit_price|currency }}</span>
-            {% trans "On sale:" %}
+<div class="box">
+<div class="row">
+    <div class="col-md-6">
+    <form class="product-sorting" role="form">
+        <div class="form-group">
+        <label class="control-label" for="sorting-select">{% trans "Sort by" %}</label>
+            <select onchange="location.href = this[this.selectedIndex].value;" class="form-control" id="sorting-select">
+            {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
+            {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
+            <option {% if option == products.sort_by %} selected{% endif %}
+                value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
+                {{ name }}
+            </option>
             {% endif %}
-            <span class="price">{{ product.price|currency }}</span>
-        {% else %}
-            <span class="coming-soon">{% trans "Coming soon" %}</span>
-        {% endif %}
+            {% endfor %}
+            </select>
         </div>
-        </div>
-    </a>
+    </form>
     </div>
+</div>
+</div>
+
+<div id="content">
+<div class="row products">
+{% for product in products.object_list %}
+<div class="col-xs-12 col-sm-6 col-md-4">
+    <div class="product">
+        {% if product.image %}
+        <div class="flip-container">
+            <div class="flipper">
+                <div class="front">
+                <a href="{{ product.get_absolute_url }}">
+                    <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
+                </a>
+                </div>
+                <div class="back">
+                    <a href="{{ product.get_absolute_url }}">
+                        <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
+                    </a>
+                </div>
+            </div>
+        </div>
+        <a href="{{ product.get_absolute_url }}" class="invisible">
+            <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
+        </a>
+        {% endif %}
+        <div class="text">
+            <h3><a href="{{ product.get_absolute_url }}l">{{ product }}</a></h3>
+            {% if product.has_price %}
+                        <p class="price">
+                        {% if product.on_sale %}
+                            <del>{{ product.unit_price|rub_currency }}</del>
+                        {% endif %}
+                        {{ product.price|rub_currency }}
+                        </p>
+                    {% else %}
+                        <p class="coming-soon">{% trans "Coming soon" %}</p>
+            {% endif %} 
+            <p class="buttons">
+                <a href="{{ product.get_absolute_url }}" class="btn btn-default">Подробнее</a>
+                <a href="/" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>В корзину</a>
+            </p>
+        </div>
+    </div>
+</div>
 {% endfor %}
+</div>
 </div>
 
 {% pagination_for products %}
 
 {% endif %}
 
+</div>
 {% endblock %}

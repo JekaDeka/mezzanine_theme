@@ -1,5 +1,4 @@
 {% load mezzanine_tags %}
-
 {% nevercache %}
 <input type="hidden" name="referrer" value="{{ request.META.HTTP_REFERER }}">
 {% csrf_token %}
@@ -10,7 +9,7 @@
 {{ field }}
 {% else %}
 <div class="form-group input_{{ field.id_for_label }} {{ field.field.type }}
-    {% if field.errors %} has-error{% endif %}">
+    {% if field.errors %} has-error{% endif %} text-center">
     {% if field.label %}<label class="control-label" for="{{ field.auto_id }}">{{ field.label }}</label>{% endif %}
     {{ field }}
     {% if field.errors %}

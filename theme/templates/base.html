@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}>
-{% load pages_tags mezzanine_tags i18n staticfiles %}
+{% load pages_tags theme_tags mezzanine_tags i18n staticfiles %}
 
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -171,7 +171,7 @@
 <div class="row">
     {% block left_panel %}
         <div class="col-md-3 left">
-            <div class="panel panel-default">{% page_menu "pages/menus/tree.html" %}</div>
+            <div class="panel panel-default">{% simple_menu "pages/menus/tree.html" %}</div>
         </div>
     {% endblock %}
 
@@ -197,9 +197,33 @@
 </div>
 </div>
 
+{% block hotthisweek %}
+{% endblock %}
+
+{% block getinspired %}
+{% endblock %}
+
+{% block fromblog %}
+{% endblock %}
+
 <footer>
 <div class="container">
+<div class="row">
+<div class="col-md-8">
 {% page_menu "pages/menus/footer.html" %}
+</div>
+<div class="col-md-4">
+<hr>
+<h4>Будь в курсе</h4>
+    <p class="social">
+        <a href="#" class="facebook external" data-animate-hover="shake"><i class="fa fa-facebook"></i></a>
+        <a href="#" class="twitter external" data-animate-hover="shake"><i class="fa fa-twitter"></i></a>
+        <a href="#" class="instagram external" data-animate-hover="shake"><i class="fa fa-instagram"></i></a>
+        <a href="#" class="gplus external" data-animate-hover="shake"><i class="fa fa-google-plus"></i></a>
+        <a href="#" class="email external" data-animate-hover="shake"><i class="fa fa-envelope"></i></a>
+    </p>
+</div>
+</div>
 </div>
 <div id="copyright">
             <div class="container">

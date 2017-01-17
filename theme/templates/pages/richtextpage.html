@@ -2,10 +2,16 @@
 
 {% load mezzanine_tags %}
 
-{% block main %}{{ block.super }}
+{% block title %}
+{% endblock %}
 
-{% editable page.richtextpage.content %}
-{{ page.richtextpage.content|richtext_filters|safe }}
-{% endeditable %}
-
+{% block main %}
+<div class="col-md-9 center">
+	<div class="box" id="text-page">
+	{{ block.super }}
+	{% editable page.richtextpage.content %}
+	{{ page.richtextpage.content|richtext_filters|safe }}
+	{% endeditable %}
+	</div>
+</div>
 {% endblock %}

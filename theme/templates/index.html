@@ -1,34 +1,178 @@
-{% extends "base.html" %}
-{% load pages_tags mezzanine_tags i18n staticfiles %}
+{% extends "base.html" %} 
+{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles %} 
 
-{% block meta_title %}{% trans "Home" %}
-{% endblock %}
-{% block title %}
-    {# {% trans "Home" %} #}
-{% endblock %}
+{% block meta_title %}{% trans "Home" %} {% endblock %} 
 
-{% block breadcrumb_menu %}{% endblock %}
+{% block title %} {# {% trans "Home" %} #} {% endblock %} 
 
-{% block left_panel %}{% endblock %}
+{% block breadcrumb_menu %} {% endblock %} 
+
+{% block left_panel %} {% endblock %} 
 
 {% block main %}
-    <div class="col-sm-12">
-        <div id="main-slider">
-            <div class="item">
-                <img alt="" class="img-responsive" src="{% static 'img/main-slider1.jpg' %}">
-            </div>
-            <div class="item">
-                <img alt="" class="img-responsive" src="{% static 'img/main-slider2.jpg' %}">
-            </div>
-            <div class="item">
-                <img alt="" class="img-responsive" src="{% static 'img/main-slider3.jpg' %}">
-            </div>
-            <div class="item">
-                <img alt="" class="img-responsive" src="{% static 'img/main-slider4.jpg' %}">
-            </div>
-        </div>
-    </div>
+<div class="col-sm-12">
+	<div id="main-slider">
+		<div class="item">
+			<img alt="" class="img-responsive" src="{% static 'img/main-slider1.jpg' %}">
+		</div>
+		<div class="item">
+			<img alt="" class="img-responsive" src="{% static 'img/main-slider2.jpg' %}">
+		</div>
+		<div class="item">
+			<img alt="" class="img-responsive" src="{% static 'img/main-slider3.jpg' %}">
+		</div>
+		<div class="item">
+			<img alt="" class="img-responsive" src="{% static 'img/main-slider4.jpg' %}">
+		</div>
+	</div>
+</div>
+{% endblock %} 
+
+{% block right_panel %} {% endblock %} 
+
+{% block hotthisweek %}
+{% shop_recent_products 4 as recent_products %}
+{% if recent_products %}
+<div class="container-fluid" id="hot">
+	<div class="row">
+		<div id="hot">
+			<div class="box">
+				<div class="container">
+					<div class="col-md-12">
+						<h2>Новинки</h2>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row products" id="content">
+	{% for product in recent_products %}
+	{% spaceless %}
+		<div class="col-xs-6 col-md-3">
+			<div class="product">
+			{% if product.image %}
+				<div class="flip-container">
+				<div class="flipper">
+					<div class="front">
+						<a href="{{ product.get_absolute_url }}">
+							<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 260 %}" alt="{{ product.image.description }}" class="img-responsive">
+						</a>
+					</div>
+					<div class="back">
+						<a href="{{ product.get_absolute_url }}">
+							<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 245 %}" alt="{{ product.image.description }}" class="img-responsive">
+						</a>
+					</div>
+				</div>
+				</div>
+				<a href="{{ product.get_absolute_url }}" class="invisible">
+					<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 260 %}" alt="{{ product.image.description }}" class="img-responsive">
+				</a>
+			{% endif %}
+				<div class="text">
+					<h3><a href="{{ product.get_absolute_url }}">{{ product }}</a></h3>
+					{% if product.has_price %}
+			            <p class="price">
+			            {% if product.on_sale %}
+			            	<span class="old-price">{{ product.unit_price|rub_currency }}</span>
+			            {% endif %}
+			            {{ product.price|rub_currency }}
+			            </p>
+		            {% else %}
+		            	<p class="coming-soon">{% trans "Coming soon" %}</p>
+		            {% endif %} 
+				</div>
+			</div>
+		</div>
+	{% endspaceless %}
+	{% endfor %}
+	</div>
+</div>
+{% endif %}
+{% endblock %} 
+
+{% block getinspired %}
+<div class="container">
+<div class="row">
+	<div class="col-md-12">
+		<div class="box slideshow">
+			<h3>Вдохновляйся</h3>
+			<!-- <p class="lead">Get the inspiration from our world class designers</p> -->
+			<div id="get-inspired" class="owl-carousel owl-theme">
+				<div class="item">
+					<a href="#">
+						<img src="{% static 'img/getinspired1.jpg' %}" alt="Get inspired" class="img-responsive">
+					</a>
+				</div>
+				<div class="item">
+					<a href="#">
+						<img src="{% static 'img/getinspired2.jpg' %}" alt="Get inspired" class="img-responsive">
+					</a>
+				</div>
+				<div class="item">
+					<a href="#">
+						<img src="{% static 'img/getinspired3.jpg' %}" alt="Get inspired" class="img-responsive">
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+{% endblock %} 
+
+{% block fromblog %}
+{% blog_recent_posts 2 as recent_posts %}
+{% if recent_posts %}
+<div class="container-fluid">
+	<div class="row">
+		<div class="box text-center" data-animate="fadeInUp">
+			<div class="container">
+				<div class="col-md-12">
+					<h3 class="text-uppercase">Из нашего блога</h3>
+					<p class="lead"><a href="/blog/">Подробнее</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row" id="content">
+	<div class="col-md-12" data-animate="fadeInUp">
+			<div id="blog-homepage" class="row">
+			{% for post in recent_posts %}
+			{% spaceless %}
+						<div class="col-sm-6">
+							<div class="post">
+								<h4><a href="{{ post.get_absolute_url }}">{{ post.title }}</a></h4>
+								<p class="author-category">
+								{% trans "Posted by" %}:
+								{% with post.user as author %}
+								<a href="{% url "blog_post_list_author" author %}">{{ author.get_full_name|default:author.username }}</a>
+								{% endwith %}
+								{% with post.categories.all as categories %}
+								{% if categories %}
+								{% trans "in" %}
+								{% for category in categories %}
+								<a href="{% url "blog_post_list_category" category.slug %}">{{ category }}</a>{% if not forloop.last %}, {% endif %}
+								{% endfor %}
+								{% endif %}
+								{% endwith %}
+								</p>
+								<hr>
+								<p class="intro">{{ post.description_from_content|safe }}</p>
+								<p class="read-more"><a href="{{ post.get_absolute_url }}" class="btn btn-primary">Подробнее</a>
+								</p>
+							</div>
+						</div>
+			{% endspaceless %}
+			{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endif %}
 {% endblock %}
-
-
-{% block right_panel %}{% endblock %}

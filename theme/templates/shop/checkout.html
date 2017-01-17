@@ -1,16 +1,12 @@
 {% extends "shop/base.html" %}
-{% load shop_tags mezzanine_tags i18n %}
+{% load shop_tags theme_tags mezzanine_tags i18n %}
 
 {% block meta_title %}{% trans "Checkout" %} - {{ step_title }}{% endblock %}
-{% block title %}{% trans "Checkout" %} - {% trans "Step" %} {{ step }} {% trans "of" %} {{ steps|length }}{% endblock %}
+{% block title %}
+{% trans "Checkout" %} - {% trans "Step" %} {{ step }} {% trans "of" %} {{ steps|length }}
+{% endblock %}
 {% block body_id %}checkout{% endblock %}
 
-{% block extra_head %}
-<script>
-var _gaq = [['_trackPageview', '{{ request.path }}{{ step_url }}/']];
-$(function() {$('.middle :input:visible:enabled:first').focus();});
-</script>
-{% endblock %}
 
 {% block breadcrumb_menu %}
 {% for step in steps %}
@@ -25,14 +21,20 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
 <li>{% trans "Complete" %}</li>
 {% endblock %}
 
-{% block main %}
+{% block left_panel %}
+{% endblock %}
 
-{% block before-form %}{% endblock %}
-<div class="row">
-<form method="post" class="col-md-8 checkout-form">
+{% block main %}
+<div class="col-md-9" id="checkout">
+<div class="box">
+
+{% block before-form %}
+{% endblock %}
+<form method="post" class="">
     {% csrf_token %}
 
-    {% block fields %}{% endblock %}
+    {% block fields %}
+    {% endblock %}
 
     {% block nav-buttons %}
         {% if request.cart.has_items %}
@@ -53,8 +55,16 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
 
 </form>
 
+{% block after-form %}
+{% endblock %}
+</div>
+</div>
+{% endblock %}
+
+
+{% block right_panel %}
 {% if request.cart.has_items %}
-<div class="col-md-4">
+<div class="col-md-3">
     <div class="panel panel-default checkout-panel">
     <div class="panel-body">
     <ul class="media-list">
@@ -65,19 +75,28 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
         {% endif %}
         <div class="media-body">
             {{ item.quantity }} x {{ item.description }}
-            <span class="price">{{ item.total_price|currency }}</span>
+            <span class="price">{{ item.total_price|rub_currency }}</span>
         </div>
     </li>
     {% endfor %}
     </ul>
-    {% order_totals %}
     <br style="clear:both;">
     <a class="btn btn-default" href="{% url "shop_cart" %}">{% trans "Edit Cart" %}</a>
     </div>
     </div>
 </div>
-{% endif %}
-
-{% block after-form %}{% endblock %}
+<div class="col-md-3"> 
+{% order_totals %}
 </div>
+
+{% endif %}
+{% endblock %}
+
+
+{% block exstra_js %}
+{{ block.super }}
+<script>
+var _gaq = [['_trackPageview', '{{ request.path }}{{ step_url }}/']];
+$(function() {$('.middle :input:visible:enabled:first').focus();});
+</script>
 {% endblock %}
