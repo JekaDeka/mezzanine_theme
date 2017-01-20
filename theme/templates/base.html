@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}>
-{% load pages_tags theme_tags mezzanine_tags i18n staticfiles %}
+{% load pages_tags theme_tags mezzanine_tags accounts_tags i18n staticfiles %}
 
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
@@ -24,8 +24,7 @@
 <link rel="stylesheet" href="{% static "css/owl.theme.css" %}">
 <!-- theme stylesheet -->
 <link rel="stylesheet" id="theme-stylesheet" href="{% static "css/style.default.css" %}">
-<!-- your stylesheet with modifications -->
-<link rel="stylesheet" href="{% static "css/custom.css" %}">
+
 
 
 {% if LANGUAGE_BIDI %}
@@ -37,6 +36,9 @@
 <link rel="stylesheet" href="{% static "css/cartridge.rtl.css" %}">
 {% endif %}
 {% endifinstalled %}
+
+<!-- your stylesheet with modifications -->
+<link rel="stylesheet" href="{% static "css/custom.css" %}">
 {% block extra_css %}{% endblock %}
 {% endcompress %}
 
@@ -56,7 +58,6 @@
             <div class="col-md-6" data-animate="fadeInDown">
             </div>
             <div class="col-md-6">
-            {% load i18n mezzanine_tags accounts_tags %}
                 <ul class="menu">
                 {% if request.user.is_authenticated %}
                 <li>
@@ -65,8 +66,6 @@
                     {% if profile_url %}
                         <a href="{{ profile_url }}"> <strong> {{ request.user|username_or:"email" }} </strong> </a>
                     </li>
-                        <a href="{% url "profile_update" %}" class="btn btn-default btn-sm btn-account">
-                            <span class="glyphicon glyphicon-edit"></span> {% trans "Update profile" %}</a>
                     {% else %}
                         <a href="{% url "profile_update" %}"><strong> {{ request.user|username_or:"email" }} </strong></a>
                     </li>
@@ -101,13 +100,13 @@
                             <span class="sr-only">{% trans "Toggle Search" %}</span>
                             <i class="fa fa-search"></i>
                         </button>
-                        <a class="btn btn-default navbar-toggle" href="{% url "shop_cart" %}">
-                            <i class="fa fa-shopping-cart"></i> 
-                            <span class="hidden-xs">
-                            {% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
-                            {% trans "in cart" %}
-                            </span>
-                        </a>
+<!--                         <a class="btn btn-default navbar-toggle" href="{% url "shop_cart" %}">
+    <i class="fa fa-shopping-cart"></i> 
+    <span class="hidden-xs">
+    {% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
+    {% trans "in cart" %}
+    </span>
+</a> -->
         </div>
     <!--     {% block navbar_title %}
     {% if settings.SITE_TITLE %}<a class="navbar-brand" href="/">{{ settings.SITE_TITLE }}</a>{% endif %}
@@ -119,13 +118,13 @@
         {% block navbar_dropdown_menu %}{% page_menu "pages/menus/dropdown.html" %}{% endblock%}
     </div>
     <div class="navbar-buttons">
-                    <div class="navbar-collapse collapse right" id="basket-overview">
+                    <!-- <div class="navbar-collapse collapse right" id="basket-overview">
                         <a href="{% url "shop_cart" %}" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i>
                         <span class="hidden-sm">
                             {% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
                             {% trans "in cart" %}
                         </span></a>
-                    </div>
+                    </div> -->
                     <!--/.nav-collapse -->
                     <div class="navbar-collapse collapse right" id="search-not-mobile" style="dispay: inline;">
                         <button type="button" class="btn navbar-btn btn-primary" data-toggle="collapse" data-target="#search">

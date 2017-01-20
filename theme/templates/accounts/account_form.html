@@ -1,17 +1,22 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags %}
+{% load i18n mezzanine_tags pages_tags %}
 
 {% block meta_title %}{{ title }}{% endblock %}
-{% block title %}{{ title }}{% endblock %}
+{# {% block title %}{% endblock %} #}
 {% block body_id %}account{% endblock %}
 
 {% block breadcrumb_menu %}
-{{ block.super }}
+<ul class="breadcrumb">
+{% spaceless %}
+{% page_menu "pages/menus/breadcrumb.html" %}
+{% endspaceless %}
 <li>{{ title }}</li>
+</ul>
 {% endblock %}
 
-{% block main %}
 
+{% block main %}
+<div class="col-md-9 box"> 
 {% errors_for form %}
 
 <form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
@@ -20,9 +25,15 @@
     {% fields_for form %}
     <div class="form-actions">
         {% block account_form_actions %}
-        <input class="btn btn-primary btn-lg pull-right" type="submit" value="{{ title }}">
+        <input class="btn btn-primary pull-left" type="submit" value="{{ title }}">
         {% endblock %}
     </div>
     </fieldset>
 </form>
+</div>
+{% endblock %}
+
+
+
+{% block right_panel %}
 {% endblock %}

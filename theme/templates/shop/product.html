@@ -78,11 +78,12 @@ $(document).ready(function() {
 	
 	{% if product.on_sale %}
 		<div class="ribbon sale">
-		<div class="theribbon">SALE</div>
+		<div class="theribbon">Скидка</div>
 		<div class="ribbon-background"></div>
 		</div>
 	{% endif %}
 </div>
+
 <div class="col-sm-6">
 	<div class="box">
 		<h1 class="text-center">{{ product}}</h1>
@@ -95,11 +96,12 @@ $(document).ready(function() {
 			<li id="variation-{{ variation.sku }}"
 				{% if not variation.default %}style="display:none;"{% endif %}>
 				{% if variation.has_price %}
+					<p class="price">
 					{% if variation.on_sale %}
-						<span class="old-price">{{ variation.unit_price|rub_currency }}</span>
-						{% trans "On sale:" %}
+						 <del>{{ variation.unit_price|rub_currency }}</del>
 					{% endif %}
-					<span class="price">{{ variation.price|rub_currency }}</span>
+					{{ variation.price|rub_currency }}
+					</p>
 				{% else %}
 					{% if has_available_variations %}
 					<span class="error-msg">
@@ -116,8 +118,8 @@ $(document).ready(function() {
 		<form method="post" id="add-cart" class="shop-form">
 			{% fields_for add_product_form %}
 			<div class="text-center buttons">
-				<button type="submit" class="btn btn-primary" name="add_cart" value=""><i class="fa fa-shopping-cart"></i>{% trans "Buy" %}
-				</button>
+				<!-- <button type="submit" class="btn btn-primary" name="add_cart" value=""><i class="fa fa-shopping-cart"></i>{% trans "Buy" %}
+				</button> -->
 				{% if settings.SHOP_USE_WISHLIST %}
 				<button type="submit" class="btn btn-default" name="add_wishlist" value=""><i class="fa fa-heart"></i>{% trans "Save for later" %}
 				</button>
@@ -172,7 +174,7 @@ $(document).ready(function() {
 
 
 {% if settings.SHOP_USE_RELATED_PRODUCTS and related_products %}
-<div class="text-center">
+<div class="box text-center">
 	<h2>Похожие товары</h2>
 </div>
 <div class="row related-products">

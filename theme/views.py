@@ -91,3 +91,25 @@ def blog_post_feed(request, format, **kwargs):
         return {"rss": PostsRSS, "atom": PostsAtom}[format](**kwargs)(request)
     except KeyError:
         raise Http404()
+
+
+def create_user_blog(request, tag=None, year=None, month=None, username=None,
+                     category=None, template="blog/blog_post_list.html",
+                     extra_context=None):
+    templates = []
+    context = {"blog_posts": None, "year": year, "month": month,
+               "tag": tag, "category": category}
+    context.update(extra_context or {})
+    templates.append(template)
+    return TemplateResponse(request, templates, context)
+
+
+def create_user_shop_item(request, tag=None, year=None, month=None, username=None,
+                          category=None, template="blog/blog_post_list.html",
+                          extra_context=None):
+    templates = []
+    context = {"blog_posts": None, "year": year, "month": month,
+               "tag": tag, "category": category}
+    context.update(extra_context or {})
+    templates.append(template)
+    return TemplateResponse(request, templates, context)

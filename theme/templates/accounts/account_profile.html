@@ -1,16 +1,22 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags accounts_tags %}
+{% load i18n mezzanine_tags accounts_tags pages_tags %}
 
 {% block meta_title %}{{ profile_user|username_or:"get_full_name" }}{% endblock %}
-{% block title %}{{ profile_user|username_or:"get_full_name" }}{% endblock %}
+{% block title %}{% endblock %}
 {% block body_id %}account{% endblock %}
 
 {% block breadcrumb_menu %}
-{{ block.super }}
+<ul class="breadcrumb">
+{% spaceless %}
+{% page_menu "pages/menus/breadcrumb.html" %}
+{% endspaceless %}
 <li>{{ profile_user|username_or:"get_full_name" }}</li>
+</ul>
 {% endblock %}
 
+
 {% block main %}
+<div class="col-md-9 box"> 
 <div class="row">
 <div class="profile-image col-md-3">
     <img class="img-thumbnail" src="{% gravatar_url profile_user.email 128 %}">
@@ -26,4 +32,8 @@
     {% endfor %}
 </div>
 </div>
+</div>
+{% endblock %}
+
+{% block right_panel %}
 {% endblock %}

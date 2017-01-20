@@ -124,3 +124,30 @@ footer .social a.email:hover {
 #comments, .rating {
   margin: 0 0;
 }
+.blog-list-detail {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#content #productMain .price del {
+  color: #999999;
+  font-size: 25px;
+}
+
+#content .product .text .buttons .btn {
+  max-width: 100%;
+  word-wrap: break-word;
+  white-space: normal;
+}
+.product-sorting select {
+  margin-left: 0;
+  width: auto;
+  max-width: 100%;
+}
+.shop-category-list .caption {
+  padding: 10px 0px;
+  text-align: center;
+}
+.shop-category-list a {
+  color: black;
+}
