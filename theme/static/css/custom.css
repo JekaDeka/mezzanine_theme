@@ -89,11 +89,25 @@ footer .social a.email:hover {
 }
 
 .navlist-menu-level-1, .navlist-menu-level-2, .navlist-menu-level-3, .navlist-menu-level-4, .navlist-menu-level-5 {
-  padding: 5px 0px 5px 10px;
+  /*padding: 5px 0px 5px 10px;*/
+  margin-left: 10px;
 }
-
+ul.nav.nav-list.navlist-menu-level-2 {
+	background-color: #ecf6ff;
+}
+ul.nav.nav-list.navlist-menu-level-3 {
+	background-color: #e2f1ff;
+}
+#e2f1ff
 .navlist-menu-level-1 a {
   color: #999999;
+}
+
+li > ul {
+	display: none;
+}
+li.active-branch > ul {
+	display: block;
 }
 
 .form-actions {
@@ -164,5 +178,5 @@ footer .social a.email:hover {
 }
 
 .panel-body {
-  padding: 5px 15px 5px 0px;
+  /*padding: 5px 15px 5px 0px;*/
 }
