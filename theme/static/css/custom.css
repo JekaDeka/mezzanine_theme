@@ -98,7 +98,6 @@ ul.nav.nav-list.navlist-menu-level-2 {
 ul.nav.nav-list.navlist-menu-level-3 {
 	background-color: #e2f1ff;
 }
-#e2f1ff
 .navlist-menu-level-1 a {
   color: #999999;
 }
@@ -109,6 +108,20 @@ li > ul {
 li.active-branch > ul {
 	display: block;
 }
+
+.dropdown-menu {
+	left: auto;
+	padding: 0;
+}
+.dropdown-menu > li > a {
+	padding: 15px 20px;
+}
+
+.dropdown-submenu > .dropdown-menu {
+	margin-top: -1px;
+	margin-left: 0px;
+}
+
 
 .form-actions {
   background-color: #ffffff;

@@ -983,7 +983,7 @@ h1 {
   position: relative;
 }
 .yamm .dropdown-menu {
-  left: auto;
+  /*left: auto;*/
 }
 .yamm .nav.navbar-right .dropdown-menu {
   left: auto;
