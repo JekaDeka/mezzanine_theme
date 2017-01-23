@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 
-{% load i18n mezzanine_tags %}
+{% load i18n mezzanine_tags pages_tags %}
 
 {% block meta_title %}{% trans "Search Results" %}{% endblock %}
-{% block title %}{% trans "Search Results" %}{% endblock %}
+{% block title %}{% endblock %}
 {% block extra_head %}
 <meta name="robots" content="noindex">
 {% endblock %}
 
 {% block breadcrumb_menu %}
-<li>
-    <a href="{% url "home" %}">{% trans "Home" %}</a>
-</li>
+<ul class="breadcrumb">
+{% spaceless %}
+{% page_menu "pages/menus/breadcrumb.html" %}
+{% endspaceless %}
 <li class="active">{% trans "Search Results" %}</li>
+</ul>
+
 {% endblock %}
 
 {% block main %}
-
+<div class="col-md-9 box">
 <p>
 {% if results.paginator.count == 0 %}
 {% blocktrans %}
@@ -51,5 +54,9 @@ Showing {{ start }} to {{ end }} of {{ total }} results in {{ search_type }} mat
 </div>
 
 {% pagination_for results %}
+</div>
+{% endblock %}
 
+
+{% block right_panel %}
 {% endblock %}

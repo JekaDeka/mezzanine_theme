@@ -159,7 +159,7 @@
 {% block breadcrumb_menu %}
 <ul class="breadcrumb">
 {% spaceless %}
-{% page_menu "pages/menus/breadcrumb.html" %}
+    {% page_menu "pages/menus/breadcrumb.html" %}
 {% endspaceless %}
 </ul>
 {% endblock %}
@@ -169,9 +169,18 @@
 <div class="container">
 <div class="row">
     {% block left_panel %}
+    <div id="content">
         <div class="col-md-3 left">
-            <div class="panel panel-default panel-body">{% simple_menu "pages/menus/tree.html" %}</div>
+            <div class="panel panel-default sidebar-menu">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{% trans "Categories" %}</h3>
+                </div>
+                <div class="panel-body">
+                    {% page_menu "pages/menus/tree.html" %}
+                </div>
+            </div>
         </div>
+    </div>
     {% endblock %}
 
     {% block main %}

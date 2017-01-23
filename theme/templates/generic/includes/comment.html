@@ -14,8 +14,10 @@
     <div class="media-body">
         <h4 class="media-heading"><a href="{{ comment.url }}">{{ comment.user_name }}</a>
     {% else %}
-    <img class="pull-left media-object" src="{% gravatar_url comment.email %}">
-    <div class="media-body">
+    <div class="col-sm-3 col-md-2 text-center-xs">
+        <img class="pull-left media-object img-circle img-responsive" src="{% gravatar_url comment.email %}">
+    </div>
+    <div class="media-body col-sm-9 col-md-10">
         <h4 class="media-heading">{{ comment.user_name }}
     {% endif %}
             <small class="timespan">

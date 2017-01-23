@@ -1,10 +1,10 @@
 {% load i18n mezzanine_tags comment_tags %}
-<div id="comments">
+<div>
 <h3>{% trans "Comments" %}</h3>
 {% if settings.COMMENTS_DISQUS_SHORTNAME %}
 {% include "generic/includes/disqus_comments.html" %}
 {% else %}
-<script>
+<!-- <script>
 $(function() {
     $('.reply').click(function() {
         $('.comment-reply-form').hide();
@@ -12,7 +12,9 @@ $(function() {
     });
 });
 </script>
-<style>.input_id_honeypot {display:none !important;}</style>
+<style>.input_id_honeypot {display:none !important;}</style> -->
+
+
 {% comment_thread object_for_comments %}
 <h3>{% trans "New Comment" %}</h3>
 <form method="post" id="comment" action="{{ comment_url }}#comment">
@@ -24,6 +26,6 @@ $(function() {
     <div class="form-actions">
         <input class="btn btn-primary btn-lg" type="submit" value="{% trans "Comment" %}">
     </div>
-</form>
+</form> 
 {% endif %}
 </div>
