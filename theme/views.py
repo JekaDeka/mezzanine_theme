@@ -8,12 +8,21 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth import (login as auth_login, authenticate,
+                                 logout as auth_logout, get_user_model)
+from django.contrib.auth.decorators import login_required
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.utils.views import paginate
+from mezzanine.accounts import get_profile_form
+# from mezzanine.accounts.forms import LoginForm, PasswordResetForm
+# from mezzanine.blog.forms import BlogPostForm
+from theme.forms import СustomBlogForm
+from mezzanine.utils.email import send_verification_mail, send_approve_mail
+from mezzanine.utils.urls import login_redirect, next_url
 
 User = get_user_model()
 
@@ -93,20 +102,23 @@ def blog_post_feed(request, format, **kwargs):
         raise Http404()
 
 
-def create_user_blog(request, tag=None, year=None, month=None, username=None,
+def create_user_blog(request, template="accounts/create/create_blog.html",
+                     form_class=СustomBlogForm, extra_context=None):
+
+    form = form_class
+    if request.method == "POST":
+        # authenticated_user = form.save()
+        # info(request, _("Successfully logged in"))
+        # auth_login(request, authenticated_user)
+        return login_redirect(request)
+    context = {"form": form}
+    context.update(extra_context or {})
+    return TemplateResponse(request, template, context)
+
+
+def create_user_shop(request, tag=None, year=None, month=None, username=None,
                      category=None, template="blog/blog_post_list.html",
                      extra_context=None):
-    templates = []
-    context = {"blog_posts": None, "year": year, "month": month,
-               "tag": tag, "category": category}
-    context.update(extra_context or {})
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
-
-
-def create_user_shop_item(request, tag=None, year=None, month=None, username=None,
-                          category=None, template="blog/blog_post_list.html",
-                          extra_context=None):
     templates = []
     context = {"blog_posts": None, "year": year, "month": month,
                "tag": tag, "category": category}

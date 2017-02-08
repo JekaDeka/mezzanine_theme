@@ -11,6 +11,7 @@ from django.template.loader import get_template
 from django.utils.translation import ugettext_lazy as _
 
 from django.db.models import Count, Q
+from django.conf import settings
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
@@ -18,10 +19,21 @@ from cartridge.shop.models import Product
 from mezzanine.generic.models import Keyword
 from mezzanine.utils.urls import home_slug
 from mezzanine import template
+import os
 
 User = get_user_model()
 
 register = template.Library()
+
+
+@register.as_tag
+def get_slideshow(*args):
+    relevant_path = os.path.join(settings.MEDIA_ROOT, "uploads/slideshow")
+    included_extensions = ['jpg', 'bmp', 'png']
+    # files = os.listdir(os.path.join(settings.MEDIA_ROOT, "uploads/slideshow"))
+    files = [fn for fn in os.listdir(relevant_path)
+             if any(fn.endswith(ext) for ext in included_extensions)]
+    return files
 
 
 @register.as_tag

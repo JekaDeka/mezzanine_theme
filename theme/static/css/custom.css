@@ -5,6 +5,10 @@
 	height: auto;
 }
 
+#blog-post-conten p {
+  word-wrap: break-word;
+}
+
 #top ul.menu > li {
 	color: white;
 }

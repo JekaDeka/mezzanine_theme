@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags accounts_tags pages_tags %}
+{% load i18n mezzanine_tags accounts_tags pages_tags staticfiles %}
 
 {% block meta_title %}{{ profile_user|username_or:"get_full_name" }}{% endblock %}
 {% block title %}{% endblock %}
@@ -27,8 +27,9 @@
 <div class="profile-content col-md-9">
     <h2>{{ profile_user.get_full_name }}</h2>
     {% for field, value in profile_user|profile_fields %}
-    <h3>{{ field }}</h3>
-    <p>{{ value|linebreaksbr }}</p>
+	    {% if field == 'Изображение' %}
+	    	<img class="img-responsive" src="{{ MEDIA_URL }}{% thumbnail value 150 150 %}">
+	    {% endif %}
     {% endfor %}
 </div>
 </div>
