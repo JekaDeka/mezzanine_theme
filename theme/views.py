@@ -18,8 +18,6 @@ from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-# from mezzanine.accounts.forms import LoginForm, PasswordResetForm
-# from mezzanine.blog.forms import BlogPostForm
 from theme.forms import СustomBlogForm
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from mezzanine.utils.urls import login_redirect, next_url
