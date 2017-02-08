@@ -2,6 +2,7 @@
 *.pyo
 *.db
 *.txt
+*.bat
 .DS_Store
 .coverage
 local_settings.py
