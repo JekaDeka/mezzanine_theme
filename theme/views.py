@@ -100,26 +100,26 @@ def blog_post_feed(request, format, **kwargs):
         raise Http404()
 
 
-def create_user_blog(request, template="accounts/create/create_blog.html",
-                     form_class=СustomBlogForm, extra_context=None):
+# def create_user_blog(request, template="accounts/create/create_blog.html",
+#                      form_class=СustomBlogForm, extra_context=None):
 
-    form = form_class
-    if request.method == "POST":
-        # authenticated_user = form.save()
-        # info(request, _("Successfully logged in"))
-        # auth_login(request, authenticated_user)
-        return login_redirect(request)
-    context = {"form": form}
-    context.update(extra_context or {})
-    return TemplateResponse(request, template, context)
+#     form = form_class
+#     if request.method == "POST":
+#         # authenticated_user = form.save()
+#         # info(request, _("Successfully logged in"))
+#         # auth_login(request, authenticated_user)
+#         return login_redirect(request)
+#     context = {"form": form}
+#     context.update(extra_context or {})
+#     return TemplateResponse(request, template, context)
 
 
-def create_user_shop(request, tag=None, year=None, month=None, username=None,
-                     category=None, template="blog/blog_post_list.html",
-                     extra_context=None):
-    templates = []
-    context = {"blog_posts": None, "year": year, "month": month,
-               "tag": tag, "category": category}
-    context.update(extra_context or {})
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
+# def create_user_shop(request, tag=None, year=None, month=None, username=None,
+#                      category=None, template="blog/blog_post_list.html",
+#                      extra_context=None):
+#     templates = []
+#     context = {"blog_posts": None, "year": year, "month": month,
+#                "tag": tag, "category": category}
+#     context.update(extra_context or {})
+#     templates.append(template)
+#     return TemplateResponse(request, templates, context)

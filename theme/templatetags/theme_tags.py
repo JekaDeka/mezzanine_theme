@@ -15,6 +15,7 @@ from django.conf import settings
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
+from theme.models import Slider, SliderItem
 from cartridge.shop.models import Product
 from mezzanine.generic.models import Keyword
 from mezzanine.utils.urls import home_slug
@@ -28,12 +29,12 @@ register = template.Library()
 
 @register.as_tag
 def get_slideshow(*args):
-    relevant_path = os.path.join(settings.MEDIA_ROOT, "uploads/slideshow")
-    included_extensions = ['jpg', 'bmp', 'png']
-    # files = os.listdir(os.path.join(settings.MEDIA_ROOT, "uploads/slideshow"))
-    files = [fn for fn in os.listdir(relevant_path)
-             if any(fn.endswith(ext) for ext in included_extensions)]
-    return files
+    try:
+        slider = Slider.objects.all()[:1].get()
+        items = SliderItem.objects.filter(slider__title=slider.title)
+    except Exception as e:
+        raise e
+    return list(items)
 
 
 @register.as_tag

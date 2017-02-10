@@ -3,6 +3,6 @@ from theme import views
 
 #prefix is create
 urlpatterns = [
-    url(r'^blog/$', views.create_user_blog),
-    url(r'^shop/$', views.create_user_shop),
+    # url(r'^blog/$', views.create_user_blog),
+    # url(r'^shop/$', views.create_user_shop),
 ]

@@ -1,10 +1,13 @@
-<!doctype html>
-<html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}>
+<!DOCTYPE html>
+<!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!-->
+<html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}> <!--<![endif]-->
 {% load pages_tags theme_tags mezzanine_tags accounts_tags i18n staticfiles %}
 
 <head>
+
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
 <meta name="description" content="{% block meta_description %}{% endblock %}">
 <title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
@@ -16,248 +19,247 @@
 {% endifinstalled %}
 
 {% compress css %}
-<link rel="stylesheet" href="{% static "css/mezzanine.css" %}">
-<link rel="stylesheet" href="{% static "css/font-awesome.css" %}">
-<link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
-<link rel="stylesheet" href="{% static "css/animate.min.css" %}">
-<link rel="stylesheet" href="{% static "css/owl.carousel.css" %}">
-<link rel="stylesheet" href="{% static "css/owl.theme.css" %}">
-<!-- theme stylesheet -->
-<link rel="stylesheet" id="theme-stylesheet" href="{% static "css/style.default.css" %}">
-
-
-
-{% if LANGUAGE_BIDI %}
-<link rel="stylesheet" href="{% static "css/bootstrap-rtl.css" %}">
-{% endif %}
-{% ifinstalled cartridge.shop %}
-<link rel="stylesheet" href="{% static "css/cartridge.css" %}">
-{% if LANGUAGE_BIDI %}
-<link rel="stylesheet" href="{% static "css/cartridge.rtl.css" %}">
-{% endif %}
-{% endifinstalled %}
-
-<!-- your stylesheet with modifications -->
-<link rel="stylesheet" href="{% static "css/custom.css" %}">
-{% block extra_css %}{% endblock %}
+<link rel="stylesheet" href="{% static "css/style.css" %}">
+<link rel="stylesheet" href="{% static "css/green.css" %}" id="colors">
+<link rel="stylesheet" href="{% static "css/custom.css" %}" id="colors">
+<!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js' %}"></script>
+<![endif]-->
+{% block extra_css %}
+{% endblock %}
 {% endcompress %}
 
 <!--[if lt IE 9]>
-<script src="{% static "js/html5shiv.js" %}"></script>
-<script src="{% static "js/respond.min.js" %}"></script>
+<script src="{% static 'js/html5shiv.js' %}"></script>
+<script src="{% static 'js/respond.min.js' %}"></script>
 <![endif]-->
 
-{% block extra_head %}{% endblock %}
+{% block extra_head %}
+{% endblock %}
 </head>
 
-<body id="{% block body_id %}body{% endblock %}">
-<!-- *** TOPBAR ***
- _________________________________________________________ -->
-    <div id="top">
-        <div class="container">
-            <div class="col-md-6" data-animate="fadeInDown">
-            </div>
-            <div class="col-md-6">
-                <ul class="menu">
-                {% if request.user.is_authenticated %}
-                <li>
-                    {% trans "Logged in as: " %}
-                    {% url "profile" request.user.username as profile_url %}
-                    {% if profile_url %}
-                        <a href="{{ profile_url }}"> <strong> {{ request.user|username_or:"email" }} </strong> </a>
-                    </li>
-                    {% else %}
-                        <a href="{% url "profile_update" %}"><strong> {{ request.user|username_or:"email" }} </strong></a>
-                    </li>
-                    {% endif %}
+<body class="{% block body_class %}boxed{% endblock %}">
+<div id="wrapper">
 
+{% block top_bar %}
+<div id="top-bar">
+    <div class="container">
 
-                {% else %}
-                    <li><a href="{% url "login" %}?next={{ request.path }}">
-                        <span class="glyphicon glyphicon-log-in"></span> {% trans "Log in" %}</a>
-                    </li>
-                    <li><a href="{% url "signup" %}?next={{ request.path }}">
-                        <span class="glyphicon glyphicon-edit"></span> {% trans "Sign up" %}</a>
-                    </li>
-                {% endif %}
-                <li><a href="/contact/">Контакты</a>
-                    </li>
-                </ul>
-            </div>
+        <!-- Top Bar Menu -->
+        <div class="ten columns">
+            <ul class="top-bar-menu">
+                <li><i class="fa fa-phone"></i> (564) 123 4567</li>
+                <li><i class="fa fa-envelope"></i> <a href="/">mail@example.com</a></li>
+            </ul>
         </div>
-    </div>
-<!-- *** TOP BAR END *** -->
-
-<div class="navbar navbar-default yamm" role="navigation" id="navbar">
-<div class="container">
-    <div class="navbar-header">
-        <div class="navbar-buttons">
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navigation">
-                            <span class="sr-only">{% trans "Toggle Navigation" %}</span>
-                            <i class="fa fa-align-justify"></i>
-                        </button>
-                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#search">
-                            <span class="sr-only">{% trans "Toggle Search" %}</span>
-                            <i class="fa fa-search"></i>
-                        </button>
-<!--                         <a class="btn btn-default navbar-toggle" href="{% url "shop_cart" %}">
-    <i class="fa fa-shopping-cart"></i> 
-    <span class="hidden-xs">
-    {% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
-    {% trans "in cart" %}
-    </span>
-</a> -->
+        <!-- Social Icons -->
+        <div class="six columns">
+            <ul class="social-icons">
+                <li><a class="facebook" href="#"><i class="icon-facebook"></i></a></li>
+                <li><a class="twitter" href="#"><i class="icon-twitter"></i></a></li>
+                <li><a class="dribbble" href="#"><i class="icon-dribbble"></i></a></li>
+                <li><a class="gplus" href="#"><i class="icon-gplus"></i></a></li>
+                <li><a class="pinterest" href="#"><i class="icon-pinterest"></i></a></li>
+            </ul>
         </div>
-    <!--     {% block navbar_title %}
-    {% if settings.SITE_TITLE %}<a class="navbar-brand" href="/">{{ settings.SITE_TITLE }}</a>{% endif %}
-    {% if settings.SITE_TAGLINE %}<p class="navbar-text visible-lg">{{ settings.SITE_TAGLINE }}</p>{% endif %}
-    {% endblock%} -->
+
     </div>
-    <div class="navbar-collapse collapse" id="navigation">
-        {# {% block navbar_search_form %}{% search_form "all" %}{% endblock %} #}
-        {% block navbar_dropdown_menu %}{% page_menu "pages/menus/dropdown.html" %}{% endblock%}
-    </div>
-    <div class="navbar-buttons">
-                    <!-- <div class="navbar-collapse collapse right" id="basket-overview">
-                        <a href="{% url "shop_cart" %}" class="btn btn-primary navbar-btn"><i class="fa fa-shopping-cart"></i>
-                        <span class="hidden-sm">
-                            {% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
-                            {% trans "in cart" %}
-                        </span></a>
-                    </div> -->
-                    <!--/.nav-collapse -->
-                    <div class="navbar-collapse collapse right" id="search-not-mobile" style="dispay: inline;">
-                        <button type="button" class="btn navbar-btn btn-primary" data-toggle="collapse" data-target="#search">
-                            <span class="sr-only">{% trans "Toggle Search" %}</span>
-                            <i class="fa fa-search"></i>
-                        </button>
-                    </div>
-    </div>
-                <div class="collapse clearfix" id="search">
-                    {% block navbar_search_form %}{% search_form "all" %}{% endblock %}
-                </div>
-</div>
 </div>
 
-<div class="container">
-
-{% nevercache %}
-{% if messages %}
-<div class="messages">
-{% for message in messages %}
-<div class="alert alert-dismissable alert-{{ message.tags }}" data-alert="alert">
-    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-    {{ message }}
-</div>
-{% endfor %}
-</div>
-{% endif %}
-{% endnevercache %}
-
-<h1>{% block title %}{% endblock %}</h1>
-
-{% block breadcrumb_menu %}
-<ul class="breadcrumb">
-{% spaceless %}
-    {% page_menu "pages/menus/breadcrumb.html" %}
-{% endspaceless %}
-</ul>
+<div class="clearfix"></div>
 {% endblock %}
 
-</div>
-
+{% block header %}
 <div class="container">
-<div class="row">
-    {% block left_panel %}
-    <div id="content">
-        <div class="col-md-3 left">
-            <div class="panel panel-default sidebar-menu">
-                <div class="panel-heading">
-                    <h3 class="panel-title">{% trans "Categories" %}</h3>
-                </div>
-                <div class="panel-body">
-                    {% page_menu "pages/menus/tree.html" %}
-                </div>
-            </div>
+
+
+    <!-- Logo -->
+    <div class="four columns">
+        <div id="logo">
+            <h1><a href="/"><img src="#" alt="" /></a></h1>
         </div>
     </div>
-    {% endblock %}
 
-    {% block main %}
-    {% endblock %}
 
-    {% block right_panel %}
-        <div class="col-md-3 right">
-        {% nevercache %}
-        {% include "includes/language_selector.html" %}
-        {% include "includes/user_panel.html" %}
-        {% endnevercache %}
-        <div class="panel panel-default">
-        <div class="panel-body">
-        {% ifinstalled mezzanine.twitter %}
-        {% include "twitter/tweets.html" %}
-        {% endifinstalled %}
+    <!-- Additional Menu -->
+    <div class="twelve columns">
+        <div id="additional-menu">
+            <ul>
+                <li><a href="/">Мой магазин</a></li>
+                <li><a href="/">Мой блог</a></li>
+                <li><a href="/">Мой профиль</a></li>
+                <li><a href="/">Войти</a></li>
+                <li><a href="/">Регистрация</a></li>
+            </ul>
         </div>
-        </div>
-    {% endblock %}
-</div>
+    </div>
+
+    <div class="twelve columns">
+        {% block navbar_search_form %}{% search_form "all" %}{% endblock %}
+    </div>
 
 </div>
-</div>
-
-{% block hotthisweek %}
 {% endblock %}
 
-{% block getinspired %}
-{% endblock %}
-
-{% block fromblog %}
-{% endblock %}
-
-<footer>
+{% block navigation %}
 <div class="container">
-<div class="row">
-<div class="col-md-8">
-{% page_menu "pages/menus/footer.html" %}
-</div>
-<div class="col-md-4">
-<hr>
-<h4>Будь в курсе</h4>
-    <p class="social">
-        <a href="#" class="facebook external" data-animate-hover="shake"><i class="fa fa-facebook"></i></a>
-        <a href="#" class="twitter external" data-animate-hover="shake"><i class="fa fa-twitter"></i></a>
-        <a href="#" class="instagram external" data-animate-hover="shake"><i class="fa fa-instagram"></i></a>
-        <a href="#" class="gplus external" data-animate-hover="shake"><i class="fa fa-google-plus"></i></a>
-        <a href="#" class="email external" data-animate-hover="shake"><i class="fa fa-envelope"></i></a>
-    </p>
+<div class="sixteen columns">
+{% block navbar_dropdown_menu %}
+    {% page_menu "pages/menus/dropdown.html" %}
+{% endblock%}
 </div>
 </div>
-</div>
-<div id="copyright">
-            <div class="container">
-                <div class="col-md-6">
-                    <p class="pull-left"></p>
-                </div>
-                <div class="col-md-6">
-                    <p class="pull-right"></a>
-                    </p>
-                </div>
-            </div>
-        </div>
-</footer>
+{% endblock %}
 
+
+{% block breadcrumbs %}
+<section class="titlebar">
+<div class="container">
+	<div class="sixteen columns">
+		<h2>{% block title %}{{ page.title|title }}{% endblock %}</h2>
+		{% spaceless %}
+		<nav id="breadcrumbs">
+			<ul>
+		    {% page_menu "pages/menus/breadcrumb.html" %}
+			    {% block breadcrumb_element %}
+			    {% endblock %}
+		    </ul>
+		</nav>
+		{% endspaceless %}
+	</div>
+</div>
+</section>
+{% endblock %}
+
+{% block slider %}
+{% endblock %}
+
+{% block main_containter %}
+<div class="container">
+{% block main %}
+{% endblock %}
+</div>
+{% endblock %}
+
+{% block featured %}
+{% endblock %}
+
+{% block new_arrivals %}
+{% endblock %}
+
+{% block parallax_banner %}
+{% endblock %}
+
+{% block product_list %}
+{% endblock %}
+
+{% block lastest_articles %}
+{% endblock %}
+
+
+{% block footer %}
+<div class="margin-top-50"></div>
+<div id="footer">
+
+    <!-- Container -->
+    <div class="container">
+
+        <div class="four columns">
+            <img src="#" alt="" class="margin-top-10"/>
+            <p class="margin-top-15">Сверху лого. Снизу текст.</p>
+        </div>
+
+        <div class="four columns">
+
+            <!-- Headline -->
+            <h3 class="headline footer">Каталог</h3>
+            <span class="line"></span>
+            <div class="clearfix"></div>
+
+            <ul class="footer-links">
+                <li><a href="#">Аксессуары</a></li>
+                <li><a href="#">Интерьер</a></li>
+                <li><a href="#">Косметика ручной работы</a></li>
+                <li><a href="#">Куклы и игрушки</a></li>
+                <li><a href="#">Одежда</a></li>
+            </ul>
+
+        </div>
+
+        <div class="four columns">
+
+            <!-- Headline -->
+            <h3 class="headline footer">Личный кабинет</h3>
+            <span class="line"></span>
+            <div class="clearfix"></div>
+
+            <ul class="footer-links">
+                <li><a href="#">Профиль</a></li>
+                <li><a href="#">Мой блог</a></li>
+                <li><a href="#">Мой магазин</a></li>
+            </ul>
+
+        </div>
+
+        <div class="four columns">
+            <!-- Headline -->
+            <h3 class="headline footer">Контакты</h3>
+            <span class="line"></span>
+            <div class="clearfix"></div>
+            <p>Номер телефона, адрес и т.д.</p>
+        </div>
+
+    </div>
+    <!-- Container / End -->
+
+</div>
+<!-- Footer / End -->
+
+<!-- Footer Bottom / Start -->
+<div id="footer-bottom">
+
+    <!-- Container -->
+    <div class="container">
+
+        <div class="eight columns"><a href="/">handmaker.top</a></div>
+        <div class="eight columns">
+        </div>
+
+    </div>
+    <!-- Container / End -->
+
+</div>
+<!-- Footer Bottom / End -->
+{% endblock %}
+<!-- Back To Top Button -->
+<div id="backtotop"><a href="#"></a></div>
+</div>
 {% compress js %}
-<script src="{% static "mezzanine/js/"|add:settings.JQUERY_FILENAME %}"></script>
-{# <script src="{% static "js/jquery-1.11.0.min.js" %}"></script> #}
-<script src="{% static "js/bootstrap.min.js" %}"></script>
-<script src="{% static "js/jquery.cookie.js" %}"></script>
-<script src="{% static "js/waypoints.min.js" %}"></script>
-<script src="{% static "js/modernizr.js" %}"></script>
-<script src="{% static "js/bootstrap-hover-dropdown.js" %}"></script>
-<script src="{% static "js/owl.carousel.min.js" %}"></script>
-<script src="{% static "js/front.js" %}"></script>
-<script src="{% static "js/bootstrap-extras.js" %}"></script>
-{% block extra_js %}{% endblock %}
+<script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+<script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
+<script src="{% static 'js/jquery.jpanelmenu.js' %}"></script>
+<script src="{% static 'js/jquery.themepunch.plugins.min.js' %}"></script>
+<script src="{% static 'js/jquery.themepunch.revolution.min.js' %}"></script>
+<script src="{% static 'js/jquery.themepunch.showbizpro.min.js' %}"></script>
+<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+<script src="{% static 'js/hoverIntent.js' %}"></script>
+<script src="{% static 'js/superfish.js' %}"></script>
+<script src="{% static 'js/jquery.pureparallax.js' %}"></script>
+<script src="{% static 'js/jquery.pricefilter.js' %}"></script>
+<script src="{% static 'js/jquery.selectric.min.js' %}"></script>
+<script src="{% static 'js/jquery.royalslider.min.js' %}"></script>
+<script src="{% static 'js/SelectBox.js' %}"></script>
+<script src="{% static 'js/modernizr.custom.js' %}"></script>
+<script src="{% static 'js/waypoints.min.js' %}"></script>
+<script src="{% static 'js/jquery.flexslider-min.js' %}"></script>
+<script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+<script src="{% static 'js/jquery.tooltips.min.js' %}"></script>
+<script src="{% static 'js/jquery.isotope.min.js' %}"></script>
+<script src="{% static 'js/puregrid.js' %}"></script>
+<script src="{% static 'js/stacktable.js' %}"></script>
+<script src="{% static 'js/custom.js' %}"></script>
+{% block extra_js %}
+{% endblock %}
 {% endcompress %}
 
 {% block footer_js %}

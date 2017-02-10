@@ -1,28 +1,7 @@
 {% load mezzanine_tags i18n %}
-<form action="{% url "search" %}" class="navbar-form" role="search">
-
-<div class="form-group">
-    <input class="form-control" placeholder="{% trans "Search" %}" type="text" name="q" value="{{ request.REQUEST.q }}">
-</div>
-
-{% if search_model_choices %}
-    {% if search_model_choices|length == 1 %}
-    <input type="hidden" name="type" value="{{ search_model_choices.0.1 }}">
-    {% else %}
-    <div class="form-group">
-    <select class="form-control" name="type">
-        <option value="">{% trans "Everything" %}</option>
-        {% for verbose_name, model in search_model_choices %}
-        <option value="{{ model }}"
-            {% if model == request.REQUEST.type  %}selected{% endif %}>
-            {{ verbose_name }}
-        </option>
-        {% endfor %}
-    </select>
-    </div>
-    {% endif %}
-{% endif %}
-
-<!-- <input type="submit" class="btn btn-default" value="{% trans "Go" %}"> -->
-<button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
-</form>
+<nav class="top-search">
+    <form action="{% url "search" %}">
+        <button><i class="fa fa-search"></i></button>
+        <input class="search-field" placeholder="Поиск" type="text" name="q" value="{{ request.REQUEST.q }}" />
+    </form>
+</nav>

@@ -1,9 +1,12 @@
 from copy import deepcopy
 from django.contrib import admin
-from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.blog.models import BlogPost
 from cartridge.shop.models import Product
 from cartridge.shop.admin import ProductAdmin
+from mezzanine.blog.admin import BlogPostAdmin
+from mezzanine.core.admin import TabularDynamicInlineAdmin
+from mezzanine.pages.admin import PageAdmin
+from theme.models import Slider, SliderItem
 
 blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
 product_fieldsets = deepcopy(ProductAdmin.fieldsets)
@@ -35,7 +38,28 @@ class MyProductAdmin(ProductAdmin):
         super(MyProductAdmin, self).save_model(request, obj, form, change)
 
 
+class ItemInline(admin.StackedInline):
+    model = SliderItem
+    # fieldsets = (
+    #     (None, {'fields': (('image', 'alt', 'sort'),
+    #                        ('url', 'video_url'), ('title', 'credit'), 'content', 'price')}),
+    # )
+
+
+class SliderAdmin(admin.ModelAdmin):
+    inlines = [
+        ItemInline,
+    ]
+    list_display = ('title', )
+    search_fields = ['title', ]
+
+    # fieldsets = (
+    #     (None, {'fields': (('title'), 'is_baget', 'parent', 'content', 'height', 'width', 'random', 'resize',
+    #                        'quality', 'image')}),
+    # )
+
 admin.site.unregister(BlogPost)
 admin.site.unregister(Product)
 admin.site.register(BlogPost, MyBlogPostAdmin)
 admin.site.register(Product, MyProductAdmin)
+admin.site.register(Slider, SliderAdmin)
