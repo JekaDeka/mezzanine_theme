@@ -103,14 +103,14 @@
         {% if request.user.is_authenticated %}
             /admin/blog/blogpost/add/
         {% else %}
-            {% url "signup" %}?next={% url 'promote_user' %}
+            {% url "login" %}?next={% url 'promote_user' %}
         {% endif %}
         " class="button gray">Написать статью</a>
         <a href="
         {% if request.user.is_authenticated %}
             /admin/shop/product/add/
         {% else %}
-            {% url "signup" %}?next={% url 'promote_user' %}
+            {% url "login" %}?next={% url 'promote_user' %}
         {% endif %}
         " class="button gray">Добавить новый товар</a>
     </p>
