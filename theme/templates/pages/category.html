@@ -1,150 +1,134 @@
 {% extends "pages/page.html" %}
 
-{% load mezzanine_tags shop_tags i18n theme_tags pages_tags  %}
+{% load mezzanine_tags shop_tags i18n theme_tags pages_tags static  %}
 {% block body_id %}category{% endblock %}
 
-
-{% block left_panel %}
-<div id="content">
-<div class="col-md-3">
-    {# {% if categories %} #}
-        <div class="panel panel-default sidebar-menu">
-            <div class="panel-heading">
-                <h3 class="panel-title">{% trans "Categories" %}</h3>
-            </div>
-            <div class="panel-body">
-                {% shop_menu "pages/menus/shop_tree.html" %}
-            </div>
-        </div>
-</div>
-</div>
+{% block breadcumbs_menu %}
+{% shop_menu "pages/menus/breadcrumb.html" %}
 {% endblock %}
 
 
-{% block breadcrumb_menu %}
-<ul class="breadcrumb">
-    {% spaceless %}
-        {% page_breadcrumb_menu "pages/menus/breadcrumb.html" %}
-    {% endspaceless %}
-</ul>
+{% block main_containter %}
+<div class="container product-categories">
+<!-- <div class="sixteen columns"> -->
+{% if child_categories %}
+	<div class="">
+		{% for category in child_categories %}
+		<div class="three columns">
+			<a href="{{ category.get_absolute_url }}" class="img-caption">
+				<figure>
+				{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
+					{% if category.featured_image %}
+						<img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" />
+					{% else %}
+						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 250 250 %}" alt="">
+					{% endif %}
+				{% else %}
+					<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 250 250 %}" alt="">
+				{% endif %}
+				<figcaption>
+					<h3>{{ category.title }}</h3>
+					<span>Подробнее</span>
+				</figcaption>
+				</figure>
+			</a>
+		</div>  
+		{% endfor %}
+	</div>
+{% endif %} 
+<!-- </div> -->
+</div>
+{{ block.super }}
+{% endblock %}
+
+{% block sidebar %}
+<div class="four columns">
+	<div class="widget margin-top-0">
+		<h3 class="headline"> {% trans "Categories" %} </h3>
+		<span class="line"></span><div class="clearfix"></div>
+		{% shop_menu "pages/menus/shop_tree.html" %}
+		<div class="clearfix"></div>
+	</div>
+	<!-- filters -->
+<!-- 	<div class="widget">
+ 		<h3 class="headline">Сортировать по цене</h3><span class="line"></span><div class="clearfix"></div>
+
+		<div id="price-range">
+			<div class="padding-range"><div id="slider-range" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a></div></div>
+			<label for="amount">Цена:</label>
+			<input type="text" id="amount">
+			<a href="#" class="button color">Применить</a>
+		</div>
+		<div class="clearfix"></div>
+ </div> -->
+</div>
 {% endblock %}
 
 
 {% block main %}
-<div class="col-md-9">
-<div class="box">
-    <h1>{{ page.title }}</h1>
-
 {{ block.super }}
+	{% if products.object_list %}
+	<div class="twelve columns">
+	<form class="product-sorting" role="form">
+	        <select onchange="location.href = this[this.selectedIndex].value;" class="orderby" id="sorting-select">
+	        {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
+	        {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
+	        <option{% if option == products.sort_by %} selected{% endif %}
+	            value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
+	            {{ name }}
+	        </option>
+	        {% endif %}
+	        {% endfor %}
+	        </select>
+	</form>
+	</div>
+	
 
-{% editable page.category.content %}
-<p>{{ page.category.content|safe }} </p>
-{% endeditable %}
+	<div class="twelve columns products">
+		{% for product in products.object_list %}
+		<div class="four shop columns">
+			<figure class="product">
+				{% if product.on_custom_sale %}
+					<div class="product-discount">СКИДКА</div>
+				{% endif %}
+				<div class="mediaholder">
+				<a href="{{ product.get_absolute_url }}">
+					{% if product.image %}
+					<img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}">
+					<div class="cover">
+						<img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}">
+					</div>
+					{% else %}
+					<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+					<div class="cover">
+						<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 380 %}">
+					</div>
+					{% endif %}
+				</a>
+				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+				</div>
+				<a href="{{ product.get_absolute_url }}">
+					<section>
+						<span class="product-category">Готовый или под заказ <!-- {{product|get_product_category}} --></span>
+						<h5>{{ product.title }}</h5>
+						{% if product.on_custom_sale %}
+							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+						{% else %}
+						<span class="product-price">{{ product.price|rub_currency }}</span>
+						{% endif %}
+					</section>
+				</a>
+			</figure>
+		</div>
+		{% endfor %}
+		<div class="clearfix"></div>
+		{% if products.paginator.count != 0 %}
+			{% pagination_for products %}
+		{% endif %}
+	</div>
 
-{% if child_categories %}
-<div class="row shop-category-list">
-{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
-    {% for category in child_categories %}
-    <div class="col-xs-4 col-sm-3 col-lg-3">
-    <a href="{{ category.get_absolute_url }}">
-        {% if category.featured_image %}
-        <img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 200 200 %}" class="img-responsive" />
-        {% else %}
-        <div class="placeholder"></div>
-        {% endif %}
-        <div class="caption">
-            <h4>{{ category.title }}</h4>
-        </div>
-    </a>
-    </div>  
-    {% endfor %}
-{% else %}
-    {% for category in child_categories %}
-    <div class="col-xs-6 col-sm-4 col-lg-3">
-    <a href="{{ category.get_absolute_url }}" class="thumbnail">
-        <div class="caption"><h4>{{ category.title }}</h4></div>
-    </a>
-    </div>
-    {% endfor %}
-{% endif %}
-</div>
-{% endif %}
-</div>
+	{% endif %}
+	
 
-{% if products.paginator.count != 0 %}
 
-<div class="box">
-<div class="row">
-    <div class="col-md-6">
-    <form class="product-sorting" role="form">
-        <div class="form-group">
-        <label class="control-label" for="sorting-select">{% trans "Sort by" %}</label>
-            <select onchange="location.href = this[this.selectedIndex].value;" class="form-control" id="sorting-select">
-            {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
-            {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
-            <option {% if option == products.sort_by %} selected{% endif %}
-                value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
-                {{ name }}
-            </option>
-            {% endif %}
-            {% endfor %}
-            </select>
-        </div>
-    </form>
-    </div>
-</div>
-</div>
-
-<div id="content">
-<div class="row products">
-{% for product in products.object_list %}
-<div class="col-xs-6 col-sm-4 col-md-4">
-    <div class="product">
-        {% if product.image %}
-        <div class="flip-container">
-            <div class="flipper">
-                <div class="front">
-                <a href="{{ product.get_absolute_url }}">
-                    <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
-                </a>
-                </div>
-                <div class="back">
-                    <a href="{{ product.get_absolute_url }}">
-                        <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
-                    </a>
-                </div>
-            </div>
-        </div>
-        <a href="{{ product.get_absolute_url }}" class="invisible">
-            <img src="{{ MEDIA_URL }}{% thumbnail product.image 450 600 %}" alt="" class="img-responsive">
-        </a>
-        {% endif %}
-        <div class="text">
-            <h3><a href="{{ product.get_absolute_url }}l">{{ product }}</a></h3>
-            {% if product.has_price %}
-                        <p class="price">
-                        {% if product.on_sale %}
-                            <del>{{ product.unit_price|rub_currency }}</del>
-                        {% endif %}
-                        {{ product.price|rub_currency }}
-                        </p>
-                    {% else %}
-                        <p class="coming-soon">{% trans "Coming soon" %}</p>
-            {% endif %} 
-            <p class="buttons">
-                <a href="{{ product.get_absolute_url }}" class="btn btn-default">Подробнее</a>
-                <!-- <a href="/" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>В корзину</a> -->
-            </p>
-        </div>
-    </div>
-</div>
-{% endfor %}
-</div>
-</div>
-
-{% pagination_for products %}
-
-{% endif %}
-
-</div>
 {% endblock %}

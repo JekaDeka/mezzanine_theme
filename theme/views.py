@@ -5,7 +5,7 @@ from calendar import month_name
 
 from django.contrib.auth import get_user_model
 from django.http import Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.template.response import TemplateResponse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
@@ -20,7 +20,8 @@ from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
 from theme.forms import СustomBlogForm
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
-from mezzanine.utils.urls import login_redirect, next_url
+from django.contrib.auth.models import Group
+
 
 User = get_user_model()
 
@@ -99,27 +100,20 @@ def blog_post_feed(request, format, **kwargs):
     except KeyError:
         raise Http404()
 
+def promote_user(request, template="accounts/account_signup.html",
+           extra_context=None):
+    user = request.user
+    if user.is_authenticated():
+        if not user.is_staff:
+            user.is_staff = True
+            group = Group.objects.get(name='custom')
+            user.groups.add(group)
+            user.save()
 
-# def create_user_blog(request, template="accounts/create/create_blog.html",
-#                      form_class=СustomBlogForm, extra_context=None):
-
-#     form = form_class
-#     if request.method == "POST":
-#         # authenticated_user = form.save()
-#         # info(request, _("Successfully logged in"))
-#         # auth_login(request, authenticated_user)
-#         return login_redirect(request)
-#     context = {"form": form}
-#     context.update(extra_context or {})
-#     return TemplateResponse(request, template, context)
+    return redirect('/')
 
 
-# def create_user_shop(request, tag=None, year=None, month=None, username=None,
-#                      category=None, template="blog/blog_post_list.html",
-#                      extra_context=None):
-#     templates = []
-#     context = {"blog_posts": None, "year": year, "month": month,
-#                "tag": tag, "category": category}
-#     context.update(extra_context or {})
-#     templates.append(template)
-#     return TemplateResponse(request, templates, context)
+
+
+# def create_user_blog(request):
+#     pass

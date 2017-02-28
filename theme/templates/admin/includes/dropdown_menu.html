@@ -1,45 +1,59 @@
-{% load i18n mezzanine_tags %}
-<div id="side-panel">
-<div class="dropdown-menu">
-<ul>
-    {% for app in dropdown_menu_app_list %}
-    <li>
-        <a href="#">{% trans app.name %}</a>
-        <ul class="dropdown-menu-menu">
-        {% for model in app.models %}
-            {% if model.perms.add or model.perms.change or model.perms.custom %}
-            <li{% if forloop.first %} class="first"{% endif %}><a
-                href="{% if not model.perms.change and not model.perms.custom %}{{ model.add_url }}{% else %}{{ model.admin_url }}{% endif %}">{{ model.name }}</a></li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-    </li>
-    {% endfor %}
-</ul>
-
-{% if settings.USE_L10N and LANGUAGES|length > 1 %}
-{% get_language_info_list for LANGUAGES as languages %}
-<form>
-    <select id="id_language" onchange="window.location.href=this.value;">
-        {% for lang in languages %}
-        <option{% if LANGUAGE_CODE == lang.code %} selected="selected"{% endif %} value="{% translate_url lang.code %}">{{ lang.name_local }}</option>
-        {% endfor %}
-    </select>
-</form>
-{% endif %}
-
-{% if dropdown_menu_sites and dropdown_menu_sites|length > 1 %}
-<form action="{% url "set_site" %}">
-<input type="hidden" name="next" value="{{ request.path }}">
-<select name="site_id" onchange="this.form.submit();">
-{% for site in dropdown_menu_sites %}
-<option value="{{ site.id }}"
-    {% if site.id == dropdown_menu_selected_site_id %} selected{% endif %}
-    >{{ site }}</option>
-{% endfor %}
-</select>
-</form>
-{% endif %}
+{% load i18n mezzanine_tags accounts_tags staticfiles %}
+<div class="static-sidebar-wrapper sidebar-bleachedcedar">
+	<div class="static-sidebar">
+		<div class="sidebar">
+			<div class="widget" id="widget-profileinfo">
+				<div class="widget-body">
+					<div class="userinfo ">
+						<div class="avatar pull-left">
+							<img src="{% static 'admin/img/3.jpg' %}" class="img-responsive img-circle">
+						</div>
+						<div class="info">
+							<span class="username">{{ request.user|username_or:"get_full_name" }}</span>
+							<span class="useremail">{% if request.user.email %}
+									                	{{request.user.email}}
+									                {% endif %}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="widget stay-on-collapse" id="widget-sidebar">
+				<nav role="navigation" class="widget-body">
+					<ul class="acc-menu">
+						<li class="nav-separator"><span>Главное меню</span></li>
+						<li><a class="withripple" href="/admin/"><span class="icon">
+		<i class="material-icons">home</i></span><span>Мой профиль</span></a></li>
+						<li class="nav-separator"><span>Дополнительное меню</span></li>
+						{% for app in dropdown_menu_app_list %}
+						<li class="hasChild">
+							<a class="withripple" href="javascript:;">
+							{% if  app.index == 0 %}
+							<span class="icon"><i class="fa fa-pencil"></i></span> 
+							{% elif app.index == 1 %}
+							<span class="icon"><i class="material-icons">shopping_cart</i></span>
+							{% elif app.index == 2 %}
+							<span class="icon"><i class="fa fa-wrench"></i> </span>
+							{% elif app.index == 3 %}
+							<span class="icon"><i class="fa fa-user"></i></span>
+							{% else %}
+							<span class="icon"><i class="material-icons">apps</i></span>
+							{% endif %}
+							
+							<span>{% trans app.name %}</span>
+							</a>
+							<ul class="acc-menu">
+								{% for model in app.models %} {% if model.perms.add or model.perms.change or model.perms.custom %}
+								<li>
+									<a class="withripple" href="{% if not model.perms.change and not model.perms.custom %}{{ model.add_url }}{% else %}{{ model.admin_url }}{% endif %}">{{ model.name }} </a>
+								</li>
+								{% endif %} {% endfor %}
+							</ul>
+						</li>
+						{% endfor %}
+					</ul>
+				</nav>
+			</div>
+		</div>
+	</div>
 </div>
-<div id="side-panel-toggle"></div>
-</div>
+

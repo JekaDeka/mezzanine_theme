@@ -1,0 +1,74 @@
+ul li {
+	list-style: none;
+}
+#topnav .notifications .scroll-pane {
+	height: 127px!important;
+}
+.filterset > h3:after {
+	font: normal normal normal 14px/1 FontAwesome;
+	content: "\f0ab";
+	margin-left: 10px;
+}
+/*.filterset ul li {
+	list-style: none;
+}*/
+.width {
+	width: 100%!important;
+}
+.table-custom a{
+	font-weight: 500!important;
+}
+.field-status ul {
+	padding: 0!important;
+}
+.field-status ul li{
+	list-style: none;
+	display: inline-block;
+	margin-left: 10px;
+}
+.field-status ul li label {
+	line-height: 1!important;
+	font-size: 14px!important;
+}
+
+
+#tree {margin-top:10px;}
+#tree div {
+	word-wrap: break-word;
+	border:1px solid #ddd;
+	background:#f9f9f9; padding:9px;
+    border-top-color:#eee; border-bottom-color:#ccc;
+    float:left; width:100%; margin:3px; min-height:18px;
+
+}
+#tree ol {
+	padding:0;
+	margin:0px !important;
+	clear: both;
+}
+#tree ol ol {padding-left:40px;}
+#tree li {list-style-type:none;}
+#tree .tree-toggle, #tree .changelink {
+	float:left; font-weight:bold; font-size:12px;
+}
+#tree .changelink {
+	word-wrap: break-word;
+	max-width: 300px;
+	background-position: 0 5px;
+}
+#tree a {
+	float:right;
+}
+#tree a .icon {display:block; float:left; width:16px; color:#fff;
+               text-align:center; background:#c6c6c6; margin:0 8px 0 4px;
+               border-radius:2px;}
+#tree a .close {display:none; opacity: 0.9}
+#tree a:hover .icon {color:#fff; background:#5B80B2;}
+.ordering {float:right; cursor:move; margin-left:10px;}
+.addlist, #addlist-primary  {
+	float:right;
+}
+
+
+.placeholder {border:1px dashed #ddd;}
+.uneditable {margin-left:25px; color:#999;}

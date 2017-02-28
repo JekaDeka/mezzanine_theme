@@ -2,29 +2,18 @@
 {% load i18n mezzanine_tags pages_tags %}
 
 {% block meta_title %}{{ title }}{% endblock %}
-{# {% block title %}{% endblock %} #}
-{% block body_id %}account{% endblock %}
-
-{% block breadcrumb_menu %}
-<ul class="breadcrumb">
-{% spaceless %}
-{% page_menu "pages/menus/breadcrumb.html" %}
-{% endspaceless %}
-<li>{{ title }}</li>
-</ul>
-{% endblock %}
 
 
 {% block main %}
 {% errors_for form %}
 
-<form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+<form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %} class="login">
     <fieldset>
-    <legend>{{ title }}</legend>
+    <!-- <legend>{{ title }}</legend> -->
     {% fields_for form %}
     <div class="form-actions">
         {% block account_form_actions %}
-        <input class="btn btn-primary pull-left" type="submit" value="{{ title }}">
+        <input class="button" type="submit" value="{{ title }}">
         {% endblock %}
     </div>
     </fieldset>

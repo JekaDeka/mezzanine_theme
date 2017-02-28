@@ -1,3 +1,61 @@
+.input_id_phone, .input_id_city, .input_id_image, .input_idphone, .input_id_bio {
+	display: none;
+}
+
+h5 {
+	line-height: 34px;
+}
+.product section h5 {
+    word-break: break-word;
+}
+.product-price-discount {
+	padding: 1px 0 5px 0;
+}
+.product-price-discount i {
+	margin: -4px 0px -4px 5px;
+	padding: 4px 5px;
+}
+.active-link {
+	color: #3acf87!important;
+}
+/*
+nav shit and etc, shop_tree display inline-block
+*/
+#categories > li  {
+	border-bottom: 1px solid #eee;
+}
+#categories .active-li {
+	background-color: #3acf87;
+}
+#categories .active-li > a {
+	color: #fff!important;
+}
+#categories li a {
+	border-bottom: none;
+}
+#categories li a.active {
+	background-color: transparent!important;
+	color: #3acf87;
+	font-weight: 600;
+}
+#categories li > a:hover {
+    background-color: transparent!important;
+    color: #777;
+    padding-left: 15px;
+}
+
+.open_nav {
+	font-family: FontAwesome;
+	width: 20px;
+    height: 20px;
+	float: right;
+	cursor: pointer;
+	line-height: 30px;
+}
+.open_nav::after {
+
+}
+
 ul.widget-tabs > li:hover {
 	border-bottom: 1px solid #a0a0a0;
 	padding-left: 7px;
@@ -60,4 +118,26 @@ li.dropdown ul li ul {
 	    border-right: 4px solid transparent;
 	    border-left: 4px solid transparent;
 	}
+}
+
+.disabled {
+	opacity: 0.2;
+}
+
+.disabled:hover {
+	cursor: not-allowed;
+	background-color: #2f2f2f!important;
+}
+
+.product-author {
+	background-color: #f4f4f4;
+    padding: 15px; 
+    overflow: hidden;
+}
+
+.product-author h3 {
+	line-height: 28px;
+}
+.product-author section h3:hover {
+	color: #3acf87;
 }

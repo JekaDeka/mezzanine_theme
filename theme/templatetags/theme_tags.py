@@ -6,6 +6,16 @@ from decimal import Decimal
 from collections import defaultdict
 
 from django.contrib.auth import get_user_model
+from django.contrib.admin import site
+from django.apps import apps
+from django.utils.text import capfirst
+from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
+from django.conf import settings
+from django import template
+from django import VERSION as DJANGO_VERSION
+from django.contrib.auth.models import User
 from django.template import Context, TemplateSyntaxError, Variable
 from django.template.loader import get_template
 from django.utils.translation import ugettext_lazy as _
@@ -14,13 +24,22 @@ from django.db.models import Count, Q
 from django.conf import settings
 
 from mezzanine.blog.models import BlogPost, BlogCategory
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch
+
 from mezzanine.pages.models import Page
 from theme.models import Slider, SliderItem
-from cartridge.shop.models import Product
+from cartridge.shop.models import Category, Product
 from mezzanine.generic.models import Keyword
 from mezzanine.utils.urls import home_slug
 from mezzanine import template
 import os
+
+
+# Depending on you python version, reduce has been moved to functools
+try:
+    from functools import reduce
+except ImportError:
+    pass
 
 User = get_user_model()
 
@@ -34,7 +53,9 @@ def get_slideshow(*args):
         items = SliderItem.objects.filter(slider__title=slider.title)
     except Exception as e:
         raise e
-    return list(items)
+    if items:
+        return list(items)
+    return None
 
 
 @register.as_tag
@@ -291,7 +312,7 @@ def rub_currency(value):
     Format a value as a RUB currency
     """
     if not value:
-        value = 0
+        return "Цена не указана"
     value = str(value) + " руб."
     return value
 
@@ -460,3 +481,234 @@ def page_breadcrumb_menu(context, token):
 
     t = get_template(template_name)
     return t.render(Context(context))
+
+
+@register.filter(name='get_product_category')
+def get_product_category(product):
+    try:
+        prod = Product.objects.get(title=product)
+        categories = prod.category_set.all()
+        titles = []
+        for cat in categories:
+            titles.append(cat.title)
+    except:
+        return None
+    
+    return ", ".join(str(x) for x in titles)
+
+@register.filter(name='get_variation_list')
+def get_variation_list(variations):
+    sizes = set()
+    colors = set()
+    foot = set()
+    for variation in variations:
+        sizes.add(variation.option1)
+        colors.add(variation.option2)
+        foot.add(variation.option3)
+    d = {'Размер': sizes, 'Цвет': colors}
+    return d
+
+@register.simple_tag(takes_context=True)
+def get_user_by_url(context):
+    try:
+        request = context["request"]
+        url = request.path.split('/')[-2]
+    except:
+        return None
+    return url
+
+@register.simple_tag(takes_context=True)
+def get_user_products(context):
+    try:
+        request = context["request"]
+        username = request.path.split('/')[-2]
+        user = User.objects.get(username = username)
+        products = Product.objects.filter(user_id = user)
+    except:
+        return None
+    return products
+
+@register.simple_tag(takes_context=True)
+def get_user_blog_posts(context):
+    try:
+        request = context["request"]
+        username = request.path.split('/')[-2]
+        user = User.objects.get(username = username)
+        posts = BlogPost.objects.filter(user_id = user)
+    except:
+        return None
+    return posts
+
+
+MAX_LENGTH_BOOTSTRAP_COLUMN = 12
+
+
+def css_classes_for_field(field, custom_classes):
+    orig_class = field.field.widget.attrs.get('class', '')
+    required = 'required' if field.field.required else ''
+    classes = field.css_classes(' '.join([orig_class, custom_classes, required]))
+    return classes
+
+
+@register.filter()
+def get_label(field, custom_classes=''):
+    classes = css_classes_for_field(field, custom_classes)
+    return field.label_tag(attrs={'class': classes}, label_suffix='')
+
+
+@register.filter()
+def add_class(field, custom_classes=''):
+    classes = css_classes_for_field(field, custom_classes)
+    try:
+        # For widgets like SelectMultiple, checkboxselectmultiple
+        field.field.widget.widget.attrs.update({'class': classes})
+    except:
+        field.field.widget.attrs.update({'class': classes})
+    return field
+
+
+@register.filter()
+def widget_type(field):
+    if isinstance(field, dict):
+        return 'adminreadonlyfield'
+    try:
+        # For widgets like SelectMultiple, checkboxselectmultiple
+        widget_type = field.field.widget.widget.__class__.__name__.lower()
+    except:
+        widget_type = field.field.widget.__class__.__name__.lower()
+    return widget_type
+
+
+@register.filter()
+def placeholder(field, placeholder=''):
+    field.field.widget.attrs.update({'placeholder': placeholder})
+    return field
+
+
+def sidebar_menu_setting():
+    return getattr(settings, 'BOOTSTRAP_ADMIN_SIDEBAR_MENU', False)
+
+
+@register.assignment_tag
+def display_sidebar_menu(has_filters=False):
+    if has_filters:
+        # Always display the menu in change_list.html
+        return True
+    return sidebar_menu_setting()
+
+
+@register.assignment_tag
+def jquery_vendor_path():
+    if DJANGO_VERSION < (1, 9):
+        return 'admin/js/jquery.js'
+    return 'admin/js/vendor/jquery/jquery.js'
+
+
+@register.assignment_tag
+def datetime_widget_css_path():
+    if DJANGO_VERSION < (1, 9):
+        return ''
+    return 'admin/css/datetime_widget.css'
+
+
+@register.inclusion_tag('bootstrap_admin/sidebar_menu.html',
+                        takes_context=True)
+def render_menu_app_list(context):
+    show_global_menu = sidebar_menu_setting()
+    if not show_global_menu:
+        return {'app_list': ''}
+
+    if DJANGO_VERSION < (1, 8):
+        dependencie = 'django.core.context_processors.request'
+        processors = settings.TEMPLATE_CONTEXT_PROCESSORS
+        dependency_str = 'settings.TEMPLATE_CONTEXT_PROCESSORS'
+    else:
+        dependencie = 'django.template.context_processors.request'
+        implemented_engines = getattr(settings, 'BOOTSTRAP_ADMIN_ENGINES',
+            ['django.template.backends.django.DjangoTemplates'])
+        dependency_str = "the 'context_processors' 'OPTION' of one of the " + \
+            "following engines: %s" % implemented_engines
+        filtered_engines = [engine for engine in settings.TEMPLATES
+            if engine['BACKEND'] in implemented_engines]
+        if len(filtered_engines) == 0:
+            raise ImproperlyConfigured(
+                "bootstrap_admin: No compatible template engine found" +
+                "bootstrap_admin requires one of the following engines: %s"
+                % implemented_engines
+            )
+        processors = reduce(lambda x, y: x.extend(y), [
+            engine.get('OPTIONS', {}).get('context_processors', [])
+            for engine in filtered_engines])
+
+    if dependencie not in processors:
+        raise ImproperlyConfigured(
+            "bootstrap_admin: in order to use the 'sidebar menu' requires" +
+            " the '%s' to be added to %s"
+            % (dependencie, dependency_str)
+        )
+
+    # Code adapted from django.contrib.admin.AdminSite
+    app_dict = {}
+    user = context.get('user')
+    for model, model_admin in site._registry.items():
+        app_label = model._meta.app_label
+        has_module_perms = user.has_module_perms(app_label)
+
+        if has_module_perms:
+            perms = model_admin.get_model_perms(context.get('request'))
+
+            # Check whether user has any perm for this module.
+            # If so, add the module to the model_list.
+            if True in perms.values():
+                info = (app_label, model._meta.model_name)
+                model_dict = {
+                    'name': capfirst(model._meta.verbose_name_plural),
+                    'object_name': model._meta.object_name,
+                    'perms': perms,
+                }
+                if perms.get('change', False):
+                    try:
+                        model_dict['admin_url'] = reverse(
+                            'admin:%s_%s_changelist' % info,
+                            current_app=site.name
+                        )
+                    except NoReverseMatch:
+                        pass
+                if perms.get('add', False):
+                    try:
+                        model_dict['add_url'] = reverse(
+                            'admin:%s_%s_add' % info,
+                            current_app=site.name
+                        )
+                    except NoReverseMatch:
+                        pass
+                if app_label in app_dict:
+                    app_dict[app_label]['models'].append(model_dict)
+                else:
+                    app_dict[app_label] = {
+                        'name': apps.get_app_config(app_label).verbose_name,
+                        'app_label': app_label,
+                        'app_url': reverse(
+                            'admin:app_list',
+                            kwargs={'app_label': app_label},
+                            current_app=site.name
+                        ),
+                        'has_module_perms': has_module_perms,
+                        'models': [model_dict],
+                    }
+
+    # Sort the apps alphabetically.
+    app_list = list(six.itervalues(app_dict))
+    app_list.sort(key=lambda x: x['name'].lower())
+
+    # Sort the models alphabetically within each sapp.
+    for app in app_list:
+        app['models'].sort(key=lambda x: x['name'])
+    return {'app_list': app_list, 'current_url': context.get('request').path}
+
+
+@register.filter()
+def class_for_field_boxes(line):
+    size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
+    return 'col-sm-{0}'.format(size_column or 1)  # if '0' replace with 1
+

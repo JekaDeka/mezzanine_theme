@@ -2,9 +2,9 @@ from __future__ import unicode_literals
 
 from django import forms
 
+from mezzanine.utils.static import static_lazy as static
 from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
-
 
 # These fields need to be in the form, hidden, with default values,
 # since it posts to the blog post admin, which includes these fields
@@ -28,3 +28,5 @@ class СustomBlogForm(forms.ModelForm):
         super(СustomBlogForm, self).__init__(initial=initial)
         for field in hidden_field_defaults:
             self.fields[field].widget = forms.HiddenInput()
+
+        

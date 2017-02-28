@@ -2,24 +2,24 @@
 
 {% spaceless %}
 {% if page_branch_in_menu %}
-    <ul class="nav nav-list navlist-menu-level-{{ branch_level }}">
+    {% if branch_level != 0 %}
+    <ul {% if branch_level == 1 %} id="categories" {% endif %}>
+    {% endif %}
       {% for page in page_branch %}
+        {% if branch_level != 0 %}
         {% if page.in_menu %}
-          {% if page.get_absolute_url != '/catalog/' %}
-            <li class="
-              {% if page.is_current %} active{% endif %}
-              {% if page.is_current_or_ascendant %} active-branch{% endif %}
-              " id="tree-menu-{{ page.html_id }}">
-              <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
-              {# wrap the next line with 'if page.is_current_or_ascendant' #}
-              {# to only show child pages in the menu for the current page #}
+            <li class="{% if page.is_current_or_ascendant %} active-branch {% endif %}">
+              <a style="display: inline-block;"href="{{ page.get_absolute_url }}" class="
+                                                    {% if branch_level == 0 or page.is_current_or_ascendant %} active {% endif %}
+                                                    ">{{ page.title }} </a>
+              {% if page.has_children_in_menu %}
+                <span class="open_nav fa-caret-down"></span>
+              {% endif %}
               {% if page.has_children_in_menu %}{% page_menu page %}{% endif %}
             </li>
-          {% else %}
-              <div>
-                {% if page.has_children_in_menu %}{% page_menu page %}{% endif %}
-              </div>
-          {% endif %}
+        {% endif %}
+        {% else %}
+        {% if page.has_children_in_menu %}{% page_menu page %}{% endif %}
         {% endif %}
       {% endfor %}
     </ul>

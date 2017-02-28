@@ -20,7 +20,7 @@ jQuery(function($) {
 </script>
 
 <div id="addlist-primary">
-    <select class="addlist">
+    <select class="addlist form-control">
         <option value="">{% trans "Add" %} ...</option>
         {% for model in content_models %}
           {% set_model_permissions model %}

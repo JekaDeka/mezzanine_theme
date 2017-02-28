@@ -74,9 +74,10 @@
 			</section>
 
 		</article>
-
-		{% if settings.COMMENTS_DISQUS_SHORTNAME %}
-			{% include "generic/includes/disqus_comments.html" %}
+		{% if blog_post.allow_comments %}
+			{% if settings.COMMENTS_DISQUS_SHORTNAME %}
+				{% include "generic/includes/disqus_comments.html" %}
+			{% endif %}
 		{% endif %}
 	</div>
 </div>

@@ -75,8 +75,8 @@
 
     <!-- Logo -->
     <div class="four columns">
-        <div id="logo">
-            <h1><a href="/"><img src="#" alt="" /></a></h1>
+        <div style="padding-top: 15px;">
+            <h1><a href="/"><img src="{% static 'images/logo/_handmaker.png' %}" alt="logo" /></a></h1>
         </div>
     </div>
 
@@ -85,15 +85,36 @@
     <div class="twelve columns">
         <div id="additional-menu">
             <ul>
-                <li><a href="/">Мой магазин</a></li>
-                <li><a href="/">Мой блог</a></li>
-                <li><a href="/">Мой профиль</a></li>
-                <li><a href="/">Войти</a></li>
-                <li><a href="/">Регистрация</a></li>
+            {% if request.user.is_authenticated %}
+                <li><a href="{% url 'admin:index' %}">Моя панель управления</a></li>
+                <li><a href="{% url 'profile' request.user.username %}">Мой профиль</a></li>
+				<li><a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a></li>
+            {% else %}
+                <li><a href="{% url "login" %}?next={{ request.path }}">Войти</a></li>
+                <li><a href="{% url "signup" %}?next={% url 'promote_user' %}">Регистрация</a></li>
+            {% endif %}
             </ul>
         </div>
     </div>
 
+    <div class="twelve columns">
+    <p style="float:right">
+        <a href="
+        {% if request.user.is_authenticated %}
+            /admin/blog/blogpost/add/
+        {% else %}
+            {% url "signup" %}?next={% url 'promote_user' %}
+        {% endif %}
+        " class="button gray">Написать статью</a>
+        <a href="
+        {% if request.user.is_authenticated %}
+            /admin/shop/product/add/
+        {% else %}
+            {% url "signup" %}?next={% url 'promote_user' %}
+        {% endif %}
+        " class="button gray">Добавить новый товар</a>
+    </p>
+    </div>
     <div class="twelve columns">
         {% block navbar_search_form %}{% search_form "all" %}{% endblock %}
     </div>
@@ -120,9 +141,11 @@
 		{% spaceless %}
 		<nav id="breadcrumbs">
 			<ul>
+            {% block breadcumbs_menu %}
 		    {% page_menu "pages/menus/breadcrumb.html" %}
-			    {% block breadcrumb_element %}
-			    {% endblock %}
+            {% endblock %}
+			{% block breadcrumb_element %}
+			{% endblock %}
 		    </ul>
 		</nav>
 		{% endspaceless %}
@@ -136,9 +159,21 @@
 
 {% block main_containter %}
 <div class="container">
+{% block sidebar %}
+{% endblock %}
+
 {% block main %}
 {% endblock %}
 </div>
+<div class="container">
+{% block product_info %}
+{% endblock %}
+</div>
+<div class="container margin-top-10">
+{% block related_products %}
+{% endblock %}
+</div>
+
 {% endblock %}
 
 {% block featured %}
@@ -165,8 +200,8 @@
     <div class="container">
 
         <div class="four columns">
-            <img src="#" alt="" class="margin-top-10"/>
-            <p class="margin-top-15">Сверху лого. Снизу текст.</p>
+            <img src="{% static 'images/logo/_handmaker.png' %}" alt="" class=""/>
+            <p class="margin-top-15">Добавить небольшой текст</p>
         </div>
 
         <div class="four columns">
@@ -258,6 +293,7 @@
 <script src="{% static 'js/puregrid.js' %}"></script>
 <script src="{% static 'js/stacktable.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
+<script src="{% static 'js/active-branch-show.js' %}"></script>
 {% block extra_js %}
 {% endblock %}
 {% endcompress %}

@@ -1,0 +1,39 @@
+{% load theme_tags %}
+{% if result_hidden_fields %}
+<div class="hiddenfields"> {# DIV for HTML validation #}
+{% for item in result_hidden_fields %}
+    {{ item }}
+{% endfor %}
+</div>
+{% endif %}
+
+{% if results %}
+<div class="panel-body table-responsive">
+    <table class="table table-striped table-bordered no-footer table-hover table-custom" id="editable" role="grid" aria-describedby="editable_info">
+        <thead>
+            <tr role="row">
+                {% for header in result_headers %}
+                <th{{ header.class_attrib }}>
+                {% if header.sortable %}
+                {% if header.url %}
+                <a href="{{ header.url }}">
+                {% else %}
+                <a href="{{ header.url_primary }}">
+                {% endif %}
+                {% endif %}
+                {{ header.text|capfirst }}
+                {% if header.sortable %}</a>{% endif %}</th>{% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+        {% for result in results %}
+            <tr>
+                {% for item in result %}
+                    {{ item }}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}

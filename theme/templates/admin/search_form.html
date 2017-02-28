@@ -1,0 +1,25 @@
+{% load staticfiles i18n %}
+
+{% if cl.search_fields %}
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form role="form" class="form-inline" id="changelist-search" action="" method="get">
+            <div class="row"><!-- DIV needed for valid HTML -->
+                <div class="col-lg-12">
+                    {% comment %}<label for="searchbar">&nbsp;</label>{% endcomment %}
+                    <input type="text" class="form-control width" placeholder="Введите слово..." name="{{ search_var }}" value="{{ cl.query }}" id="searchbar" {% if not cl.query %}class="search-fields-verbose"{% endif %} />
+                </div>
+                <div class="col-lg-12">
+                    <input type="submit" class="btn btn-raised btn-default" style="max-width: 100%!important" value="Искать" />
+                </div>
+            </div>
+            {% for pair in cl.params.items %}
+                {% ifnotequal pair.0 search_var %}<input type="hidden" name="{{ pair.0 }}" value="{{ pair.1 }}"/>{% endifnotequal %}
+            {% endfor %}
+            </form>
+        </div>
+    </div>
+    <script type="text/javascript">document.getElementById("searchbar").focus();</script>
+
+{% endif %}

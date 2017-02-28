@@ -1,0 +1,232 @@
+{% extends "admin/base_site.html" %}
+
+<!-- LOADING -->
+{% load staticfiles admin_list i18n %}
+
+{% block extrahead %}
+  {{ block.super }}
+
+  <script type="text/javascript" src="{% static "admin/js/mezz/action.js" %}"></script>
+  {% if action_form %}
+    {% if actions_on_top or actions_on_bottom %}
+      <script type="text/javascript">
+      (function($) {
+          $(document).ready(function($) {
+            $("tr input.action-select").actions();
+          });
+      })(jQuery);
+      </script>
+    {% endif %}
+  {% endif %}
+{% endblock extrahead %}
+
+{% block extrascript %}
+{{ block.super }}
+  <script>
+  	;(function($){ $(document).ready(function(){
+  		$('.filterset').children('h3').next().slideToggle();
+  		// $($('.filterset').children('h3').next()[2]).slideToggle();
+	    $('.filterset').children('h3').each(function(){
+	        var $title = $(this);
+	        $title.click(function(){
+	            $title.next().slideToggle();
+	        });
+	    });   
+	  });
+	})(jQuery);
+    (function ($) {
+      $('.object-tools .btn').tooltip({'container':'body'});
+      $('#result_list .vTextField').addClass('form-control');
+      $('#toolbar .popover-dismiss').popover({
+        trigger: 'focus',
+        container: 'body',
+        title: '',
+        content:$('.popover-search-info').html(),
+        html:true,
+        hide:600
+      }).focus();
+
+      // checkbox progressbar
+      $checkboxes = $('#result_list .action-checkbox input');
+      var COUNT_ITEMS = $checkboxes.length;
+      $checkboxes.on('click', function () {
+        checked = $('#result_list .action-checkbox input:checked').length;
+        width = (checked * 100) / COUNT_ITEMS;
+        $('.progressbar-selected-rows').width(width + '%');
+      });
+      $('#action-toggle').on('click', function () {
+        if ($(this).is(':checked')) {
+          $('.progressbar-selected-rows').width('100%');
+        } else {
+          $('.progressbar-selected-rows').width(0);
+        }
+      });
+      $('.info-actions .clear').on('click', function () {
+        $('.progressbar-selected-rows').width(0);
+      });
+
+      // if not using date hierarchy filters
+      if (!$('.date-hierarchy').find('.toplinks').length) {
+        $('.panel-body.actions-top').addClass('no-hierarchy-filters');
+      }
+    })(jQuery);
+  </script>
+	
+{% endblock extrascript %}
+
+<!-- BREADCRUMBS -- >
+{% block breadcrumbs %}
+<ol class="breadcrumb">            
+<li><a href="index.html">Home</a></li>
+<li><a href="#">UI Elements</a></li>
+<li class="active"><a href="ui-icons-fontawesome.html">FontAwesome Icons</a></li>
+</ol>
+{% endblock %}
+
+<!-- CONTENT -->
+{% block content %}
+<div class="row">
+	<div class="col-md-12">
+		<!-- Errors -->
+		{% if cl.formset.errors %}
+		<div class="alert alert-info" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
+			<p class="errornote">
+			{% blocktrans count cl.formset.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
+			<button type="button" class="close" data-dismiss="alert">×</button>
+			</p>
+			<ul class="errorlist">{% for error in cl.formset.non_field_errors %}<li>{{ error }}</li>{% endfor %}</ul>
+		</div>
+		{% endif %}
+		<div class="row">
+			<div class="col-md-12 col-lg-10">
+				<div class="panel panel-default" data-widget="{&quot;draggable&quot;: &quot;false&quot;}" data-widget-static="" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
+					<div class="panel-heading">
+					{% block object-tools %}
+						{% if has_add_permission %}
+						{% block object-tools-items %}
+						<div class="panel-ctrls">
+							<div class="DTTT btn-group pull-left mt-sm">
+							<a href="add/{% if is_popup %}?_popup=1{% endif %}" class="btn btn-default DTTT_button_text" id="ToolTables_crudtable_0">
+								<i class="fa fa-plus"></i> 
+								<span>{% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}</span>
+							</a>
+							</div>
+						</div>
+						{% endblock %}
+					   {% endif %}
+					{% endblock %}
+					</div>
+					<div class="panel-body">
+						<form action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
+				
+					
+						{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
+					
+
+						{% if cl.formset %}
+							{{ cl.formset.management_form }}
+						{% endif %}
+
+						{% block result_list %}
+
+							{% if action_form and actions_on_top and cl.full_result_count and cl.result_count %}
+								{# {% admin_actions %} #}
+								<div class="actions" style="margin-top: -10px; margin-right: -7px; float: right;">
+								    <div class="" title="Действие:" >
+								    	<div class="" style="display:none;">
+								    		<select class="required form-control" name="action">
+												<option value="">---------</option>
+												<option value="delete_selected" selected="selected">Удалить выбранные Записи в блоге</option>
+											</select>
+											<span class="material-input"></span>
+										</div>
+<!-- 								      <span class="input-group-btn"> -->
+								      
+								    <button type="submit" class="btn" title="Выполнить выбранное действие" name="index" value="1" style="color: rgb(97, 97, 97)!important; margin: 0!important; font-size: inherit;">
+								    <i class="fa fa-minus"></i> <span>Удалить выбранные записи</span>
+								    <div class="ripple-container"></div></button>
+								      <!-- </span> -->
+								    </div>  
+								<input class="select-across" name="select_across" type="hidden" value="1">
+								  
+								</div>
+							{% endif %}
+								
+								{% result_list cl %}
+
+							{% if action_form and actions_on_bottom and cl.full_result_count and cl.result_count %}
+								{% admin_actions %}
+							{% endif %}
+						{% endblock %}
+						{% block pagination %}{% pagination cl %}{% endblock %}		
+						{% if cl.formset and cl.result_count %}
+							<p class="submit-row">
+								<input class="btn-raised btn-primary btn" type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>
+							</p>
+						{% endif %}
+					
+						
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 col-lg-2">
+						{% block filters %}
+						<div class="row">
+						{% if cl.has_filters or cl.search_fields or cl.date_hierarchy %}
+						<div id="changelist-filter">
+
+							<!-- Results -->
+							
+							{% ifnotequal cl.result_count cl.full_result_count %}
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							<div class="panel panel-default">
+							<div class="module results panel-heading">
+								<h2>{% trans 'Results' %}</h2>
+							</div>
+							<div class="panel-body">
+								<p>{% blocktrans with cl.result_count as counter %}{{ counter }} найдено{% endblocktrans %}</p>
+								<a href="?{% if cl.is_popup %}_popup=1{% endif %}">{% blocktrans with cl.full_result_count as full_result_count %}{{ full_result_count }} total{% endblocktrans %}</a>
+							</div>
+							</div>
+							</div>
+							{% endifnotequal %}
+							
+
+							<!-- Search -->
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							{% block search %}
+								{% search_form cl %}
+							{% endblock %}
+							</div>
+
+							<!-- Date Hierarchy -->
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							{% block date_hierarchy %}
+								{% date_hierarchy cl %}
+							{% endblock %}
+							</div>
+
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							{% if cl.has_filters %}
+							<div class="panel panel-default">
+    							<div class="panel-heading">
+								<h2>{% trans 'Filter' %}</h2>
+								</div>
+								<div class="panel-body">
+								{% for spec in cl.filter_specs %}
+									{% admin_list_filter cl spec %}
+								{% endfor %}
+								</div>
+							</div>
+							{% endif %}
+							</div>
+						</div>
+					{% endif %}
+					</div>
+				{% endblock %}
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

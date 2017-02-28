@@ -2,7 +2,8 @@
 {% load i18n %}
 
 {% block main %}
-<div class="col-md-9 box"> 
+<div class="six columns centered">
+
 {% if request.user.is_authenticated %}
     <p>{% trans "You're already logged in. If you'd like to create a new account, you'll need to log out first." %}</p>
 {% else %}

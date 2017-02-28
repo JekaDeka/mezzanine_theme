@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="{{ LANGUAGE_CODE }}" xml:lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %}dir="rtl"{% endif %}>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<link rel="shortcut icon" href="#">
+<title>{% block title %}{% endblock %}</title>
+{% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
+
+<link type='text/css' href='http://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500' rel='stylesheet'>
+<link type='text/css'  href="https://fonts.googleapis.com/icon?family=Material+Icons"  rel="stylesheet"> 
+<!-- LOADING -->
+{% load mezzanine_tags staticfiles i18n %}
+
+<!-- STYLESHEETS / EXTRASTYLE -->
+{% block stylesheets %}
+<link href="{% static 'admin/fonts/font-awesome/css/font-awesome.min.css' %}" type="text/css" rel="stylesheet">        <!-- Font Awesome -->
+<link href="{% static 'admin/css/styles.css' %}" type="text/css" rel="stylesheet">                                     <!-- Core CSS with all styles -->
+
+<link href="{% static 'admin/plugins/codeprettifier/prettify.css' %}" type="text/css" rel="stylesheet">                <!-- Code Prettifier -->
+
+<link href="{% static 'admin/plugins/dropdown.js/jquery.dropdown.css' %}" type="text/css" rel="stylesheet">            <!-- iCheck -->
+<link href="{% static 'admin/plugins/progress-skylo/skylo.css' %}" type="text/css" rel="stylesheet">                   <!-- Skylo -->
+
+<!--[if lt IE 10]>
+	<script src="js/media.match.min.js' %}"></script>
+	<script src="js/respond.min.js' %}"></script>
+	<script src="js/placeholder.min.js' %}"></script>
+<![endif]-->
+<!-- The following CSS are included as plugins and can be removed if unused-->
+	
+<link href="{% static 'admin/plugins/form-fseditor/fseditor.css' %}" type="text/css" rel="stylesheet">                      		<!-- FullScreen Editor -->
+<link href="{% static 'admin/css/custom.css' %}" type="text/css" rel="stylesheet">  
+{% endblock %}
+
+{% block extrastyle %}
+{% endblock %}
+
+{% block extrahead %}
+<script src="{% static 'admin/js/jquery-1.10.2.min.js' %}"></script> 							<!-- Load jQuery -->
+<script>
+    {% url "static_proxy" as static_proxy_url %}
+    {% url "fb_browse" as fb_browse_url %}
+    {% url "displayable_links_js" as link_list_url %}
+    {% url "admin:index" as admin_index_url %}
+    {% get_current_language as LANGUAGE_CODE %}
+    window.__home_link = '<a href="{% url "home" %}">{% trans "View site" %}</a>';
+    window.__csrf_token = '{{ csrf_token }}';
+    window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
+    window.__filebrowser_url = '{{ fb_browse_url }}';
+    window.__link_list_url = '{{ link_list_url }}';
+    window.__tinymce_css = '{% static "mezzanine/css/tinymce.css" %}';
+    window.__admin_url = '{{ admin_index_url }}';
+    window.__static_proxy = '{{ static_proxy_url }}';
+    window.__admin_media_prefix__ = '{% static "admin" %}/';
+    window.__grappelli_installed = {{ settings.GRAPPELLI_INSTALLED|lower }};
+    window.__admin_menu_collapsed = {{ settings.ADMIN_MENU_COLLAPSED|lower }};
+    window.__language_code = '{{ LANGUAGE_CODE }}';
+</script>
+<script type="text/javascript" src="{% static "admin/js/mezz/core.js" %}"></script>
+{% url "admin:jsi18n" as jsi18nurl %}
+{% if request.user.is_authenticated %}
+	<script src="{{ jsi18nurl|default:"../../../jsi18n/" }}"></script>
+{% endif %}
+
+<script type="text/javascript" src="/static/admin/js/urlify.js"></script>
+{% endblock %}
+</head>
+
+<body class="{% block bodyclass %}{% endblock %}">
+{% block header %}
+{% if request.user.is_authenticated %}
+	{% include "admin/includes/header.html" %}
+{% endif %}
+{% endblock %}
+
+{% block login %}
+{% endblock %}
+
+{% block wrapper %}
+<div id="wrapper">
+	<div id="layout-static">
+		{% block sidebar %}
+			{% if user.is_staff and not is_popup and not request.GET.pop %}
+				{% admin_dropdown_menu %}
+			{% endif %}
+		{% endblock %}
+
+		<div class="static-content-wrapper">
+			<div class="static-content">
+				<div class="page-content">
+					{% block breadcrumbs %}
+					{% endblock %}
+
+					{% block page_heading %}
+					<div class="page-heading">
+						<h1>{{ title }}</h1>
+					</div>
+					{% endblock %}
+
+					<div class="container-fluid">
+						<div data-widget-group="group1" class="ui-sortable">
+						{% block content %}
+						{% endblock %}
+						</div>
+					</div>
+				</div>
+			</div>
+		{% block footer %}
+		<footer role="contentinfo">
+			<div class="clearfix">
+				<ul class="list-unstyled list-inline pull-left">
+					<li><h6 style="margin: 0;">© 2017 handmaker.top</h6></li>
+				</ul>
+			</div>
+		</footer>
+		{% endblock %}
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+	<!-- Load site level scripts -->
+	<!-- <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js' %}"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js' %}"></script> -->
+
+	
+	<script src="{% static 'admin/js/jqueryui-1.10.3.min.js' %}"></script> 							<!-- Load jQueryUI -->
+	<script src="{% static 'admin/js/bootstrap.min.js' %}"></script> 								<!-- Load Bootstrap -->
+	<script src="{% static 'admin/js/enquire.min.js' %}"></script> 									<!-- Load Enquire -->
+
+	<script src="{% static 'admin/plugins/velocityjs/velocity.min.js' %}"></script>					<!-- Load Velocity for Animated Content -->
+	<script src="{% static 'admin/plugins/velocityjs/velocity.ui.min.js' %}"></script>
+
+	<script src="{% static 'admin/plugins/progress-skylo/skylo.js' %}"></script> 		<!-- Skylo -->
+
+	<script src="{% static 'admin/plugins/wijets/wijets.js' %}"></script>     						<!-- Wijet -->
+
+	<script src="{% static 'admin/plugins/sparklines/jquery.sparklines.min.js' %}"></script> 			 <!-- Sparkline -->
+
+	<script src="{% static 'admin/plugins/codeprettifier/prettify.js' %}"></script> 				<!-- Code Prettifier  -->
+
+	<script src="{% static 'admin/plugins/bootstrap-tabdrop/js/bootstrap-tabdrop.js' %}"></script>  <!-- Bootstrap Tabdrop -->
+
+	<script src="{% static 'admin/plugins/nanoScroller/js/jquery.nanoscroller.min.js' %}"></script> <!-- nano scroller -->
+
+	<script src="{% static 'admin/plugins/dropdown.js/jquery.dropdown.js' %}"></script> <!-- Fancy Dropdowns -->
+	<script src="{% static 'admin/plugins/bootstrap-material-design/js/material.min.js' %}"></script> <!-- Bootstrap Material -->
+	<script src="{% static 'admin/plugins/bootstrap-material-design/js/ripples.min.js' %}"></script> <!-- Bootstrap Material -->
+
+	<script src="{% static 'admin/js/application.js' %}"></script>
+	<!-- End loading site level scripts -->
+	<!-- Load page level scripts-->
+	<script src="{% static 'admin/plugins/form-fseditor/jquery.fseditor-min.js' %}"></script>            			<!-- Fullscreen Editor -->
+	<script src="{% static 'admin/plugins/bootbox/bootbox.js' %}"></script> 	<!-- Bootbox -->
+	<!-- End loading page level scripts-->
+{% endblock %}
+
+{% block extrascript %}
+{% endblock %}
+</body>
+</html>

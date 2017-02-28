@@ -1,0 +1,42 @@
+{% extends "admin/change_list.html" %}
+{% load pages_tags staticfiles %}
+
+
+{% block extrahead %}
+{{ block.super }}
+<style>
+.delete {width:10px; height:10px; margin:2px 4px 0 10px; display:block; float:right; background:url('{% static settings.MEZZANINE_ADMIN_PREFIX|add:"img/admin/icon_deletelink.gif" %}');}
+.grappelli-delete {width:11px; height:11px; margin:4px 4px 0 10px; background:url('{% static settings.MEZZANINE_ADMIN_PREFIX|add:"img/icons/icon-inline_item_tools-deletelink.png" %}');}
+.grappelli-delete:hover {background:url('{% static settings.MEZZANINE_ADMIN_PREFIX|add:"img/icons/icon-inline_item_tools-deletelink-hover.png" %}');}
+</style>
+
+<script src="{% static "admin/js/page_tree.js" %}"></script>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+
+    
+
+    {% if cl.result_count == 0 %}
+    <p class="paginator">0 {{ cl.opts.verbose_name_plural }}</p>
+    {% else %}
+    <div class="col-md-12 col-lg-8">
+    <div class="panel panel-info">
+    <div class="panel-body">
+    {% if has_add_permission %}
+        {% include "admin/includes/content_typed_change_list.html" %}
+    {% endif %}
+    <div class="bs-component">
+    <div id="tree">
+    	{% page_menu "pages/menus/admin.html" %}
+    </div>
+    </div>
+    </div>
+    </div>
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}

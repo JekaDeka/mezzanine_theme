@@ -21,13 +21,9 @@
             {% else %}
             <span class="uneditable">{{ page.title }}</span>
             {% endif %}
-            <span class="ordering"{% if not page.perms.change %}
-                style="visibility:hidden;"{% endif %}>
-                <img src="{% static settings.MEZZANINE_ADMIN_PREFIX|add:"img/admin/arrow-up.gif" %}">
-                <img src="{% static settings.MEZZANINE_ADMIN_PREFIX|add:"img/admin/arrow-down.gif" %}">
-            </span>
+
             {% if page.perms.add %}
-            <select class="addlist" id="addlink-{{ page.id }}">
+            <select class="addlist form-select" id="addlink-{{ page.id }}">
                 <option value="">{% trans "Add" %} ...</option>
                 {% for model in content_models %}
                     {% if model.perms.add %}

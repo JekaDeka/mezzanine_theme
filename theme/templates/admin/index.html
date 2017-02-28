@@ -1,26 +1,138 @@
-{% extends "admin/base_site.html" %}
-
-{% load i18n mezzanine_tags staticfiles %}
-
-{% block extrahead %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static settings.MEZZANINE_ADMIN_PREFIX|add:"css/dashboard.css" %}">
-<link rel="stylesheet" href="{% static "mezzanine/css/admin/dashboard.css" %}">
-<!--[if IE 7]><style>.dashboard #content {padding-top: 80px;}</style><![endif]-->
+{% extends "admin/base_site.html" %} 
+{% load staticfiles accounts_tags %}
+{% block page_heading %}
 {% endblock %}
+{% block content %}
+<div class="row">
+    <div class="col-md-12 profile-area">
+        <div class="media col-md-6 col-sm-6 col-xs-6">
+            <a class="media-left pr-n" href="#">
+                <img class="media-object img-resposnive" src="{% static 'admin/img/3.jpg' %}" alt="profile image" width="88" height="88">
+            </a>
+            <div class="media-body pl-xl">
+                <h4 class="media-heading">{{ request.user|username_or:"get_full_name" }}</h4> 
+				{% if request.user.email %}
+                	{{request.user.email}}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12 pl-n pr-n">
+        <ul class="nav nav-tabs material-nav-tabs mb-lg">
+            <li class="dropdown pull-right tabdrop hide"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-angle-down"></i> </a>
+                <ul class="dropdown-menu"></ul>
+            </li>
+            <li class="active"><a href="#tab-8-1" data-toggle="tab"> Информация </a></li>
+            <li><a href="{% url 'admin:index' %}">Редактировать</a></li>
+        </ul>
+    </div>
+    <div class="col-md-3">
+        <div class="panel panel-profile" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
+            <div class="panel-heading">
+                <h2>About</h2>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <div class="personel-info pt-n">
+                        <span class="icon"><i class="material-icons">email</i></span>
+                        <span>{{request.user.email}}</span>
+                    </div>
+                    {% if request.user.myprofile.phone %}
+                     <div class="personel-info">
+                        <span class="icon"><i class="material-icons">call</i></span>
+                        <span>{{request.user.myprofile.phone}}</span>
+                    </div>
+                    {% endif %}
+                   	{% if request.user.myprofile.city %}
+                    <div class="personel-info">
+                        <span class="icon"><i class="material-icons">place</i></span>
+                        <span>{{ request.user.myprofile.city }}</span>
+                    </div>
+                    {% endif %}
 
-{% block coltype %}colMS{% endblock %}
-{% block bodyclass %}dashboard{% endblock %}
-
-{% block breadcrumbs %}<div class="breadcrumbs">{% trans "Home" %}</div>{% endblock %}
-
-{% block content_title %}<h1>{% trans "Dashboard" %}</h1>{% endblock %}
-
-{% block content %}<div id="content-main">{% dashboard_column 0 %}</div>{% endblock %}
-
-{% block sidebar %}
-    <div id="content-related" class="dashboard1">{% dashboard_column 2 %}</div>
-    {% block extendedsidebar %}
-    <div id="content-related" class="dashboard2">{% dashboard_column 1 %}</div>
-    {% endblock %}
-{% endblock %}
+                    {% if request.user.myprofile.site %}
+                    <div class="personel-info pb-n">
+                        <span class="icon"><i class="material-icons">language</i></span>
+                        <span>{{ request.user.myprofile.site }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <ul class="list-inline text-center">
+                    <li><a href="#" class=""><i class="fa fa-facebook"></i></a></li>
+                    <li><a href="#" class=""><i class="fa fa-twitter"></i></a></li>
+                    <li><a href="#" class=""><i class="fa fa-dribbble"></i></a></li>
+                    <li><a href="#" class=""><i class="fa fa-linkedin"></i></a></li>
+                    <li><a href="#" class=""><i class="fa fa-instagram"></i></a></li>
+                </ul>
+            </div>
+        </div>
+        <!-- panel -->
+        <!-- <div class="panel panel-profile" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
+            <div class="panel-heading">
+                <h2>Gallery</h2>
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/1.jpg" alt="">
+                    </div>
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/2.jpg" alt="">
+                    </div>
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/3.jpg" alt="">
+                    </div>
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/4.jpg" alt="">
+                    </div>
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/5.jpg" alt="">
+                    </div>
+                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
+                        <img class="img-responsive" src="assets/demo/images/6.jpg" alt="">
+                    </div>
+                </div>
+                <a href="#" class="pull-left">View all <i class="material-icons">arrow_forward</i></a>
+            </div>
+        </div> -->
+    </div>
+    <!-- col-sm-3 -->
+    <div class="col-md-9">
+        <div class="tab-content">
+            <div class="panel-profile">
+                <div class="tab-content">
+                    <div class="tab-pane p-md active" id="tab-8-1">
+                        <div class="about-area">
+                            <h4>Информация</h4>
+                            {% if profile_user.myprofile.bio  %}
+								{{ profile_user.myprofile.bio|safe }}
+							{% else %}
+								<p>Не указана</p>
+							{% endif %}
+                        </div>
+                        <div class="about-area">
+                            <h4>Личные данные</h4>
+                            <div class="table-responsive">
+                                <table class="table about-table">
+                                    <tbody>
+                                        <tr>
+                                            <th>ФИО</th>
+                                            <td>{{request.user.first_name}} {{request.user.last_name}}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Расположение: </th>
+                                            <td>{{request.user.myprofile.city}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- .tab-content -->
+    </div>
+    <!-- col-sm-8 -->
+</div>
+{% endblock content %}
