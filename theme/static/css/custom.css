@@ -1,3 +1,6 @@
+.help-block {
+	color: red;
+}
 .input_id_phone, .input_id_city, .input_id_image, .input_idphone, .input_id_bio {
 	display: none;
 }
