@@ -19,13 +19,16 @@ blog_fieldsets[0][1]["fields"].insert(-2, "preview_content")
 product_fieldsets = deepcopy(ProductAdmin.fieldsets)
 product_fieldsets[0][1]["fields"] += ("material",)
 product_fieldsets[0][1]["fields"] += ("condition",)
-
+product_fieldsets[0][1]["fields"] += ("pre_order",)
 
 class MyBlogPostAdmin(BlogPostAdmin):
     fieldsets = blog_fieldsets
+    fieldsets.remove(fieldsets[1])
     list_per_page = 30
-    fieldsets[0][1]['fields'] = ['title', 'status', ('publish_date', 'expiry_date'), 'featured_image', 
-                                    'categories', 'preview_content', 'content', 'allow_comments']
+    fieldsets[0][1]['fields'] = ['title', 'status', 
+                            # ('publish_date', 'expiry_date'), 
+    'featured_image', 
+    'preview_content', 'content', 'categories', 'allow_comments']
 
     def get_queryset(self, request):
         qs = super(MyBlogPostAdmin, self).get_queryset(request)
@@ -39,8 +42,11 @@ class MyBlogPostAdmin(BlogPostAdmin):
 class MyProductAdmin(ProductAdmin):
     fieldsets = product_fieldsets
     list_per_page = 30
-    fieldsets[0][1]['fields'] = ['title', 'status', ('publish_date', 'expiry_date'), 'available', 
-                                    'categories', 'content', 'material', 'condition']
+    fieldsets[0][1]['fields'] = ['pre_order', 'title', 
+    'status', 
+    # ('publish_date', 'expiry_date'), 
+    'material', 'condition',  
+    'categories', 'content']
     def get_queryset(self, request):
         qs = super(MyProductAdmin, self).get_queryset(request)
         if request.user.is_superuser:

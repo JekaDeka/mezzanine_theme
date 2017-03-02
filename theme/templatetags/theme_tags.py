@@ -712,3 +712,8 @@ def class_for_field_boxes(line):
     size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
     return 'col-sm-{0}'.format(size_column or 1)  # if '0' replace with 1
 
+
+@register.filter()
+def class_for_single_line(line):
+    # size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
+    return 'col-sm-{0}'.format(6) 
