@@ -16,6 +16,7 @@ from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
+from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
 from theme.forms import СustomBlogForm
@@ -107,6 +108,8 @@ def promote_user(request, template="accounts/account_signup.html",
         if not user.is_staff:
             user.is_staff = True
             group = Group.objects.get(name='custom')
+            siteperms = SitePermission.objects.create(user=user)
+            siteperms.sites.add(2)
             user.groups.add(group)
             user.save()
 

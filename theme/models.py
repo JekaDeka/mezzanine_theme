@@ -26,7 +26,7 @@ class MyProfile(models.Model):
 
 
 class Slider(models.Model):
-    title = models.CharField(max_length=255, blank=True,
+    title = models.CharField(max_length=255, blank=False,
                              verbose_name=("Название"))
 
     class Meta:

@@ -6,15 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-touch-fullscreen" content="yes">
-
-<link rel="shortcut icon" href="#">
+{% load mezzanine_tags staticfiles i18n %}
+<link rel="shortcut icon" href="{% static "images/logo/logo.png" %}">
 <title>{% block title %}{% endblock %}</title>
 {% block blockbots %}<meta name="robots" content="NONE,NOARCHIVE" />{% endblock %}
 
 <link type='text/css' href='http://fonts.googleapis.com/css?family=Roboto:300,400,400italic,500' rel='stylesheet'>
 <link type='text/css'  href="https://fonts.googleapis.com/icon?family=Material+Icons"  rel="stylesheet"> 
-<!-- LOADING -->
-{% load mezzanine_tags staticfiles i18n %}
 
 <!-- STYLESHEETS / EXTRASTYLE -->
 {% block stylesheets %}
