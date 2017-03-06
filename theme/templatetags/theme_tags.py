@@ -52,7 +52,7 @@ def get_slideshow(*args):
         slider = Slider.objects.all()[:1].get()
         items = SliderItem.objects.filter(slider__title=slider.title)
     except Exception as e:
-        raise e
+        return None
     if items:
         return list(items)
     return None
