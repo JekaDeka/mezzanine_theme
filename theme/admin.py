@@ -53,11 +53,11 @@ class MyProductAdmin(ProductAdmin):
         qs = super(MyProductAdmin, self).get_queryset(request)
         if request.user.is_superuser:
             return qs
-        return qs.filter(user=request.user)
+        return qs.filter(user_id=request.user)
 
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
-            obj.user = request.user
+            obj.user_id = request.user
         super(MyProductAdmin, self).save_model(request, obj, form, change)
 
 
