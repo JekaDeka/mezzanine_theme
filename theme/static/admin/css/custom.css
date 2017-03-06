@@ -1,3 +1,15 @@
+/* font size reset */
+.form-group label.control-label {
+	font-size: 16px;
+}
+
+body, .panel .panel-body, .form-group .help-block {
+	font-size: 14px;
+}
+#tree .tree-toggle, #tree .changelink {
+	font-size: 13px!important;
+}
+/*------------------------------*/
 tr.form-row > td{
     vertical-align: middle!important;
 }
