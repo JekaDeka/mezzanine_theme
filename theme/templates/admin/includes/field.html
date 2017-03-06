@@ -1,14 +1,35 @@
 {% load theme_tags %}
-<!-- form-row form-group -->
-<div class="{% if line.fields|length_is:'1' and line.errors %} has-error{% endif %}{% if not line.has_visible_field %} hidden{% endif %}{% for field in line %}{% if field.field.name %} field-{{ field.field.name }}{% endif %}{% endfor %}{% if not line.fields|length_is:'1' %} field-box {{ css_field_box }}{% endif %}">
+<div class="form-group
+{% if line.fields|length_is:'1' and line.errors %} has-error{% endif %}
+{% if not line.has_visible_field %} hidden{% endif %}
+{% for field in line %}
+  {% if field.field.name %} field-{{ field.field.name }}
+{% endif %}
+{% endfor %}
+{% if not line.fields|length_is:'1' %} field-box {{ css_field_box }}{% endif %}
+{% if not css_field_box and not is_tabular %}
+  {% if field.field|widget_type == 'tinymcewidget' or field.field|widget_type == 'filteredselectmultiple' %}
+  col-sm-12
+  {% else %}
+  col-sm-6
+  {% endif %}
+{% endif %}
+
+">
     {% if field.is_checkbox %}
-      <div class="checkbox">
+      <div class=" {% if field.field.name == 'pre_order'  %}
+      togglebutton
+      {% else %}
+      checkbox
+      {% endif %}">
         {% if not is_tabular %}
           <label>
             {{ field.field }} {{ field.field.label }}
           </label>
         {% else %}
+        <label>
           {{ field.field }}
+        </label>
         {% endif %}
 
         {% for error in field.field.errors %}
@@ -23,12 +44,7 @@
       </div>
     {% else %}
       {% with field.field|widget_type as widget_type %}
-        <div class="widget_type__{{ widget_type }} 
-        {% if widget_type == 'admintextinputwidget' %}
-          col-md-4
-        {% elif widget_type == 'filteredselectmultiple' %}
-          col-md-12
-        {% endif %}">
+        <div class="widget_type__{{ widget_type }}">
           {% if widget_type == 'adminsplitdatetime' %}
             {% if not is_tabular %}
               {{ field.label_tag }}
@@ -52,7 +68,7 @@
             {# only show the label for visible fields #}
             {% if not field.field.is_hidden %}
               {% if not is_tabular %}
-                {{ field.label_tag }}
+                {{ field.field|get_label:'control-label' }}
               {% endif %}
             {% endif %}
               {% if field.is_readonly %}

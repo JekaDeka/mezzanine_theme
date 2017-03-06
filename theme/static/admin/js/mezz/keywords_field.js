@@ -8,8 +8,9 @@ jQuery(function($) {
     // Add click functionality to each keyword so that it toggles
     // the keyword's existance in the associated input box.
     $('.keywords-field a').click(function() {
-        var div = $(this).parent().prev();
-        var field = $(div).find('input[type=text]');
+        // var div = $(this).parent().prev();
+        // var field = $(div).find('input[type=text]');
+        var field = $(this).parent().prev('input[type=text]');
         var keywords = []
         if (field.attr('value') != null) {
             var keywords = $.map(field.attr('value').split(','), function(keyword) {
@@ -46,14 +47,15 @@ jQuery(function($) {
             return true;
         }
         var button = $(this);
-        var fields = $.makeArray($('.keywords-field').prev().find('input[type=text]'));
+        var fields = $.makeArray($('.keywords-field').prev('input[type=text]'));
         var submitKeywords = function() {
             var field = fields.shift();
             var keywords = {text_keywords: field.value};
             $.post(window.__admin_keywords_submit_url, keywords, function(data) {
                 var ids = data.split("|")[0].split(',');
                 field.value = data.split("|")[1];
-                $(field).attr('value', ids);
+                $($.find('#id_keywords_0')).attr('value', ids);
+                // $(field).attr('value', ids);
                 if (fields.length > 0) {
                     submitKeywords();
                 } else {

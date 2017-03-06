@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from future.builtins import str, int
 
 from calendar import month_name
-
+from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect
@@ -19,7 +19,7 @@ from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm
+from theme.forms import СustomBlogForm, ContactForm
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from django.contrib.auth.models import Group
 
@@ -115,8 +115,18 @@ def promote_user(request, template="accounts/account_signup.html",
 
     return redirect('/')
 
+def true_index(request):
+    return render(request, '_index.html')
 
-
-
-# def create_user_blog(request):
-#     pass
+def index(request):
+    form = ContactForm
+    # new logic!
+    if request.method == 'POST':
+        form = form(data=request.POST)
+        if form.is_valid():
+            return redirect('/')
+        else:
+            return redirect('/')
+    context = {'form': form }
+    print('123')
+    return render(request, 'index.html', context)

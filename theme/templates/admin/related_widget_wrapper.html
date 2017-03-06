@@ -10,11 +10,12 @@
         </a> -->
         {% endif %}
         {% if can_add_related %}
-        <!-- <a class="related-widget-wrapper-link add-related input-group-addon" id="add_id_{{ name }}"
+        <a class="related-widget-wrapper-link add-related input-group-addon" id="add_id_{{ name }}"
             href="{{ add_related_url }}?{{ url_params }}"
             title="{% blocktrans %}Add another {{ model }}{% endblocktrans %}">
-            <span class="glyphicon glyphicon-plus">
-        </a> -->
+            <i class="fa fa-plus"></i>
+            <span class="glyphicon glyphicon-plus"></span>
+        </a>
         {% endif %}
         {% if can_delete_related %}
         <!-- <a class="related-widget-wrapper-link delete-related input-group-addon" id="delete_id_{{ name }}"

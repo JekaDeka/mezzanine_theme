@@ -1,21 +1,32 @@
 {% load theme_tags %}
+{% if fieldset.name != 'Другие товары' %}
 <fieldset class="module aligned {{ fieldset.classes }}">
-  {% if fieldset.name %}<h2>{{ fieldset.name }}</h2>{% endif %}
-  {% if fieldset.description %}
-    <div class="description">{{ fieldset.description|safe }}</div>
+  <div class="panel panel-midnightblue" data-widget='{"draggable": "false"}'>
+  {% if fieldset.name %}
+        <div class="panel-heading">
+          <h2>{{ fieldset.name }}</h2>
+          {% if fieldset.description %}
+            <div class="description">{{ fieldset.description|safe }}</div>
+          {% endif %}
+          <div class="panel-ctrls" data-actions-container="" data-action-collapse='{"target": ".panel-body, .panel-footer"}'></div>
+        </div>
   {% endif %}
-  {% for line in fieldset %}
-    {% if not line.fields|length_is:'1' %}
-      <div class="field-boxes row">
-        {% for field in line %}
-          {% include "admin/includes/field.html" with line=line css_field_box=line|class_for_field_boxes %}
-        {% endfor %}
+        <div class="panel-body">
+          {% for line in fieldset %}
+            {% if not line.fields|length_is:'1' %}
+              <div class="field-boxes row">
+                {% for field in line %}
+                  {% include "admin/includes/field.html" with line=line css_field_box=line|class_for_field_boxes %}
+                {% endfor %}
+              </div>
+            {% else %}
+              {% for field in line %}
+                {% include "admin/includes/field.html" with line=line %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        </div>
       </div>
-    {% else %}
-      {% for field in line %}
-        {% include "admin/includes/field.html" with line=line %}
-      {% endfor %}
-    {% endif %}
-  {% endfor %}
 </fieldset>
+{% endif %}
 

@@ -24,8 +24,8 @@
 {% endif %}
 
 {% block content %}
-  <div id="content-main">
-    <form  class="grid-form" {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" role="form" novalidate>
+<div class="row">
+    <form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="{{ form_url }}" method="post" id="{{ opts.model_name }}_form" role="form" novalidate>
     {% csrf_token %}
       {% block form_top %}{% endblock %}
 
@@ -36,10 +36,7 @@
         <input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}" />
       {% endif %}
       <div class="col-sm-12 form-fields">
-        <div class="panel panel-default form-panel">
-          <a href="#" class="form-expand">
-            <span class="glyphicon glyphicon-resize-horizontal "></span>
-          </a>
+        <div class="form-panel">
           <div class="panel-body">
             {% if errors %}
             <div class="alert alert-dismissable alert-danger">
@@ -81,7 +78,7 @@
 
             {% block submit_buttons_bottom %}
             <div class="row">
-            <div class="col-sm-8">
+            <div class="col-xs-12">
               {% submit_row %}
             </div>
             </div>
@@ -93,7 +90,25 @@
       
 
     </form>
-
-  </div>
+</div>
 {% endblock %}
 
+{% block extrascript %}
+  {{ block.super }}
+  <script>
+  (function($) {
+$('.delete :checkbox').change(function() {  
+    var tr = $(this).closest("tr");
+    if (this.checked) {
+        $(tr).addClass('danger');
+    } else {
+        $(tr).removeClass('danger');
+    }
+});
+
+$('.field-default :checkbox').change(function() {  
+    $('.field-default :checkbox').not(this).prop('checked', false);  
+});
+})(jQuery);
+  </script>
+{% endblock extrascript %}

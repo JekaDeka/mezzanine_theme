@@ -102,6 +102,14 @@
 
 					<div class="container-fluid">
 						<div data-widget-group="group1" class="ui-sortable">
+						{% if messages %}
+					    <div class="alert alert-dismissable alert-success">
+					    	{% for message in messages %}
+					    		<i class="fa fa-check"></i>&nbsp; {{ message }}
+					    		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+					    	{% endfor %}
+					    </div>
+					    {% endif %}
 						{% block content %}
 						{% endblock %}
 						</div>
@@ -156,6 +164,8 @@
 	<!-- Load page level scripts-->
 	<script src="{% static 'admin/plugins/form-fseditor/jquery.fseditor-min.js' %}"></script>            			<!-- Fullscreen Editor -->
 	<script src="{% static 'admin/plugins/bootbox/bootbox.js' %}"></script> 	<!-- Bootbox -->
+	<script src="{% static 'admin/demo/demo.js' %}"></script>
+	<script src="{% static 'admin/demo/demo-switcher.js' %}"></script>
 	<!-- End loading page level scripts-->
 {% endblock %}
 

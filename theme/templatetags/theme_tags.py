@@ -714,6 +714,13 @@ def class_for_field_boxes(line):
 
 
 @register.filter()
-def class_for_single_line(line):
+def class_for_single_line():
     # size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
     return 'col-sm-{0}'.format(6) 
+
+
+
+@register.filter("generate_id")
+def generate_id(value):
+    value = value.replace(" ", "")
+    return value

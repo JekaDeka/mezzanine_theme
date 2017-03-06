@@ -14,12 +14,12 @@ from mezzanine.pages.admin import PageAdmin
 from theme.models import Slider, SliderItem
 
 blog_fieldsets = deepcopy(BlogPostAdmin.fieldsets)
-blog_fieldsets[0][1]["fields"].insert(-2, "preview_content")
+# blog_fieldsets[0][1]["fields"].insert(-2, "preview_content")
 
 product_fieldsets = deepcopy(ProductAdmin.fieldsets)
-product_fieldsets[0][1]["fields"] += ("material",)
-product_fieldsets[0][1]["fields"] += ("condition",)
-product_fieldsets[0][1]["fields"] += ("pre_order",)
+# product_fieldsets[0][1]["fields"] += ("material",)
+# product_fieldsets[0][1]["fields"] += ("condition",)
+# product_fieldsets[0][1]["fields"] += ("pre_order",)
 
 class MyBlogPostAdmin(BlogPostAdmin):
     fieldsets = blog_fieldsets
@@ -30,6 +30,7 @@ class MyBlogPostAdmin(BlogPostAdmin):
     'featured_image', 
     'preview_content', 'content', 'categories', 'allow_comments']
 
+    fieldsets[1][1]['fields'].pop()
     def get_queryset(self, request):
         qs = super(MyBlogPostAdmin, self).get_queryset(request)
         if request.user.is_superuser:
@@ -42,11 +43,12 @@ class MyBlogPostAdmin(BlogPostAdmin):
 class MyProductAdmin(ProductAdmin):
     fieldsets = product_fieldsets
     list_per_page = 30
-    fieldsets[0][1]['fields'] = ['pre_order', 'title', 
-    'status', 
+    fieldsets[0][1]['fields'] = ['title', 'pre_order',  
+    'status',
     # ('publish_date', 'expiry_date'), 
-    'material', 'condition',  
+    'material', 'condition',
     'categories', 'content']
+
     def get_queryset(self, request):
         qs = super(MyProductAdmin, self).get_queryset(request)
         if request.user.is_superuser:

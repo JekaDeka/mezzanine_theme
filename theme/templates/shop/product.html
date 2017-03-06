@@ -38,9 +38,9 @@
 		<div class="slider-padding">
 			<div id="product-slider-vertical" class="royalSlider rsDefault">
 			{% for image in images %}
-				<a href="{{ MEDIA_URL }}{% thumbnail image 450 400 %}" class="mfp-gallery" title="{{product.title}}">
-					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image 450 400 %}" 
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image 100 100 %}" alt="" />
+				<a href="{{ MEDIA_URL }}{% thumbnail image.file 450 400 %}" class="mfp-gallery" title="{{product.title}}">
+					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 450 400 %}" 
+					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 100 100 %}" alt="{{ image.description }}" />
 				</a>
 			 {% endfor %}
 			 </div>

@@ -109,7 +109,7 @@
 				</div>
 				<a href="{{ product.get_absolute_url }}">
 					<section>
-						<span class="product-category">Готовый или под заказ <!-- {{product|get_product_category}} --></span>
+						<span class="product-category">Под заказ</span>
 						<h5>{{ product.title }}</h5>
 						{% if product.on_custom_sale %}
 							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
