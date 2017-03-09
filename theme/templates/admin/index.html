@@ -22,14 +22,19 @@
             <li class="dropdown pull-right tabdrop hide"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-angle-down"></i> </a>
                 <ul class="dropdown-menu"></ul>
             </li>
-            <li class="active"><a href="#tab-8-1" data-toggle="tab"> Информация </a></li>
-            <li><a href="{% url 'admin:index' %}">Редактировать</a></li>
+            <li {% if not profile_tab %}
+            class="active"
+            {% endif %}><a href="{% url 'admin:index' %}"> Информация </a></li>
+            <li {% if profile_tab %}
+            class="active"
+            {% endif %}><a href="{% url 'profile_view' request.user  %}">Редактировать</a></li>
         </ul>
     </div>
+    {% if not profile_tab %}
     <div class="col-md-3">
-        <div class="panel panel-profile" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
+        <div class="panel panel-profile">
             <div class="panel-heading">
-                <h2>About</h2>
+                <h2>Мой профиль</h2>
             </div>
             <div class="panel-body">
                 <div>
@@ -57,51 +62,22 @@
                     </div>
                     {% endif %}
                 </div>
-                <ul class="list-inline text-center">
-                    <li><a href="#" class=""><i class="fa fa-facebook"></i></a></li>
-                    <li><a href="#" class=""><i class="fa fa-twitter"></i></a></li>
-                    <li><a href="#" class=""><i class="fa fa-dribbble"></i></a></li>
-                    <li><a href="#" class=""><i class="fa fa-linkedin"></i></a></li>
-                    <li><a href="#" class=""><i class="fa fa-instagram"></i></a></li>
-                </ul>
+<!--                 <ul class="list-inline text-center">
+    <li><a href="#" class=""><i class="fa fa-facebook"></i></a></li>
+    <li><a href="#" class=""><i class="fa fa-twitter"></i></a></li>
+    <li><a href="#" class=""><i class="fa fa-dribbble"></i></a></li>
+    <li><a href="#" class=""><i class="fa fa-linkedin"></i></a></li>
+    <li><a href="#" class=""><i class="fa fa-instagram"></i></a></li>
+</ul> -->
             </div>
         </div>
-        <!-- panel -->
-        <!-- <div class="panel panel-profile" style="visibility: visible; opacity: 1; display: block; transform: translateY(0px);">
-            <div class="panel-heading">
-                <h2>Gallery</h2>
-            </div>
-            <div class="panel-body">
-                <div class="row">
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/1.jpg" alt="">
-                    </div>
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/2.jpg" alt="">
-                    </div>
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/3.jpg" alt="">
-                    </div>
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/4.jpg" alt="">
-                    </div>
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/5.jpg" alt="">
-                    </div>
-                    <div class="gallery-image col-md-4 col-sm-4 col-xs-4">
-                        <img class="img-responsive" src="assets/demo/images/6.jpg" alt="">
-                    </div>
-                </div>
-                <a href="#" class="pull-left">View all <i class="material-icons">arrow_forward</i></a>
-            </div>
-        </div> -->
     </div>
     <!-- col-sm-3 -->
     <div class="col-md-9">
         <div class="tab-content">
             <div class="panel-profile">
                 <div class="tab-content">
-                    <div class="tab-pane p-md active" id="tab-8-1">
+                    <div class="tab-pane p-md {% if not profile_tab %}active{% endif %}" id="tab-8-1">
                         <div class="about-area">
                             <h4>Информация</h4>
                             {% if profile_user.myprofile.bio  %}
@@ -133,6 +109,13 @@
         </div>
         <!-- .tab-content -->
     </div>
+    {% else %}
+    <form method="post">
+	    {% csrf_token %}
+	    {{ form }}
+	    <input type="submit" value="Submit" />
+	</form>
+    {% endif %}
     <!-- col-sm-8 -->
 </div>
 {% endblock content %}

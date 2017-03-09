@@ -7,6 +7,7 @@ from mezzanine.utils.static import static_lazy as static
 from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
 
+from theme.models import MyProfile
 
 # These fields need to be in the form, hidden, with default values,
 # since it posts to the blog post admin, which includes these fields
@@ -36,3 +37,12 @@ class СustomBlogForm(forms.ModelForm):
 # our new form
 class ContactForm(forms.Form):
     contact_email = forms.EmailField(required=True)
+
+
+class MyProfileForm(forms.ModelForm):
+
+    class Meta:
+        model = MyProfile
+        fields = ("city", "phone", "bio")
+
+        

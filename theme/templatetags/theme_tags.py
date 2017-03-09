@@ -724,3 +724,21 @@ def class_for_single_line():
 def generate_id(value):
     value = value.replace(" ", "")
     return value
+
+
+
+EXTENSIONS = {
+    'Папка': [''],
+    'Изображения': ['.jpg', '.jpeg', '.gif', '.png', '.tif', '.tiff', '.svg'],
+}
+
+
+def allowed_theme_list(separator=','):
+    output = []
+
+    for key in EXTENSIONS:
+        if key != 'Folder':
+            output += EXTENSIONS[key]
+
+    return separator.join(output)
+register.simple_tag(allowed_theme_list)

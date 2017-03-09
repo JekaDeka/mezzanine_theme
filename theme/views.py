@@ -19,10 +19,12 @@ from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm
+from theme.forms import СustomBlogForm, ContactForm, MyProfileForm
+from theme.models import MyProfile
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from django.contrib.auth.models import Group
-
+from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.decorators import login_required
 
 User = get_user_model()
 
@@ -128,5 +130,29 @@ def index(request):
         else:
             return redirect('/')
     context = {'form': form }
-    print('123')
     return render(request, 'index.html', context)
+
+@csrf_protect
+@login_required
+def profile_view(request, username,
+                    template_name='admin/index.html',
+                    form = MyProfileForm,
+                    extra_context=None):
+    u = User.objects.get(username=username)
+    user = MyProfile.objects.get(user=u)
+    if request.method == "POST":
+        form = MyProfileForm(request.POST, instance=user)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.save()
+            return TemplateResponse(request, template_name, {})
+    else:
+        form = MyProfileForm(instance=user)
+    context = {
+        'form': form,
+        'profile_tab': True,
+    }
+    if extra_context is not None:
+        context.update(extra_context)
+
+    return TemplateResponse(request, template_name, context)
