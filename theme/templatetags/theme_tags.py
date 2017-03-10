@@ -718,9 +718,6 @@ def class_for_single_line():
     # size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
     return 'col-sm-{0}'.format(6) 
 
-@register.simple_tag
-def random_bool():
-    return True
 
 
 

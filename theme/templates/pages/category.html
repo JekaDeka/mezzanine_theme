@@ -18,7 +18,7 @@
 			<ul class="option-set" data-option-key="filter">
 			<li><a href="#filter" class="selected" data-filter="*">Все</a></li>
 			{% for category in child_categories %}
-				<li><a href="#filter" data-filter=".{{category.title}}">{{category.title}}</a></li>
+				<li><a href="#filter" data-filter=".{{category.title|generate_id}}">{{category.title}}</a></li>
 			{% endfor %}
 			</ul>
 		</div>
