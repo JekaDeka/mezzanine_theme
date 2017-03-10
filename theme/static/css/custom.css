@@ -24,14 +24,17 @@ h5 {
 /*
 nav shit and etc, shop_tree display inline-block
 */
+#categories li {
+	line-height: 23px;
+}
 #categories > li  {
 	border-bottom: 1px solid #eee;
 }
 #categories .active-li {
-	background-color: #3acf87;
+	/*background-color: #3acf87;*/
 }
 #categories .active-li > a {
-	color: #fff!important;
+	/*color: #fff!important;*/
 }
 #categories li a {
 	border-bottom: none;

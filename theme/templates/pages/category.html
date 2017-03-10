@@ -9,31 +9,63 @@
 
 
 {% block main_containter %}
-<div class="container product-categories">
-<!-- <div class="sixteen columns"> -->
+
+<div class="container">
 {% if child_categories %}
-	<div class="">
-		{% for category in child_categories %}
-		<div class="three columns">
-			<a href="{{ category.get_absolute_url }}" class="img-caption">
-				<figure>
-				{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
-					{% if category.featured_image %}
-						<img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" />
+<!-- Filters -->
+	<div class="sixteen columns">
+		<div id="filters" class="filters-dropdown headline"><span></span>
+			<ul class="option-set" data-option-key="filter">
+			<li><a href="#filter" class="selected" data-filter="*">Все</a></li>
+			{% for category in child_categories %}
+				<li><a href="#filter" data-filter=".{{category.title}}">{{category.title}}</a></li>
+			{% endfor %}
+			</ul>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+
+	<div id="portfolio-wrapper">
+	{% for category in child_categories %}
+		<!-- Portfolio Item -->
+		<div class="four columns portfolio-item {{category.title}}">
+			<figure>
+				<div class="portfolio-holder">
+					<a href="{{ category.get_absolute_url }}">
+					{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
+						{% if category.featured_image %}
+							<img alt="" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
+						{% else %}
+						{% with "23456"|make_list|random as rnd %}
+						{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
+						    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="">
+						{% endwith %}
+							
+						{% endwith %}
+								
+						{% endif %}
 					{% else %}
-						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 250 250 %}" alt="">
+						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 280 280 %}" alt="">
 					{% endif %}
-				{% else %}
-					<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 250 250 %}" alt="">
-				{% endif %}
-				<figcaption>
-					<h3>{{ category.title }}</h3>
-					<span>Подробнее</span>
-				</figcaption>
-				</figure>
-			</a>
-		</div>  
-		{% endfor %}
+						<div class="hover-cover"></div>
+						<div class="hover-icon"></div>
+					</a>
+				</div>
+
+				<a href="{{ category.get_absolute_url }}">
+					<section class="item-description">
+						<span>
+						{% if category.parent.parent.title and category.parent.parent.title != 'Каталог'  %}
+							{{ category.parent.parent.title }}
+						{% endif %}
+						{{ category.parent.title }}</span>
+						<h5>{{ category.title }}</h5>
+					</section>
+				</a>
+
+			</figure>
+		</div>
+	{% endfor %}
 	</div>
 {% endif %} 
 <!-- </div> -->

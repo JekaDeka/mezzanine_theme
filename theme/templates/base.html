@@ -131,6 +131,22 @@
 {% endblock %}
 
 
+{% nevercache %}
+{% if messages %}
+<div class="container">
+{% for message in messages %}
+	<div class="sixteen columns">
+		<div class="notification success closeable margin-bottom-30">
+			<p>{{ message }}</p>
+			<a class="close"></a>
+		</div>
+	</div>
+{% endfor %}
+</div>
+{% endif %}
+{% endnevercache %}
+
+
 {% block breadcrumbs %}
 <section class="titlebar">
 <div class="container">
@@ -156,21 +172,21 @@
 {% endblock %}
 
 {% block main_containter %}
-<div class="container">
-{% block sidebar %}
-{% endblock %}
+    <div class="container">
+        {% block sidebar %}
+        {% endblock %}
 
-{% block main %}
-{% endblock %}
-</div>
-<div class="container">
-{% block product_info %}
-{% endblock %}
-</div>
-<div class="container margin-top-10">
-{% block related_products %}
-{% endblock %}
-</div>
+        {% block main %}
+        {% endblock %}
+    </div>
+    <div class="container">
+        {% block product_info %}
+        {% endblock %}
+    </div>
+    <div class="container margin-top-10">
+        {% block related_products %}
+        {% endblock %}
+    </div>
 
 {% endblock %}
 
