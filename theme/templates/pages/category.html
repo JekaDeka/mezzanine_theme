@@ -28,7 +28,7 @@
 	<div id="portfolio-wrapper">
 	{% for category in child_categories %}
 		<!-- Portfolio Item -->
-		<div class="four columns portfolio-item {{category.title}}">
+		<div class="four columns portfolio-item {{category.title|generate_id}}">
 			<figure>
 				<div class="portfolio-holder">
 					<a href="{{ category.get_absolute_url }}">
