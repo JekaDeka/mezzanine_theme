@@ -138,8 +138,14 @@ def profile_view(request, username,
                     template_name='admin/index.html',
                     form = MyProfileForm,
                     extra_context=None):
-    u = User.objects.get(username=username)
-    user = MyProfile.objects.get(user=u)
+	try:
+		u = User.objects.get(username=username)
+    	user = MyProfile.objects.get(user=u)
+	except:
+		user = None
+    
+    if not user:
+    	return TemplateResponse(request, template_name, {})
     if request.method == "POST":
         form = MyProfileForm(request.POST, instance=user)
         if form.is_valid():
