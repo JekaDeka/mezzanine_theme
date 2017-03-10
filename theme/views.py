@@ -113,6 +113,8 @@ def promote_user(request, template="accounts/account_signup.html",
             siteperms = SitePermission.objects.create(user=user)
             siteperms.sites.add(2)
             user.groups.add(group)
+            profile = MyProfile(user=user)
+            profile.save()
             user.save()
 
     return redirect('/')
