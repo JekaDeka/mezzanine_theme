@@ -18,7 +18,7 @@
 			<ul class="option-set" data-option-key="filter">
 			<li><a href="#filter" class="selected" data-filter="*">Все</a></li>
 			{% for category in child_categories %}
-				<li><a href="#filter" data-filter=".{{category.title|generate_id}}">{{category.title}}</a></li>
+				<li><a href="#filter" data-filter=".{{category.title|hard_trim}}">{{category.title}}</a></li>
 			{% endfor %}
 			</ul>
 		</div>
@@ -28,7 +28,7 @@
 	<div id="portfolio-wrapper">
 	{% for category in child_categories %}
 		<!-- Portfolio Item -->
-		<div class="four columns portfolio-item {{category.title|generate_id}}">
+		<div class="four columns portfolio-item {{category.title|hard_trim}}">
 			<figure>
 				<div class="portfolio-holder">
 					<a href="{{ category.get_absolute_url }}">

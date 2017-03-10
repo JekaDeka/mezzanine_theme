@@ -726,7 +726,11 @@ def generate_id(value):
     value = value.replace(" ", "")
     return value
 
-
+@register.filter("hard_trim")
+def hard_trim(value):
+    value = value.replace(" ", "")
+    value = value.replace(",", "")
+    return value
 
 EXTENSIONS = {
     'Папка': [''],
