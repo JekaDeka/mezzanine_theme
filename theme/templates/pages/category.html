@@ -26,23 +26,27 @@
 	<div class="clearfix"></div>
 
 	<div id="portfolio-wrapper">
-	{% for category in child_categories %}
+	{% for category in true_child_categories %}
 		<!-- Portfolio Item -->
 		<div class="four columns portfolio-item {{category.title|hard_trim}}">
 			<figure>
 				<div class="portfolio-holder">
-					<a href="{{ category.get_absolute_url }}">
+					<a href="{{ category.get_absolute_url }}
+					{% if request.GET.pre_order == '1' %}
+					?pre_order=1
+					{% elif request.GET.pre_order == '0' %}
+					?pre_order=0
+					{% endif %}
+					">
 					{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
 						{% if category.featured_image %}
 							<img alt="" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
 						{% else %}
-						{% with "23456"|make_list|random as rnd %}
-						{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
-						    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="">
-						{% endwith %}
-							
-						{% endwith %}
-								
+							{% with "23456"|make_list|random as rnd %}
+							{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
+							    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="">
+							{% endwith %}
+							{% endwith %}
 						{% endif %}
 					{% else %}
 						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 280 280 %}" alt="">
@@ -82,17 +86,26 @@
 		<div class="clearfix"></div>
 	</div>
 	<!-- filters -->
-<!-- 	<div class="widget">
+<!-- <div class="widget">
  		<h3 class="headline">Сортировать по цене</h3><span class="line"></span><div class="clearfix"></div>
 
 		<div id="price-range">
 			<div class="padding-range"><div id="slider-range" class="ui-slider ui-slider-horizontal ui-widget ui-widget-content ui-corner-all" aria-disabled="false"><div class="ui-slider-range ui-widget-header ui-corner-all" style="left: 0%; width: 100%;"></div><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 0%;"></a><a class="ui-slider-handle ui-state-default ui-corner-all" href="#" style="left: 100%;"></a></div></div>
 			<label for="amount">Цена:</label>
 			<input type="text" id="amount">
-			<a href="#" class="button color">Применить</a>
+			
 		</div>
 		<div class="clearfix"></div>
  </div> -->
+<div class="widget"> 
+			<!-- Headline -->
+			<h3 class="headline">Отобразить</h3><span class="line margin-bottom-30"></span><div class="clearfix"></div>
+			<a href="{{ page.get_absolute_url }}" class="button {% if not request.GET.pre_order %}color{% else %}dark{% endif %}"></i>
+			Все предметы</a> <br>
+			<a href="{{ page.get_absolute_url }}?pre_order=1" class="button {% if request.GET.pre_order == '1' %}color{% else %}dark{% endif %}"><i class="fa fa-gift"></i>На заказ</a>
+			<a href="{{ page.get_absolute_url }}?pre_order=0" class="button {% if request.GET.pre_order == '0' %}color{% else %}dark{% endif %}"><i class="fa fa-check-square-o"></i>Готовые</a>
+ </div>
+
 </div>
 {% endblock %}
 
@@ -112,16 +125,21 @@
 	        {% endif %}
 	        {% endfor %}
 	        </select>
+
 	</form>
+	    
 	</div>
 	
 
 	<div class="twelve columns products">
-		{% for product in products.object_list %}
+		{% for product in true_products %}
 		<div class="four shop columns">
 			<figure class="product">
 				{% if product.on_custom_sale %}
 					<div class="product-discount">СКИДКА</div>
+				{% endif %}
+				{% if product.pre_order %}
+					<div class="product-discount blue">Под заказ</div>
 				{% endif %}
 				<div class="mediaholder">
 				<a href="{{ product.get_absolute_url }}">
@@ -141,8 +159,14 @@
 				</div>
 				<a href="{{ product.get_absolute_url }}">
 					<section>
-						<span class="product-category">Под заказ</span>
-						<h5>{{ product.title }}</h5>
+						<h5>{{ product.title|title }}</h5>
+						<span class="product-category">
+						{% if product.material %}
+							{{ product.material|truncatechars:22 }}
+						{% else %}
+							<br>
+						{% endif %}
+						</span>
 						{% if product.on_custom_sale %}
 							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
 						{% else %}

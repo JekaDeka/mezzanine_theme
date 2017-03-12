@@ -43,6 +43,14 @@ class MyProfileForm(forms.ModelForm):
 
     class Meta:
         model = MyProfile
-        fields = ("city", "phone", "bio")
+        fields = ("image", "city", "phone", "bio")
+        widgets = {
+            'city': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control mask', 'data-inputmask' : "'mask':'9 (999) 999-9999'"}),
+        }
+        help_texts = {
+            'city': 'Укажите конактный адрес',
+            'phone': 'Ваш мобильный телефон',
+        }
 
         

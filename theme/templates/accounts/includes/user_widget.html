@@ -76,6 +76,9 @@
                         {% if product.on_custom_sale %}
                             <div class="product-discount">СКИДКА</div>
                         {% endif %}
+                        {% if product.pre_order %}
+                            <div class="product-discount blue">Под заказ</div>
+                        {% endif %}
                         <div class="mediaholder">
                         <a href="{{ product.get_absolute_url }}">
                             {% if product.image %}
@@ -94,8 +97,10 @@
                         </div>
                         <a href="{{ product.get_absolute_url }}">
                             <section>
-                                <span class="product-category">Готовый или под заказ <!-- {{product|get_product_category}} --></span>
-                                <h5>{{ product.title|title}}</h5>
+                                <h5>{{ product.title|title }}</h5>
+                                <span class="product-category">
+                                {{ product.material|truncatechars:22 }}
+                                </span>
                                 {% if product.on_custom_sale %}
                                     <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
                                 {% else %}

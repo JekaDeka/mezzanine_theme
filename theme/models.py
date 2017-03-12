@@ -16,8 +16,8 @@ Priced.add_to_class("on_custom_sale", on_custom_sale)
 
 class MyProfile(models.Model):
     user = models.OneToOneField("auth.User")
-    image = models.ImageField(
-        upload_to='users/avatars/', blank=True, verbose_name=("Аватарка"))
+    image = FileField(upload_to=upload_to("theme.MyProfile.image", "myprofile"), 
+        verbose_name=_("Изображение профиля"), format="Image", max_length=255, null=True, blank=True)
     city = models.CharField(max_length=255, blank=True,
                             verbose_name=("Расположение"))
     phone = models.CharField(max_length=255, blank=True,

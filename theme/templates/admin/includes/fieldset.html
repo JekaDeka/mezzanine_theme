@@ -1,7 +1,7 @@
 {% load theme_tags %}
 {% if fieldset.name != 'Другие товары' %}
 <fieldset class="module aligned {{ fieldset.classes }}">
-  <div class="panel panel-midnightblue" data-widget='{"draggable": "false"}'>
+  <div class="panel panel-midnightblue" data-widget='{"draggable": "false", "collapsed" : "true"}'>
   {% if fieldset.name %}
         <div class="panel-heading">
           <h2>{{ fieldset.name }}</h2>

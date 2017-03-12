@@ -733,6 +733,7 @@ def hard_trim(value):
     value = value.replace(",", "")
     return value
 
+
 EXTENSIONS = {
     'Папка': [''],
     'Изображения': ['.jpg', '.jpeg', '.gif', '.png', '.tif', '.tiff', '.svg'],

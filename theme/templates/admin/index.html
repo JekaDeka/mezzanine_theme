@@ -1,20 +1,46 @@
 {% extends "admin/base_site.html" %} 
-{% load staticfiles accounts_tags %}
+{% load staticfiles accounts_tags mezzanine_tags theme_tags %}
+
+{% block extrahead %}
+{{ block.super }}
+    <script type="text/javascript" src="{% static "admin/js/mezz/product_variations.js" %}"></script>
+	
+    <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
+    <script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
+    <script type="text/javascript" src="{% static "admin/js/mezz/SelectFilter2.js" %}"></script>
+
+    <script type="text/javascript" src="{% static "admin/js/mezz/inlines.js" %}"></script>
+
+    <script type="text/javascript" src="/static/filebrowser/js/AddFileBrowser.js"></script>
+    <script type="text/javascript" src="/static/mezzanine/tinymce/tinymce.min.js"></script>
+    <script type="text/javascript" src="/static/mezzanine/js/tinymce_setup.js"></script>
+    <script type="text/javascript" src="{% static "admin/js/mezz/keywords_field.js" %}"></script>
+
+{% endblock %}
+
 {% block page_heading %}
 {% endblock %}
 {% block content %}
 <div class="row">
     <div class="col-md-12 profile-area">
         <div class="media col-md-6 col-sm-6 col-xs-6">
-            <a class="media-left pr-n" href="#">
-                <img class="media-object img-resposnive" src="{% static 'admin/img/3.jpg' %}" alt="profile image" width="88" height="88">
+            <a class="media-left pr-n" href="{% url 'profile_view' request.user  %}">
+            {% if request.user.myprofile.image %}
+            	<img class="media-object img-resposnive" src="{{ MEDIA_URL }}{% thumbnail request.user.myprofile.image 88 88 %}" alt="profile image" width="88" height="88">
+            {% else %}
+            	<img class="media-object img-resposnive" src="{% static 'admin/img/3.jpg' %}" alt="profile image" width="88" height="88">
+            {% endif %}
+                
             </a>
             <div class="media-body pl-xl">
                 <h4 class="media-heading">{{ request.user|username_or:"get_full_name" }}</h4> 
 				{% if request.user.email %}
-                	{{request.user.email}}
+                	<p>{{request.user.email}}</p>
                 {% endif %}
             </div>
+        </div>
+        <div>
+        	<a href="{% url 'profile' request.user.username %}" class="btn-raised btn pull-right" >Посмотреть профиль на сайте</a>
         </div>
     </div>
     <div class="col-md-12 pl-n pr-n">
@@ -110,12 +136,39 @@
         <!-- .tab-content -->
     </div>
     {% else %}
-    <form method="post">
-	    {% csrf_token %}
-	    {{ form }}
-	    <input type="submit" value="Submit" />
-	</form>
+		<div class="col-sm-12">
+			<div class="panel panel-default" data-widget='{"draggable": "false"}'>
+				<div class="panel-body">
+					<form role="form" class="form-horizontal" method="post">
+					{% csrf_token %}
+					{% for field in form %}
+					{{ field.errors }}
+					<div class="form-group is-empty">
+							<label class="col-sm-3 control-label">{{ field.label }}</label>
+							<div class="col-sm-6">						
+								{{ field }}
+							</div>
+							{% if field.help_text %}
+							<div class="col-sm-3">
+								<p class="help-block">{{ field.help_text|safe }}</p>
+							</div>
+							{% endif %}
+						</div>
+					{% endfor %}
+					<div class="panel-footer">
+					<div class="row">
+						<div class="col-sm-8 col-sm-offset-3">
+							<input type="submit" value="Сохранить" class="btn-raised btn-success btn" name="_save" />
+							<a href="{% url 'admin:index' %}" class="btn-default btn">Отмена</a>
+						</div>
+					</div>
+				</div>
+					</form>
+					
+				</div>
+				
+			</div>
+		</div>
     {% endif %}
-    <!-- col-sm-8 -->
 </div>
 {% endblock content %}
