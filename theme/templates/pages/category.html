@@ -18,7 +18,7 @@
 			<ul class="option-set" data-option-key="filter">
 			<li><a href="#filter" class="selected" data-filter="*">Все</a></li>
 			{% for category in child_categories %}
-				<li><a href="#filter" data-filter=".{{category.title|hard_trim}}">{{category.title}}</a></li>
+				<li><a href="#filter" data-filter=".{{category.title|hard_trim}}">{{category.title|title|truncatechars:25 }}</a></li>
 			{% endfor %}
 			</ul>
 		</div>
