@@ -16,9 +16,12 @@
 	<div class="sixteen columns">
 		<div id="filters" class="filters-dropdown headline"><span></span>
 			<ul class="option-set" data-option-key="filter">
+			{% if no_child %}
+				<li><a href="#filter" class="selected" data-filter="*">Все</a></li>
+			{% endif %}
 			{% for category in sub_categories %}
 				<li><a href="#filter" 
-				{% if forloop.first %}class="selected"{% endif %} 
+				{% if forloop.first and not no_child %}class="selected"{% endif %} 
 				data-filter=".{{category.title|hard_trim}}">{{category.title|title}}</a></li>
 			{% endfor %}
 			</ul>
