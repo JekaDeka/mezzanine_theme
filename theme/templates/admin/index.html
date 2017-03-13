@@ -106,8 +106,8 @@
                     <div class="tab-pane p-md {% if not profile_tab %}active{% endif %}" id="tab-8-1">
                         <div class="about-area">
                             <h4>Информация</h4>
-                            {% if profile_user.myprofile.bio  %}
-								{{ profile_user.myprofile.bio|safe }}
+                            {% if request.user.myprofile.bio  %}
+								{{ request.user.myprofile.bio|safe }}
 							{% else %}
 								<p>Не указана</p>
 							{% endif %}
