@@ -125,7 +125,7 @@ def true_index(request):
     
     enddate = datetime.datetime.today()
     startdate = enddate - datetime.timedelta(days=60)
-    new_arrivals = Product.objects.filter(created__range=[startdate, enddate]).filter(available=1).order_by('-created')[:10]
+    new_arrivals = Product.objects.filter(created__range=[startdate, enddate]).filter(status=2).order_by('-created')[:10]
 
     recent_posts = BlogPost.objects.filter(created__range=[startdate, enddate]).order_by('-created')[:4]
 
