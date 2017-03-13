@@ -129,9 +129,17 @@ def true_index(request):
 
     recent_posts = BlogPost.objects.filter(created__range=[startdate, enddate]).order_by('-created')[:4]
 
-
+    most_popular = new_arrivals[:3]
+    best_product = new_arrivals[:3]
+    sale_product = new_arrivals[:3]
     
-    context = {'featured': featured, 'new_arrivals': new_arrivals, 'recent_posts': recent_posts}
+    context = {'featured': featured, 
+                'new_arrivals': new_arrivals, 
+                'recent_posts': recent_posts,
+                'most_popular': most_popular,
+                'best_product': best_product,
+                'sale_product': sale_product
+            }
     return render(request, '_index.html', context)
 
 def index(request):
