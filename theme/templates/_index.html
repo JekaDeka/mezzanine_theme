@@ -300,7 +300,7 @@
                 {% endblock %}
                 {% block blog_post_list_post_content %}
                 {% if blog_post.preview_content %}
-                    {{ blog_post.preview_content|truncatewords_html:45 }}
+                    {{ blog_post.preview_content|safe|truncatewords_html:45 }}
                 {% else %}
                     {{ blog_post.description_from_content|safe|truncatewords_html:45 }}
                 {% endif %}
