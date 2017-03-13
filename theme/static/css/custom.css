@@ -1,3 +1,9 @@
+.width-100 {
+	width: 100%;
+}
+.tp-banner, .tp-bgimg, .home-slider {
+	max-height: 450px!important;
+}
 .help-block {
 	color: red;
 }

@@ -13,6 +13,7 @@ from django.contrib.auth import (login as auth_login, authenticate,
 from django.contrib.auth.decorators import login_required
 
 from mezzanine.blog.models import BlogPost, BlogCategory
+from cartridge.shop.models import Category, Product
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
@@ -25,6 +26,7 @@ from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+import datetime
 
 User = get_user_model()
 
@@ -119,7 +121,16 @@ def promote_user(request, template="accounts/account_signup.html",
     return redirect('/')
 
 def true_index(request):
-    return render(request, '_index.html')
+    featured = Category.objects.all()[1:5]
+    
+    enddate = datetime.datetime.today()
+    startdate = enddate - datetime.timedelta(days=60)
+    new_arrivals = Product.objects.filter(created__range=[startdate, enddate]).order_by('-created')[:10]
+
+    recent_posts = BlogPost.objects.filter(created__range=[startdate, enddate]).order_by('-created')[:4]
+    
+    context = {'featured': featured, 'new_arrivals': new_arrivals, 'recent_posts': recent_posts}
+    return render(request, '_index.html', context)
 
 def index(request):
     form = ContactForm
