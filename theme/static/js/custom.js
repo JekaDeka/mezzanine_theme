@@ -483,7 +483,8 @@
             var $container = $('#portfolio-wrapper, #masonry-wrapper');
             $container.isotope({
                 itemSelector: '.portfolio-item, .masonry-item',
-                layoutMode: 'masonry'
+                layoutMode: 'masonry',
+                filter: $('#filters a.selected').attr('data-filter')
             });
         });
         $('#filters a').click(function(e) {

@@ -8,6 +8,7 @@ from mezzanine.pages.page_processors import processor_for
 from mezzanine.utils.views import paginate
 
 from cartridge.shop.models import Category, Product
+from mezzanine.pages.models import Page
 
 
 @processor_for(Category, exact_page=True)
@@ -31,5 +32,6 @@ def category_processor(request, page):
                         settings.MAX_PAGING_LINKS)
     products.sort_by = sort_by
     sub_categories = page.category.children.published()
-    child_categories = Category.objects.filter(id__in=sub_categories)
-    return {"true_products": products, "true_child_categories": child_categories}
+    child_categories = Category.objects.published(for_user=request.user).filter(id__in=sub_categories)
+    true_sub_categories = Category.objects.published(for_user=request.user).filter(parent_id__in=child_categories)
+    return {"true_products": products, "sub_categories": child_categories, "sub_child_categories": true_sub_categories}
