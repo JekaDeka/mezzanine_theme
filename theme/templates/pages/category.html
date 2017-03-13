@@ -29,7 +29,14 @@
 	<div id="portfolio-wrapper">
 	{% for category in sub_child_categories %}
 		<!-- Portfolio Item -->
-		<div class="four columns portfolio-item {{category.parent.title|hard_trim}}">
+		<div class="four columns portfolio-item
+		{% if no_child %}
+		{{category.title|hard_trim}}
+		{% else %}
+		{{category.parent.title|hard_trim}}
+		{% endif %}
+		
+		">
 			<figure>
 				<div class="portfolio-holder">
 					<a href="{{ category.get_absolute_url }}

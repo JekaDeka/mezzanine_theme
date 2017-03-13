@@ -34,4 +34,12 @@ def category_processor(request, page):
     sub_categories = page.category.children.published()
     child_categories = Category.objects.published(for_user=request.user).filter(id__in=sub_categories)
     true_sub_categories = Category.objects.published(for_user=request.user).filter(parent_id__in=child_categories)
-    return {"true_products": products, "sub_categories": child_categories, "sub_child_categories": true_sub_categories}
+    no_child = False
+    if not true_sub_categories:
+        true_sub_categories = child_categories
+        no_child = True
+
+    return {"true_products": products, 
+            "sub_categories": child_categories, 
+            "sub_child_categories": true_sub_categories,
+            'no_child': no_child}
