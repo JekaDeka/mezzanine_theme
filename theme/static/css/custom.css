@@ -1,16 +1,52 @@
+#logo { 
+	margin-top: 15px;
+	margin-bottom: 5px; 
+}
+#top-bar {
+	background: #505050;
+}
+#top_buttons {
+	padding: 18px 0px;
+}
+#top_buttons a {
+	color: #505050;
+	font-weight: 600;
+	font-size: 16px;
+	padding: 5px;
+}
+
+#top_buttons a:hover {
+	color: #3acf87;
+}
+.menu {
+	margin: 0;
+	background-color: #505050;
+}
 .item-description {
 	padding: 10px 0px 10px 0px;
 }
 .item-description h5, .item-description span, .product h5, .product span {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	padding: 5px 10px 5px 10px;
 	display: block;
+	padding: 5px 10px 5px 10px;
+	line-height: 15px;
+    min-height: 30px;
+    max-height: 30px;
+    overflow: hidden;
 }
 .product span {
     display: block;
 }
+.product section {
+	padding: 3px 0 3px 0;
+}
+
+.hide-top-search {
+	display: none;
+}
+.img-caption figcaption {
+	padding: 17px 0px 17px 5px;
+}
+
 @media only screen and (max-width: 767px) {
 	.custom_column {
 		width: 144px!important;
@@ -18,11 +54,7 @@
 	    margin-left: 3px!important;
 	}
 	.product h5 {
-		line-height: 26px!important;
-		overflow: hidden;
 		font-size: 15px;
-		text-overflow: ellipsis;
-	    white-space: nowrap;
 	}
 	.product span {
 		text-overflow: ellipsis;
@@ -41,6 +73,7 @@
 	}
 	.product .product-price {
 		padding: 0px 6px 6px 0px;
+		white-space: nowrap;
 	}
 	.item-description span {
 		font-size: 11px;
@@ -49,6 +82,17 @@
 	.item-description h5 {
 		font-size: 14px;
 	}
+	a.menu-trigger {
+		width: auto;
+		padding-right: 15px;
+		background: #505050;
+	}
+	#cart, .top-search {
+		margin: 18px 0 0 0;
+	}
+	.hide-top-search {
+		display: block;
+	}
 
 }
 @media only screen and (max-width: 767px) and (min-width: 480px) {
@@ -56,6 +100,9 @@
 		width: 200px!important;
 	    margin-right: 5px!important;
 	    margin-left: 5px!important;
+	}
+	.top-search input {
+		width: 153px;
 	}
 }
 .selectric {
@@ -81,6 +128,10 @@ h5 {
 }
 .product section h5 {
     word-break: break-word;
+    line-height: 22px;
+    min-height: 44px;
+    max-height: 44px;
+    overflow: hidden;
 }
 .product-price-discount {
 	padding: 1px 0 5px 0;

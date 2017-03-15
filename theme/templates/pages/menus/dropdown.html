@@ -1,9 +1,12 @@
-{% load i18n pages_tags %}
+{% load i18n pages_tags mezzanine_tags %}
 {% spaceless %}
 {% if page_branch_in_menu %}
 
 {% if branch_level == 0 %}
 <a href="#menu" class="menu-trigger"><i class="fa fa-bars"></i> Меню</a>
+<div class="hide-top-search">
+{% search_form "all" %}
+</div>
 <nav id="navigation">
 <ul class="menu" id="responsive">
     {% for page in page_branch %}
@@ -28,6 +31,7 @@
     </li>
     {% endif %}
     {% endfor %}
+    <li style="float: right; margin: 5px 0px;">{% search_form "all" %}</li>
 </ul>
 </nav>
 

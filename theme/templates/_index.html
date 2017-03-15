@@ -53,7 +53,7 @@
                         <img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 380 380 %}" alt="" class="width-100">
                     {% endif %}
                 <figcaption>
-                    <h3>{{ category.title|truncatechars:25 }}</h3>
+                    <h3>{{ category.title }}</h3>
                     <span>{{ category.parent.title }}</span>
                 </figcaption>
             </figure>

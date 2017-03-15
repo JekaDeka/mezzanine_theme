@@ -34,9 +34,9 @@
 		<!-- Portfolio Item -->
 		<div class="four columns portfolio-item custom_column
 		{% if no_child %}
-		{{category.title|hard_trim}}
+			{{category.title|hard_trim}}
 		{% else %}
-		{{category.parent.title|hard_trim}}
+			{{category.parent.title|hard_trim}}
 		{% endif %}
 		">
 			<figure>
@@ -69,11 +69,11 @@
 				<a href="{{ category.get_absolute_url }}">
 					<section class="item-description">
 						<span>
-						{% if category.parent.parent.title and category.parent.parent.title != 'Каталог'  %}
+						<!-- {% if category.parent.parent.title and category.parent.parent.title != 'Каталог'  %}
 							{{ category.parent.parent.title }} <i class="fa fa-caret-right"></i>
-						{% endif %}
-						{{ category.parent.title|truncatechars:25 }}</span>
-						<h5>{{ category.title|truncatechars:25 }}</h5>
+						{% endif %} -->
+						{{ category.parent.title }}</span>
+						<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
 					</section>
 				</a>
 
@@ -169,13 +169,9 @@
 				</div>
 				<a href="{{ product.get_absolute_url }}">
 					<section>
-						<h5>{{ product.title|title }}</h5>
+						<h5>{{ product.title|title|truncatechars:34 }}</h5>
 						<span class="product-category">
-						{% if product.material %}
-							{{ product.material }}
-						{% else %}
-							<br>
-						{% endif %}
+							{{ product.user }}
 						</span>
 						{% if product.on_custom_sale %}
 							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>

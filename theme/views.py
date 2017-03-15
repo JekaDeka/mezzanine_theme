@@ -13,6 +13,7 @@ from django.contrib.auth import (login as auth_login, authenticate,
 from django.contrib.auth.decorators import login_required
 
 from mezzanine.blog.models import BlogPost, BlogCategory
+from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
@@ -121,7 +122,8 @@ def promote_user(request, template="accounts/account_signup.html",
     return redirect('/')
 
 def true_index(request):
-    featured = Category.objects.all()[1:5]
+    main_category = Page.objects.filter(slug='catalog')[:4]
+    featured = Category.objects.filter(parent=main_category)
     
     enddate = datetime.datetime.today()
     startdate = enddate - datetime.timedelta(days=60)
