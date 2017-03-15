@@ -1,4 +1,5 @@
-.product h5, .product span {
+
+.item-description span, .product h5, .product span {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
