@@ -1,9 +1,12 @@
+.item-description {
+	padding: 10px 0px 10px 0px;
+}
 .item-description h5, .item-description span, .product h5, .product span {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-	padding-left: 10px;
-	padding-right: 10px;
+	padding: 5px 10px 5px 10px;
+	display: block;
 }
 .product span {
     display: block;
