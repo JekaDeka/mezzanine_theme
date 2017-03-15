@@ -36,7 +36,7 @@
 {% block featured %}
 <div class="container">
 {% for category in featured %}
-    <div class="four columns">
+    <div class="four columns custom_column">
         <a href="{{ category.get_absolute_url }}" class="img-caption" >
             <figure>
                 {% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}

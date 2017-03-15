@@ -32,13 +32,12 @@
 	<div id="portfolio-wrapper">
 	{% for category in sub_child_categories %}
 		<!-- Portfolio Item -->
-		<div class="four columns portfolio-item
+		<div class="four columns portfolio-item custom_column
 		{% if no_child %}
 		{{category.title|hard_trim}}
 		{% else %}
 		{{category.parent.title|hard_trim}}
 		{% endif %}
-		
 		">
 			<figure>
 				<div class="portfolio-holder">
@@ -144,7 +143,7 @@
 
 	<div class="twelve columns products">
 		{% for product in true_products %}
-		<div class="four shop columns">
+		<div class="four shop columns custom_column">
 			<figure class="product">
 				{% if product.on_custom_sale %}
 					<div class="product-discount">СКИДКА</div>
@@ -173,7 +172,7 @@
 						<h5>{{ product.title|title }}</h5>
 						<span class="product-category">
 						{% if product.material %}
-							{{ product.material|truncatechars:22 }}
+							{{ product.material }}
 						{% else %}
 							<br>
 						{% endif %}
