@@ -32,7 +32,6 @@
 	}
 	.product section {
 		padding: 3px 0 3px 0;
-		/*text-align: left;*/
     	padding-left: 5px;
 	}
 	.product .product-category {
@@ -43,6 +42,14 @@
 	.product .product-price {
 		padding: 0px 6px 6px 0px;
 	}
+	.item-description span {
+		font-size: 11px;
+		font-weight: 500;
+	}
+	.item-description h5 {
+		font-size: 14px;
+	}
+
 }
 @media only screen and (max-width: 767px) and (min-width: 480px) {
 	.custom_column {
