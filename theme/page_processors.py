@@ -41,5 +41,6 @@ def category_processor(request, page):
 
     return {"true_products": products, 
             "sub_categories": child_categories, 
-            "sub_child_categories": true_sub_categories,
+            # "sub_child_categories": true_sub_categories,
+            "sub_child_categories": child_categories,
             'no_child': no_child}
