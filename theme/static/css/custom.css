@@ -161,12 +161,22 @@ nav shit and etc, shop_tree display inline-block
 #categories .active-li {
 	/*background-color: #3acf87;*/
 }
-#categories .active-li > a {
-	/*color: #fff!important;*/
+#categories li li a.active:hover {
+	color: #777;
 }
+
 #categories li a {
 	border-bottom: none;
+	white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 72%;
 }
+#categories li ul li a, #categories li ul li a:hover {
+	padding: 3px 3px 4px 25px;
+	width: 70%;
+}
+
 #categories li a.active {
 	background-color: transparent!important;
 	color: #3acf87;
