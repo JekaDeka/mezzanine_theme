@@ -29,8 +29,8 @@
 	display: block;
 	padding: 5px 10px 5px 10px;
 	line-height: 15px;
-    min-height: 30px;
-    max-height: 30px;
+    min-height: 28px;
+    max-height: 28px;
     overflow: hidden;
 }
 .product span {
@@ -104,6 +104,12 @@
 	.top-search input {
 		width: 153px;
 	}
+	/*.item-description h5, .item-description span, .product h5, .product span {
+		line-height: 15px;
+	    min-height: 28px;
+	    max-height: 28px;
+	    overflow: hidden;
+	}*/
 }
 .selectric {
 	min-width: 240px;

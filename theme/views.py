@@ -122,8 +122,8 @@ def promote_user(request, template="accounts/account_signup.html",
     return redirect('/')
 
 def true_index(request):
-    main_category = Page.objects.filter(slug='catalog')[:4]
-    featured = Category.objects.filter(parent=main_category)
+    main_category = Page.objects.filter(slug='catalog')
+    featured = Category.objects.filter(parent=main_category)[:4]
     
     enddate = datetime.datetime.today()
     startdate = enddate - datetime.timedelta(days=60)
