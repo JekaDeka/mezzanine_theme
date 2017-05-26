@@ -77,7 +77,7 @@
         $('.tp-banner').revolution({
             delay: 9000,
             startwidth: 1290,
-            startheight: 480,
+            startheight: 380,
             minHeight: 480,
             hideThumbs: 10,
             hideTimerBar: "on",
@@ -86,6 +86,7 @@
             fullScreen: "on",
             fullScreenAlignForce: "on",
             fullWidth: "off",
+            touchenabled: "on",
             soloArrowLeftHOffset: 0,
             soloArrowLeftVOffset: 0,
             soloArrowRightHOffset: 0,
