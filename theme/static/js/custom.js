@@ -48,7 +48,7 @@
         });
         var jPanelMenu = $.jPanelMenu({
             menu: '#responsive',
-            animated: false,
+            animated: true,
             keyboardShortcuts: true
         });
         jPanelMenu.on();
@@ -58,7 +58,7 @@
             }
         });
         $(document).on('touchend', '.menu-trigger', function(e) {
-            jPanelMenu.triggerMenu();
+            jPanelMenu.trigger();
             e.preventDefault();
             return false;
         });
@@ -78,14 +78,14 @@
             delay: 9000,
             startwidth: 1290,
             startheight: 480,
-            minHeight:480,
+            minHeight: 480,
             hideThumbs: 10,
             hideTimerBar: "on",
             onHoverStop: "on",
             navigationType: "none",
             fullScreen: "on",
-            fullScreenAlignForce:"on",
-            fullWidth:"off",
+            fullScreenAlignForce: "on",
+            fullWidth: "off",
             soloArrowLeftHOffset: 0,
             soloArrowLeftVOffset: 0,
             soloArrowRightHOffset: 0,
@@ -142,7 +142,7 @@
         // $('#categories > li a').click(function(e) {
         $('.open_nav').click(function(e) {
             //add click on icon
-            if ($(this).parent().hasClass('has-sublist') ) {
+            if ($(this).parent().hasClass('has-sublist')) {
                 e.preventDefault();
             }
             if ($(this).attr('class') != 'active') {
