@@ -20,8 +20,8 @@
 
 {% compress css %}
 <link rel="stylesheet" href="{% static "css/style.css" %}">
-<link rel="stylesheet" href="{% static "css/green.css" %}" id="colors">
-<link rel="stylesheet" href="{% static "css/custom.css" %}" id="colors">
+<link rel="stylesheet" href="{% static "css/green.css" %}">
+<link rel="stylesheet" href="{% static "css/custom.css" %}">
 <!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js' %}"></script>
 <![endif]-->
@@ -42,30 +42,52 @@
 <div id="wrapper">
 
 {% block top_bar %}
+{% if request.user.is_authenticated %}
+<div class="container">
+	<div class="eight columns">
+		<ul class="top-bar-menu">
+			<li>
+				<i class="fa fa-envelope"></i> <a href="mailto:info@handmaker.top">info@handmaker.top</a>
+			</li>
+			<li>
+				<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
+				<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
+				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Написать в блог</a>
+			</li>
+			<li>
+				<i class="fa fa-plus-square" aria-hidden="true"></i>
+				<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
+				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Создать заказ</a>
+			</li>
+		</ul>
+	</div>
+	<div class="eight columns">
+		<ul class="top-bar-menu" style="float: right;">
+			<li>
+				<i class="fa fa-shopping-cart" aria-hidden="true"></i>
+				<a href="mailto:info@handmaker.top">Страница магазина</a>
+			</li>
+			<li>
+				<i class="fa fa-list" aria-hidden="true"></i>
+				<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
+				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Мои товары</a>
+			</li>
+			<li>
+				<i class="fa fa-cog" aria-hidden="true"></i>
+				<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
+				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Настройки</a>
+			</li>
+		</ul>
+	</div>
+</div>
+{% endif %}
 <div id="top-bar">
 	<div class="container">
-
-		<!-- Top Bar Menu -->
-		<!-- <div class="four columns">
-			<ul class="top-bar-menu">
-				<li><i class="fa fa-envelope"></i> <a href="mailto:info@handmaker.top">info@handmaker.top</a></li>
-			</ul>
-		</div> -->
 		<div class="sixteen columns">
 			{% block navbar_dropdown_menu %}
 				{% page_menu "pages/menus/dropdown.html" %}
 			{% endblock%}
 		</div>
-		<!-- Social Icons -->
-		<!-- <div class="four columns">
-			{# {% block navbar_search_form %}{% search_form "all" %}{% endblock %} #}
-			<ul class="social-icons">
-				<li>
-					<a class="facebook" href="https://www.facebook.com/groups/803193513100186?ref=bookmarks"><i class="icon-facebook"></i></a>
-				</li>
-				<li><a class="instagram" href="https://www.instagram.com/handmaker.top/"><i class="icon-instagram"></i></a></li>
-			</ul>
-		</div> -->
 	</div>
 </div>
 
@@ -74,81 +96,40 @@
 
 {% block header %}
 <div class="container">
-<div class="four columns">
-	<div id="logo">
-		<a href="{% url 'true_index' %}"><img src="{% static 'images/logo/hm3.png' %}" alt="logo" /></a>
-	</div>
-</div>
-<div class="twelve columns" id="_top_buttons">
-	<div style="float:right; display: none">
-		{% if request.user.is_authenticated %}
-			<a href="{% url 'admin:index' %}">Моя панель управления</a>
-			<a href="{% url 'profile' request.user.username %}">Мой магазин</a>
-			<a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a>
-		{% else %}
-			<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Создать магазин</a>
-			<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Создать заказ</a>
-			<a href="{% url "login" %}?next={{ request.path }}">Войти</a>
-		{% endif %}
-	</div>
-</div>
-<div class="twelve columns columns margin-top-10">
-	<div style="float:right;">
-		<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
-			{% url "login" %}?next={% url 'promote_user' %}{% endif %}" class="button dark">Создать магазин</a>
-		<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
-			{% url "login" %}?next={% url 'promote_user' %}{% endif %}" class="button dark">Создать заказ</a>
-		<a href="{% url "login" %}?next={{ request.path }}" class="button dark">Войти</a>
-	</div>
-</div>
-
-	<!-- Logo -->
-	<!-- <div class="four columns">
-		<div style="padding-top: 15px;">
-			<h1><a href="/"><img src="{% static 'images/logo/_handmaker.png' %}" alt="logo" /></a></h1>
+	<div class="eight columns">
+		<div id="logo">
+			<a href="{% url 'true_index' %}"><img src="{% static 'images/logo/hm3.png' %}" alt="logo" /></a>
 		</div>
-	</div> -->
-
-
-	<!-- Additional Menu -->
-	<!-- <div class="twelve columns">
+	</div>
+	<div class="eight columns">
 		<div id="additional-menu">
-			<ul>
-			{% if request.user.is_authenticated %}
-				<li><a href="{% url 'admin:index' %}">Моя панель управления</a></li>
-				<li><a href="{% url 'profile' request.user.username %}">Мой профиль</a></li>
-					<li><a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a></li>
+		<!--<img src="{% static 'images/logo/shop.png' %}" alt="logo" />-->
+			 <ul> 
+			{% if not request.user.is_authenticated %}
+				 <li> 
+				<a href="{% url "login" %}?next={{ request.path }}">Создать магазин
+					<i class="fa fa-plus-circle" aria-hidden="true"></i>
+				</a>
+				</li>
+				<li>
+					<a href="{% url "login" %}?next={{ request.path }}">Войти
+					<i class="fa fa-sign-out" aria-hidden="true"></i>
+					</a>
+				 </li> 
 			{% else %}
-				<li><a href="{% url "login" %}?next={{ request.path }}">Войти</a></li>
-				<li><a href="{% url "signup" %}?next={% url 'promote_user' %}">Регистрация</a></li>
+				 <li> 
+					<a href="{% url "login" %}?next={{ request.path }}">
+						{{ request.user.email }}
+					</a>
+				</li>
+				<li>
+					<a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a>
+				</li> 
 			{% endif %}
 			</ul>
 		</div>
-	</div> -->
-
-	<!-- <div class="twelve columns">
-	<p style="float:right">
-		<a href="
-		{% if request.user.is_authenticated %}
-			/admin/blog/blogpost/add/
-		{% else %}
-			{% url "login" %}?next={% url 'promote_user' %}
-		{% endif %}
-		" class="button gray">Создать магазин</a>
-		<a href="
-		{% if request.user.is_authenticated %}
-			/admin/shop/product/add/
-		{% else %}
-			{% url "login" %}?next={% url 'promote_user' %}
-		{% endif %}
-		" class="button gray">Создать заказ</a>
-	</p>
 	</div>
-	<div class="twelve columns">
-		
-	</div> -->
+
 
 </div>
 {% endblock %}
@@ -182,18 +163,16 @@
 <section class="titlebar">
 <div class="container">
 	<div class="sixteen columns">
-		<h2>{% block title %}{{ page.title|title }}{% endblock %}</h2>
-		{% spaceless %}
+		<h2>{{ page.title|title }}</h2>
 		<nav id="breadcrumbs">
 			<ul>
 			{% block breadcumbs_menu %}
-			{% page_menu "pages/menus/breadcrumb.html" %}
+				{% page_menu "pages/menus/breadcrumb.html" %}
 			{% endblock %}
 			{% block breadcrumb_element %}
 			{% endblock %}
 			</ul>
 		</nav>
-		{% endspaceless %}
 	</div>
 </div>
 </section>
@@ -240,18 +219,8 @@
 {% block footer %}
 <div class="margin-top-50"></div>
 <div id="footer">
-
-	<!-- Container -->
 	<div class="container">
-
-		<!-- <div class="four columns">
-			<img src="{% static 'images/logo/_handmaker.png' %}" alt="" class=""/>
-			<p class="margin-top-15">Добавить небольшой текст</p>
-		</div> -->
-
 		<div class="four columns">
-
-			<!-- Headline -->
 			<h3 class="headline footer">Каталог</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
@@ -286,7 +255,7 @@
 			<h3 class="headline footer">Контакты</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
-			<p>Номер телефона, адрес и т.д.</p>
+			<p>Номер телефона, адрес</p>
 		</div>
 
 	</div>
@@ -344,10 +313,6 @@
 {% endcompress %}
 
 {% block footer_js %}
-{# {% include "includes/footer_scripts.html" %} #}
 {% endblock %}
-
-
-
 </body>
 </html>

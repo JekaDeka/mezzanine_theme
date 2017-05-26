@@ -16,10 +16,10 @@
 				<li data-transition="fade" data-slotamount="7" data-masterspeed="1500">
 				<img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1200 500 %}" alt="" data-bgfit="cover" data-bgposition="left top" data-bgrepeat="no-repeat">	 
 				<div class="caption dark fade fadeout" 
-				data-x="right"
+				data-x="left"
 				data-y="center"
-				data-hoffset="-150"
-				data-voffset="100" 
+				data-hoffset="200"
+				data-voffset="0" 
 				data-speed="400" data-start="800"  data-easing="Power1.easeOut">
 				{{ image.short_description|safe }}
 				<a href="{{image.href }}" class="caption-btn">Подробнее</a>
@@ -38,7 +38,7 @@
 {% for category in featured %}
     <div class="four columns custom_column">
         <a href="{{ category.get_absolute_url }}" class="img-caption" >
-            <figure>
+            <figure class="blue-effect">
                 {% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
                         {% if category.featured_image %}
                             <img alt="" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 380 380 %}"/>
