@@ -46,7 +46,7 @@ class MyBlogPostAdmin(BlogPostAdmin):
 
 
 class MyProductAdmin(ProductAdmin):
-    inlines = (ProductImageAdmin,)
+    # inlines = (ProductImageAdmin,)
     fieldsets = product_fieldsets
     list_per_page = 30
     fieldsets[0][1]['fields'] = ['title', 'pre_order',

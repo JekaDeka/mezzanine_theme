@@ -13,7 +13,7 @@ HelloDjango/
 deploy/
 static/
 templates/
-
+theme/migrations/
 !*/static/
 !*/templates/
 
