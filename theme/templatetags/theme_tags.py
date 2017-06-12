@@ -9,29 +9,27 @@ from django.contrib.auth import get_user_model
 from django.contrib.admin import site
 from django.apps import apps
 from django.utils.text import capfirst
-from django.core.urlresolvers import reverse, NoReverseMatch
+from django.core.urlresolvers import reverse, resolve, NoReverseMatch
 from django.core.exceptions import ImproperlyConfigured
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.utils import six
 from django.conf import settings
 from django import template
+from mezzanine import template
 from django import VERSION as DJANGO_VERSION
-from django.contrib.auth.models import User
 from django.template import Context, TemplateSyntaxError, Variable
 from django.template.loader import get_template
 from django.utils.translation import ugettext_lazy as _
+from mezzanine.utils.urls import home_slug
 
 from django.db.models import Count, Q
-from django.conf import settings
-
+from django.contrib.auth.models import User
 from mezzanine.blog.models import BlogPost, BlogCategory
-from django.core.urlresolvers import reverse, resolve, NoReverseMatch
-
-from mezzanine.pages.models import Page
-from theme.models import Slider, SliderItem
+from theme.models import Slider, SliderItem, UserShop
 from cartridge.shop.models import Category, Product
+from mezzanine.pages.models import Page
 from mezzanine.generic.models import Keyword
-from mezzanine.utils.urls import home_slug
-from mezzanine import template
+
 import os
 
 
@@ -45,20 +43,22 @@ User = get_user_model()
 
 register = template.Library()
 
+
 @register.filter("smart_truncate_chars")
 def smart_truncate_chars(value, max_length):
     if len(value) > max_length:
         # Limits the number of characters in value tp max_length (blunt cut)
         truncd_val = value[:max_length]
-        # Check if the next upcoming character after the limit is not a space, in which case it might be a word continuing
+        # Check if the next upcoming character after the limit is not a space,
+        # in which case it might be a word continuing
         if value[max_length] != " ":
             # rfind will return the last index where matching the searched character, in this case we are looking for the last space
             # Then we only return the number of character up to that last space
             truncd_val = truncd_val[:truncd_val.rfind(" ")]
-        return  truncd_val + "..."
+        return truncd_val + "..."
     return value
 
-    
+
 @register.as_tag
 def get_slideshow(*args):
     try:
@@ -318,6 +318,7 @@ def simple_menu(context, token):
     t = get_template(template_name)
     return t.render(Context(context))
 
+
 def moneyfmt(value, places=2, curr='', sep=',', dp='.',
              pos='', neg='-', trailneg=''):
     """Convert Decimal to a money formatted string.
@@ -368,13 +369,16 @@ def moneyfmt(value, places=2, curr='', sep=',', dp='.',
     build(neg if sign else pos)
     return ''.join(reversed(result))
 
+
 @register.filter
 def rub_currency(value):
     """
     Format a value as a RUB currency
     """
     if not value:
-        return "Цена не указана"
+        return "Цена по запросу"
+    if value == 0:
+        return "Бесплатно"
     value = moneyfmt(value, curr='', sep=' ')
     value = value + " ₽"
     return value
@@ -557,8 +561,9 @@ def get_product_category(product):
             titles.append(cat.title)
     except:
         return None
-    
+
     return ", ".join(str(x) for x in titles)
+
 
 @register.filter(name='get_variation_list')
 def get_variation_list(variations):
@@ -572,6 +577,7 @@ def get_variation_list(variations):
     d = {'Размер': sizes, 'Цвет': colors}
     return d
 
+
 @register.simple_tag(takes_context=True)
 def get_user_by_url(context):
     try:
@@ -581,28 +587,6 @@ def get_user_by_url(context):
         return None
     return url
 
-@register.simple_tag(takes_context=True)
-def get_user_products(context):
-    try:
-        request = context["request"]
-        username = request.path.split('/')[-2]
-        user = User.objects.get(username = username)
-        products = Product.objects.filter(user_id = user)
-    except:
-        return None
-    return products
-
-@register.simple_tag(takes_context=True)
-def get_user_blog_posts(context):
-    try:
-        request = context["request"]
-        username = request.path.split('/')[-2]
-        user = User.objects.get(username = username)
-        posts = BlogPost.objects.filter(user_id = user)
-    except:
-        return None
-    return posts
-
 
 MAX_LENGTH_BOOTSTRAP_COLUMN = 12
 
@@ -610,7 +594,8 @@ MAX_LENGTH_BOOTSTRAP_COLUMN = 12
 def css_classes_for_field(field, custom_classes):
     orig_class = field.field.widget.attrs.get('class', '')
     required = 'required' if field.field.required else ''
-    classes = field.css_classes(' '.join([orig_class, custom_classes, required]))
+    classes = field.css_classes(
+        ' '.join([orig_class, custom_classes, required]))
     return classes
 
 
@@ -689,11 +674,11 @@ def render_menu_app_list(context):
     else:
         dependencie = 'django.template.context_processors.request'
         implemented_engines = getattr(settings, 'BOOTSTRAP_ADMIN_ENGINES',
-            ['django.template.backends.django.DjangoTemplates'])
+                                      ['django.template.backends.django.DjangoTemplates'])
         dependency_str = "the 'context_processors' 'OPTION' of one of the " + \
             "following engines: %s" % implemented_engines
         filtered_engines = [engine for engine in settings.TEMPLATES
-            if engine['BACKEND'] in implemented_engines]
+                            if engine['BACKEND'] in implemented_engines]
         if len(filtered_engines) == 0:
             raise ImproperlyConfigured(
                 "bootstrap_admin: No compatible template engine found" +
@@ -780,9 +765,7 @@ def class_for_field_boxes(line):
 @register.filter()
 def class_for_single_line():
     # size_column = MAX_LENGTH_BOOTSTRAP_COLUMN // len(line.fields)
-    return 'col-sm-{0}'.format(6) 
-
-
+    return 'col-sm-{0}'.format(6)
 
 
 @register.filter("generate_id")
@@ -813,3 +796,42 @@ def allowed_theme_list(separator=','):
 
     return separator.join(output)
 register.simple_tag(allowed_theme_list)
+
+
+@register.filter
+def not_none(value):
+    if not value:
+        return "не указан"
+    return value
+
+
+@register.filter
+def grouped(l):
+    for i in range(0, len(l), 2):
+        yield l[i:i + 2]
+
+
+@register.filter
+def get_shop_name(user):
+    if not user:
+        return "/"
+    shop = get_object_or_404(UserShop, user=user)
+    return shop.shopname
+
+
+@register.assignment_tag
+def get_shop(user):
+    shop = get_object_or_404(UserShop, user=user)
+    return shop
+
+
+@register.assignment_tag
+def get_shop_products(user):
+    products = get_list_or_404(Product, user=user)
+    return products
+
+
+@register.assignment_tag
+def get_user_blog_posts(user):
+    posts = get_list_or_404(BlogPost, user=user)
+    return posts

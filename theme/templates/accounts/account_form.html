@@ -6,7 +6,7 @@
 
 {% block main %}
 {% errors_for form %}
-
+<div class="six columns centered">
 <form method="post"{% if form.is_multipart %} enctype="multipart/form-data"{% endif %} class="login">
     <fieldset>
     <!-- <legend>{{ title }}</legend> -->
@@ -18,6 +18,7 @@
     </div>
     </fieldset>
 </form>
+</div>
 {% endblock %}
 
 

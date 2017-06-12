@@ -24,7 +24,7 @@
 <div class="row">
     <div class="col-md-12 profile-area">
         <div class="media col-md-6 col-sm-6 col-xs-6">
-            <a class="media-left pr-n" href="{% url 'profile_view' request.user  %}">
+            <a class="media-left pr-n" href="{% url 'profile_view' %}">
             {% if request.user.myprofile.image %}
             	<img class="media-object img-resposnive" src="{{ MEDIA_URL }}{% thumbnail request.user.myprofile.image 88 88 %}" alt="profile image" width="88" height="88">
             {% else %}
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div>
-        	<a href="{% url 'profile' request.user.username %}" class="btn-raised btn pull-right" >Посмотреть профиль на сайте</a>
+        	<a href="{% url 'profile' request.user.username %}" class="btn-raised btn pull-right" >Посмотреть магазин на сайте</a>
         </div>
     </div>
     <div class="col-md-12 pl-n pr-n">
@@ -48,12 +48,9 @@
             <li class="dropdown pull-right tabdrop hide"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-angle-down"></i> </a>
                 <ul class="dropdown-menu"></ul>
             </li>
-            <li {% if not profile_tab %}
-            class="active"
-            {% endif %}><a href="{% url 'admin:index' %}"> Информация </a></li>
-            <li {% if profile_tab %}
-            class="active"
-            {% endif %}><a href="{% url 'profile_view' request.user  %}">Редактировать</a></li>
+            <li {% if not profile_tab %}class="active"{% endif %}><a href="{% url 'admin:index' %}"> Информация </a></li>
+            <li {% if profile_tab %}class="active"{% endif %}><a href="{% url 'profile_view' %}">Редактировать профиль</a></li>
+            <li {% if profile_tab %}class="active"{% endif %}><a href="{% url 'profile_view' %}">Редактировать магазин</a></li>
         </ul>
     </div>
     {% if not profile_tab %}
@@ -143,17 +140,29 @@
 					{% csrf_token %}
 					{% for field in form %}
 					{{ field.errors }}
-					<div class="form-group is-empty">
-							<label class="col-sm-3 control-label">{{ field.label }}</label>
-							<div class="col-sm-6">						
-								{{ field }}
-							</div>
-							{% if field.help_text %}
-							<div class="col-sm-3">
+					<div class="form-group">
+                        {% if field.field.is_checkbox %}
+                        <label for="checkbox" class="col-sm-2 control-label"></label>
+                        <div class="col-sm-8">
+                            <div class="checkbox block">
+                                <label>
+                                    {{ field }} {{ field.label }}
+                                </label>
+                            </div>
+                        </div>
+                        {% else %}
+                            <label class="col-sm-2 control-label">{{ field.label }}</label>
+    						<div class="col-sm-8">						
+    							{{ field }}
+    						</div>
+                        {% endif %}
+						
+                        {% if field.help_text %}
+						  <div class="col-sm-2">
 								<p class="help-block">{{ field.help_text|safe }}</p>
 							</div>
-							{% endif %}
-						</div>
+						{% endif %}
+					</div>
 					{% endfor %}
 					<div class="panel-footer">
 					<div class="row">

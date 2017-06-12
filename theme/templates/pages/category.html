@@ -145,12 +145,16 @@
 		{% for product in true_products %}
 		<div class="four shop columns custom_column">
 			<figure class="product">
-				{% if product.on_custom_sale %}
-					<div class="product-discount">СКИДКА</div>
-				{% endif %}
+				<div class="badges">
 				{% if product.pre_order %}
-					<div class="product-discount blue">Под заказ</div>
+					<div class="product-example">Для примера</div>
+				{# {% else %} #}
+					<!--<div class="product-ready">Готовый вариант</div>-->
 				{% endif %}
+				{% if product.on_custom_sale %}
+					<div class="product-discnt">СКИДКА</div>
+				{% endif %}
+				</div>
 				<div class="mediaholder">
 				<a href="{{ product.get_absolute_url }}">
 					{% if product.image %}
@@ -170,9 +174,9 @@
 				<a href="{{ product.get_absolute_url }}">
 					<section>
 						<h5>{{ product.title|title|truncatechars:34 }}</h5>
-						<span class="product-category">
-							{{ product.user }}
-						</span>
+						<a href="{% url 'shop_view' product.user|get_shop_name %}" class="shopname">{{ product.user|get_shop_name }}</a>
+						<!--<span class="product-category">
+						</span>-->
 						{% if product.on_custom_sale %}
 							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
 						{% else %}

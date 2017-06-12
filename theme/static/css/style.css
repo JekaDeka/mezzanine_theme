@@ -2969,7 +2969,7 @@ a.button.color:hover {
     background-color: #f4f4f4;
     position: relative;
     margin: 0 0 50px 0;
-    padding: 50px 0;
+    padding: 25px 0;
 }
 
 .titlebar h2 {
@@ -3786,7 +3786,7 @@ blockquote {
 }
 
 .content-box {
-    padding: 32px 28px;
+    padding: 20px 20px;
     margin: 0 0 20px 0;
     text-align: center;
     cursor: pointer;
@@ -3810,7 +3810,7 @@ blockquote {
 
 .content-box h3 {
     line-height: 26px;
-    padding-bottom: 8px;
+    padding-bottom: 2px;
     color: #fff;
     font-weight: 600;
 }
@@ -8753,3 +8753,4 @@ div.layout-style {
         display: none;
     }
 }
+

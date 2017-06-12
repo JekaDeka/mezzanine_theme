@@ -1,64 +1,87 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags accounts_tags pages_tags staticfiles %}
+{% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %}
 
-{% block meta_title %}{{ profile_user|username_or:"get_full_name" }}{% endblock %}
-{% block title %}Профиль пользователя{% endblock %}
+{% block meta_title %}{{ shop.shopname }}{% endblock %}
 
-{% block breadcrumb_element %}
-<li>{{ profile_user|username_or:"get_full_name" }}</li>
+{% block breadcrumbs %}
 {% endblock %}
 
+{% block slider %}
+<div class="container fullwidth-element" style="background: url({{ MEDIA_URL }}{% thumbnail shop.background 1300 150 %}) center; height: 150px; margin-bottom: 35px;">
+	<img style="float: right; border-radius: 50%; border: 3px #e9e9e9 solid; margin-top: 25px; margin-right: 10px;" src="{{ MEDIA_URL }}{% thumbnail shop.image 150 150 %}" alt="" />
+</div>
+{% endblock %}
 
 {% block main %}
-<div class="seven columns">
-<div class="extra-padding">
-	<article>
-	<img src="
-				{% if profile_user.myprofile.image %}
-					{{ MEDIA_URL }}{% thumbnail profile_user.myprofile.image 150 150 %}
-				{% else %}
-					{% gravatar_url profile_user.email 150 %}
-				{% endif %}
-				" style="border: 0; float: left; margin-right: 15px">
-				<h3>
-					{% if profile_user.first_name %}
-						{{ profile_user.get_full_name|safe }}	
-					{% else %}
-						{{ profile_user.username }}				
-					{% endif %}
-				</h3>
-				</a>
-				{% if profile_user.myprofile.city %}
-					<p><i class="fa fa-map-marker"></i> <strong>{{ profile_user.myprofile.city|safe }}</strong><p>
-				{% endif %}
-			<div>
-				{% if profile_user.email or profile_user.myprofile.phone %}
-				{% if profile_user.email or allowed %}
-					<a href="mailto:{{ profile_user.email|safe }}">{{ profile_user.email|safe }}</a> <br>
-				{% endif %}
-				{% if profile_user.myprofile.phone %}
-					<i class="fa fa-phone"></i> {{ profile_user.myprofile.phone|safe }}
-				{% endif %}
-				{% else %}
-					<p>Информации нет</p>
-				{% endif %}
-			</div>		
-
-	</article>
-	</div>
+<div class="eleven columns">
+    <br>
+    <h2 class="headline" style="margin-top:-37px; font-size: 35px!important;">{{ shop.shopname }}</h2>
+    <span class="line"></span>
+    <div class="clearfix"></div>
+    <div>{{ shop.bio }}</div>
+    {% if shop.rules %}
+        <h3 class="headline margin-top-25">Правила магазина</h3>
+        <span class="line"></span>
+        <div class="clearfix"></div>
+        <div>{{ shop.rules }}</div>
+    {% endif %}
+    
 </div>
-<div class="nine columns">
-	<div class="widget margin-top-0">
-		<h3 class="headline">Личная информация</h3><span class="line"></span><div class="clearfix"></div>
-		{% if profile_user.myprofile.bio  %}
-			{{ profile_user.myprofile.bio|safe }}
-		{% else %}
-			<p>Не указана</p>
-		{% endif %}
-	</div>
+<div class="five columns">
+    <h3 class="headline">Доставка</h3>
+    <span class="line" style="margin-bottom:0px;"></span>
+    <div class="clearfix"></div>
+    <div class="list-1">
+        <p></p>
+        <ul>
+            {% for fields in shop.get_express_fields|grouped %}
+            <li>
+                {% for field in fields %} 
+                {% if field.value == True %}
+                    <span> {{ field.label }}: </span> 
+                {% else %}
+                    <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> 
+                {% endif %} 
+            {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+        <p>
+            {% if payment_personal or payment_bank_transfer or payment_card_transfer%} К оплате принимаются: {% if payment_bank_transfer %} банковские переводы {% endif %} {% if payment_card_transfer %} банковские карты {% endif %} {% if payment_personal %} наличные. {% endif %} {% endif %}
+        </p>
+    </div>
+    <div class="clearfix"></div>
+</div>
+<div class="five columns" style="float: right">
+    <h3 class="headline">Контакты</h3>
+    <span class="line" style="margin-bottom:0px;"></span>
+    <div class="clearfix"></div>
+    <span> {{ user.get_full_name }} </span>,
+    <span class="phone"> {{ shop.phone }} </span>
+    <p>{{ shop.city }}, {{ shop.country }}</p>
+    <div class="clearfix"></div>
+    <div style="margin: 5px 0 0 0;"></div>
+    <p><a class="button color " href="#"> Задать вопрос </a></p>
 </div>
 
 <div class="sixteen columns margin-top-50">
+<span class="line" style="margin-bottom:0px;"></span>
 	{% include "accounts/includes/user_widget.html" %}
 </div>
+{% endblock %}
+
+
+{% block extra_js %} 
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".phone").text(function(i, text) {
+		text = text.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "$1-$2-$3-$4");
+		return text;
+	});
+});
+</script>
+
+
+
 {% endblock %}

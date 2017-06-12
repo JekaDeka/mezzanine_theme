@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags blog_tags pages_tags keyword_tags disqus_tags theme_tags %}
+
+{% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
+
+{% block meta_keywords %}{% metablock %}
+{% keywords_for page as keywords %}
+{% for keyword in keywords %}
+	{% if not forloop.first %}, {% endif %}
+	{{ keyword }}
+{% endfor %}
+{% endmetablock %}{% endblock %}
+
+{% block meta_description %}{% metablock %}
+{{ page.description }}
+{% endmetablock %}{% endblock %}
+
+
+{% block breadcrumb_element %}
+{% for category in order_categories %}
+	{% url 'order_list_category' category.slug as the_url %}
+	{% if the_url in request.get_full_path %}
+		<li> {{ category }} </li>
+	{% endif %} 
+{% endfor %}
+{% endblock %}
+
+{% block main %}
+<div class="four columns">
+	<div class="widget margin-top-0">
+		<h3 class="headline"></h3><span class="line"></span><div class="clearfix"></div>
+		{{ page.richtextpage.content|richtext_filters|safe }}
+	</div>
+	{% block order_categories %}
+		{% if order_categories %}
+		<div class="widget">
+			<h3 class="headline">Виды работ </h3><span class="line"></span><div class="clearfix"></div>
+			<nav class="categories">
+				<ul>
+				{% for category in order_categories %}
+					{% url 'order_list_category' category.slug as the_url %}
+					<li><a href="{% url 'order_list_category' category.slug %}" {% if the_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
+				{% endfor %}
+				</ul>
+			</nav>
+		</div>
+		{% endif %}	
+	{% endblock %}
+</div>
+<div class="twelve columns">
+<div class="extra-padding">
+{% for order in orders.object_list %}
+<article class="post">
+<div class="order-container">                
+    <div class="order-thumb">
+    	{% if order.featured_image %}
+    	<a href="{{ order.get_absolute_url }}">
+			<img  src="{{ MEDIA_URL }}{% thumbnail order.featured_image 300 300 %}" alt="" />
+		</a>
+		{% else %}
+			<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 300 %}">
+		{% endif %}
+		<div class="order-info meta">
+			{% with order.author as author %}
+			<span><i class="fa fa-user"></i>Заказчик: <a href="{% url "profile" author %}">{{ author.get_full_name }}</a></span>
+			{% endwith %}
+			<br>
+			<span><i class="fa fa-calendar-plus-o" aria-hidden="true"></i>Добавлено: {{ order.created }}</span>
+			<br>
+			<span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
+			<br>
+			<span><i class="fa fa-rub" aria-hidden="true"></i> Бюджет: {{ order.price|rub_currency }} </span>
+		</div>
+		
+    </div>
+    <div class="order-content">
+			<h2>
+				<a href="{{ order.get_absolute_url }}">{{ order.title|title }}</a>
+			</h2>
+        <div class="order-desc">
+    	{{ order.description|safe|truncatewords:80 }}
+    	</div>
+    	<a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>
+    </div>
+    
+</div>
+</article>
+{% endfor %}
+</div>
+</div>
+
+</div>
+<div class="container">
+{% pagination_for orders %}
+{% endblock %}
+</div>
+

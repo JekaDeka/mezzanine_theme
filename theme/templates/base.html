@@ -43,7 +43,7 @@
 
 {% block top_bar %}
 {% if request.user.is_authenticated %}
-<div class="container">
+<!--<div class="container">
 	<div class="eight columns">
 		<ul class="top-bar-menu">
 			<li>
@@ -79,7 +79,7 @@
 			</li>
 		</ul>
 	</div>
-</div>
+</div>-->
 {% endif %}
 <div id="top-bar">
 	<div class="container">
@@ -103,30 +103,18 @@
 	</div>
 	<div class="eight columns">
 		<div id="additional-menu">
-		<!--<img src="{% static 'images/logo/shop.png' %}" alt="logo" />-->
-			 <ul> 
-			{% if not request.user.is_authenticated %}
-				 <li> 
-				<a href="{% url "login" %}?next={{ request.path }}">Создать магазин
-					<i class="fa fa-plus-circle" aria-hidden="true"></i>
-				</a>
-				</li>
-				<li>
-					<a href="{% url "login" %}?next={{ request.path }}">Войти
-					<i class="fa fa-sign-out" aria-hidden="true"></i>
-					</a>
-				 </li> 
-			{% else %}
-				 <li> 
-					<a href="{% url "login" %}?next={{ request.path }}">
-						{{ request.user.email }}
-					</a>
-				</li>
-				<li>
-					<a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a>
-				</li> 
+		<ul> 
+		{% if not request.user.is_authenticated %}
+			<li><a href="{% url "signup" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a></li>
+			<li><a href="{% url "login" %}">Войти <!--<i class="fa fa-sign-out" aria-hidden="true"></i>--></a></li>
+		{% else %}
+			{% if not request.user.usershop %}
+				<li><a href="{% url "shop_create" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a></li>
 			{% endif %}
-			</ul>
+			<li><a href="{% url "profile_settings" %}">{{ request.user.email }}</a></li>
+			<li><a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a></li> 
+		{% endif %}
+		</ul>
 		</div>
 	</div>
 
@@ -163,7 +151,9 @@
 <section class="titlebar">
 <div class="container">
 	<div class="sixteen columns">
-		<h2>{{ page.title|title }}</h2>
+		{% block breadcrumbs_title %}
+			<h2>{{ page.title|title }}</h2>
+		{% endblock breadcrumbs_title %}
 		<nav id="breadcrumbs">
 			<ul>
 			{% block breadcumbs_menu %}
@@ -308,6 +298,7 @@
 <script src="{% static 'js/stacktable.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/active-branch-show.js' %}"></script>
+<script src="{% static 'js/mask.js' %}"></script>
 {% block extra_js %}
 {% endblock %}
 {% endcompress %}

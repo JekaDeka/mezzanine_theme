@@ -4,30 +4,41 @@ from future.builtins import str, int
 from calendar import month_name
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from django.http import Http404
-from django.shortcuts import get_object_or_404, redirect
+from django.http import Http404, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render_to_response
+from django.template import RequestContext
 from django.template.response import TemplateResponse
+from django.http import HttpResponse
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
+from django.middleware.csrf import get_token
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product
+from theme.models import OrderItem, OrderItemCategory
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm, MyProfileForm
-from theme.models import MyProfile
+from theme.forms import СustomBlogForm, ContactForm, ShopForm
+from theme.models import UserShop
+from theme.utils import grouped
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
+from mezzanine.utils.urls import login_redirect, next_url
+from mezzanine.accounts.forms import LoginForm, PasswordResetForm
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages import info, error
+from mezzanine.utils.urls import login_redirect, next_url
 import datetime
+from PIL import Image
+
 
 User = get_user_model()
 
@@ -106,43 +117,48 @@ def blog_post_feed(request, format, **kwargs):
     except KeyError:
         raise Http404()
 
+
 def promote_user(request, template="accounts/account_signup.html",
-           extra_context=None):
-    user = request.user
-    if user.is_authenticated():
-        if not user.is_staff:
-            user.is_staff = True
-            group = Group.objects.get(name='custom')
-            siteperms = SitePermission.objects.create(user=user)
-            siteperms.sites.add(settings.SITE_ID)
-            user.groups.add(group)
-            user.save()
-            user.myprofile.save()
+                 extra_context=None):
+    # user = request.user
+    # if user.is_authenticated():
+    #     if not user.is_staff:
+    #         user.is_staff = True
+    #         group = Group.objects.get(name='custom')
+    #         siteperms = SitePermission.objects.create(user=user)
+    #         siteperms.sites.add(settings.SITE_ID)
+    #         user.groups.add(group)
+    #         user.save()
+    #         user.userprofile.save()
 
     return redirect('/')
+
 
 def true_index(request):
     main_category = Page.objects.filter(slug='catalog')
     featured = Category.objects.filter(parent=main_category)[:4]
-    
+
     enddate = datetime.datetime.today()
     startdate = enddate - datetime.timedelta(days=60)
-    new_arrivals = Product.objects.filter(created__range=[startdate, enddate]).filter(status=2).order_by('-created')[:7]
+    new_arrivals = Product.objects.filter(
+        created__range=[startdate, enddate]).filter(status=2).order_by('-created')[:7]
 
-    recent_posts = BlogPost.objects.filter(created__range=[startdate, enddate]).order_by('-created')[:4]
+    recent_posts = BlogPost.objects.filter(
+        created__range=[startdate, enddate]).order_by('-created')[:4]
 
     most_popular = new_arrivals[:3]
     best_product = new_arrivals[:3]
     sale_product = new_arrivals[:3]
-    
-    context = {'featured': featured, 
-                'new_arrivals': new_arrivals, 
-                'recent_posts': recent_posts,
-                'most_popular': most_popular,
-                'best_product': best_product,
-                'sale_product': sale_product
-            }
+
+    context = {'featured': featured,
+               'new_arrivals': new_arrivals,
+               'recent_posts': recent_posts,
+               'most_popular': most_popular,
+               'best_product': best_product,
+               'sale_product': sale_product
+               }
     return render(request, '_index.html', context)
+
 
 def index(request):
     form = ContactForm
@@ -153,36 +169,154 @@ def index(request):
             return redirect('/')
         else:
             return redirect('/')
-    context = {'form': form }
+    context = {'form': form}
     return render(request, 'index.html', context)
+
 
 @csrf_protect
 @login_required
-def profile_view(request, username,
-                    template_name='admin/index.html',
-                    form = MyProfileForm,
-                    extra_context=None):
-    try:
-        u = User.objects.get(username=username)
-        user = MyProfile.objects.get(user=u)
-    except:
-        user = None
-    
-    if not user:
-        return TemplateResponse(request, template_name, {})
-    if request.method == "POST":
-        form = MyProfileForm(request.POST, instance=user)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.save()
-            return TemplateResponse(request, template_name, {})
-    else:
-        form = MyProfileForm(instance=user)
+def profile_view(request, template_name='admin/index.html',
+                 extra_context=None):
+    # user = UserProfile.objects.get(user=request.user)
+    # if not user:
+    #     return TemplateResponse(request, template_name, {})
+    # if request.method == "POST":
+    #     form = ShopForm(request.POST, instance=user)
+    #     if form.is_valid():
+    #         user = form.save(commit=False)
+    #         user.save()
+    #         return TemplateResponse(request, template_name, {})
+    # else:
+    #     form = ShopForm(instance=user)
     context = {
-        'form': form,
-        'profile_tab': True,
+        # 'form': form,
+        # 'profile_tab': True,
     }
-    if extra_context is not None:
-        context.update(extra_context)
+    # if extra_context is not None:
+    #     context.update(extra_context)
 
     return TemplateResponse(request, template_name, context)
+
+
+def shop_view(request, shopname, template_name='accounts/account_profile.html', extra_context=None):
+    lookup = {"shopname__iexact": shopname}
+    shop = get_object_or_404(UserShop, **lookup)
+    user = get_object_or_404(User, usershop=shop)
+    context = {'shop': shop, 'user': user}
+    if extra_context is not None:
+        context.update(extra_context)
+    return TemplateResponse(request, template_name, context)
+
+
+@login_required
+def shop_create(request, template="accounts/account_shop_create.html"):
+    try:
+        shop = UserShop.objects.get(user=request.user)
+        form = ShopForm(request.POST or None, instance=shop)
+    except:
+        shop = None
+        form = ShopForm(request.POST or None, request.FILES or None)
+
+    if request.method == 'POST':
+        # form = ShopForm(request.POST, request.FILES, instance=shop)
+        if form.is_valid():
+            shop = form.save(commit=False)
+            shop.user = request.user
+            if request.FILES.get('image', False):
+                shop.image = request.FILES['image']
+
+            if request.FILES.get('background', False):
+                shop.background = request.FILES['background']
+            shop.save()
+            return redirect('shop_view', shopname=shop.shopname)
+
+    templates = []
+    context = {"form": form, "shop": shop}
+    templates.append(template)
+    return TemplateResponse(request, templates, context)
+
+
+@login_required
+def profile_settings(request, template="accounts/account_profile_settings.html",
+                     extra_context=None):
+    """
+    Profile basic settings
+    """
+    user = request.user
+    try:
+        shop = UserShop.objects.get(user=user)
+    except:
+        shop = None
+
+    # if request.method == "POST":
+    #     form = SmallProfileForm(request.POST, instance=user)
+    #     if form.is_valid():
+    #         profile = form.save(commit=False)
+    #         profile.user = auth_user
+    #         profile.save()
+
+    #         if not auth_user.is_staff:
+    #             auth_user.is_staff = True
+    #             group = Group.objects.get(name='custom')
+    #             siteperms = SitePermission.objects.create(user=auth_user)
+    #             siteperms.sites.add(settings.SITE_ID)
+    #             auth_user.groups.add(group)
+    #             auth_user.save()  # save staff status and permissions
+
+    #     return TemplateResponse(request, template, {"form": form, "title":
+    #                                                 _("Update Profile")})
+
+    context = {"shop": shop, "user": user, "title": _("Мой профиль")}
+    context.update(extra_context or {})
+    return TemplateResponse(request, template, context)
+
+
+def order_list(request, tag=None, year=None, month=None, username=None,
+               category=None, template="order/order_list.html",
+               extra_context=None):
+
+    templates = []
+    orders = OrderItem.objects.all()
+    if category is not None:
+        pass
+    author = request.user
+    order_categories = OrderItemCategory.objects.all()
+    if category is not None:
+        category = get_object_or_404(OrderItemCategory, slug=category)
+        orders = orders.filter(categories=category)
+
+    orders = paginate(orders, request.GET.get("page", 1),
+                      settings.BLOG_POST_PER_PAGE,
+                      settings.MAX_PAGING_LINKS)
+    context = {"orders": orders, "year": year, "month": month,
+               "tag": tag, "category": category, "author": author, "order_categories": order_categories}
+    context.update(extra_context or {})
+    templates.append(template)
+    return TemplateResponse(request, templates, context)
+
+
+def order_detail(request, pk, template="order/order_detail.html",
+                 extra_context=None):
+    templates = []
+    order = get_object_or_404(OrderItem, pk=pk)
+    context = {"order": order}
+
+    context.update(extra_context or {})
+    templates.append(template)
+    return TemplateResponse(request, templates, context)
+
+
+# class SignUpView(CreateView):
+#     template_name = 'accounts/account_shop_create.html'
+#     form_class = ShopForm
+
+
+def validate_shopname(request):
+    shopname = request.GET.get('shopname', None)
+    data = {
+        'is_taken': UserShop.objects.filter(shopname__iexact=shopname).exists()
+    }
+    if data['is_taken']:
+        data['error_message'] = 'Магазин с таким именем уже существует.'
+
+    return JsonResponse(data)

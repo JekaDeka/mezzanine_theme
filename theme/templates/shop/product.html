@@ -26,6 +26,9 @@
 <script src="{% static "cartridge/js/product_variations.js" %}"></script> -->
 {% endblock %}
 
+{% block breadcrumbs_title %}
+	<h2>{{ product.title }}</h2>
+{% endblock breadcrumbs_title %}
 
 {% block breadcrumb_element %}
 	<li><a href="/catalog/">Каталог</a></li>
@@ -57,7 +60,7 @@
 		
 	<!-- Headline -->
 		<section class="title">
-			<h2>{{ product}}</h2>
+			<h2>{{ product }}</h2>
 			{% if product.has_price %}
 				{% if product.on_custom_sale %}
 					<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
@@ -77,8 +80,9 @@
 			{% endif %}
 			</p>
 
-				<!-- Share Buttons -->	
-			<div class="share-buttons">
+				<!-- Share Buttons -->
+			<a href="/" class="button">Купить</a>
+			<!--<div class="share-buttons">
 				<ul>
 					<li><a href="#">Поделиться</a></li>
 					<li class="share-facebook"><a href="#">Facebook</a></li>
@@ -86,7 +90,7 @@
 					<li class="share-gplus"><a href="#">Google Plus</a></li>
 					<li class="share-pinit"><a href="#">Pin It</a></li>
 				</ul>
-			</div>
+			</div>-->
 			<div class="clearfix"></div>
 			{% if product.keywords.all %}
 				<div class="widget margin-top-10">
@@ -99,39 +103,23 @@
 				</div>
 			{% endif %}
 			<div class="widget margin-top-10">
-				<h3 class="headline">Контактная информация</h3><span class="line"></span><div class="clearfix"></div>	
-				<a href="/users/{{product.user}}/">
+			{% get_shop product.user as shop %}
+			    <h3 class="headline">Информация о магазине</h3><span class="line"></span><div class="clearfix"></div>
+				<a href="{% url 'shop_view' shop.shopname %}">
 				<img src="
-				{% if product.user.myprofile.image %}
-					{{ MEDIA_URL }}{% thumbnail product.user.myprofile.image 64 64 %}
+				{% if shop.image %}
+					{{ MEDIA_URL }}{% thumbnail shop.image 80 80 %}
 				{% else %}
-					{% gravatar_url profile_user.email 64 %}
+					{% gravatar_url profile_user.email 100 %}
 				{% endif %}
 				" style="border: 0; float: left; margin-right: 15px">
-				<h3>
-					{% if product.user.first_name %}
-						{{ product.user.get_full_name|safe }}	
-					{% else %}
-						{{ product.user.username }}				
-					{% endif %}
-				</h3>
+				<h2>
+					{{ shop.shopname }}
+				</h2>
 				</a>
-				{% if product.user.myprofile.city %}
-					<p><i class="fa fa-map-marker"></i> <strong>{{ product.user.myprofile.city|safe }}</strong><p>
-				{% endif %}
-			</div>
-			<div style="float: left">
-				{% if product.user.email or product.user.myprofile.phone %}
-				{% if product.user.email or allowed %}
-					<a href="mailto:{{ product.user.email|safe }}">{{ product.user.email|safe }}</a> <br>
-				{% endif %}
-				{% if product.user.myprofile.phone %}
-					<i class="fa fa-phone"></i> {{ product.user.myprofile.phone|safe }}
-				{% endif %}
-				{% else %}
-					<p>Информации нет</p>
-				{% endif %}
-			</div>		
+				<p><i class="fa fa-map-marker"></i> <strong>{{shop.country}}, {{ shop.city }}</strong><p>
+				<!--<a class="button color" href="#"> Задать вопрос </a>-->
+			</div>	
 		</section>
 
 	</div>
@@ -142,6 +130,7 @@
 			<!-- Tabs Navigation -->
 			<ul class="tabs-nav">
 				<li class="active"><a href="#tab2">Характеристики</a></li>
+				<li><a href="#tab4">Доставка</a></li>
 				<li><a href="#tab3">Комментарии <span class="tab-reviews"></span></a></li>
 			</ul>
 
@@ -162,44 +151,26 @@
 						<th>Состояние</th>
 						<td>{{ product.condition }}</td>
 					</tr>
-					{% if has_available_variations %}
-					{% with variations|get_variation_list as var_list %}
-					 {% for key, values in var_list.items %}
-						<tr>
-							<th>
-								{{ key }}
-							</th>
-							<td>
-							{% for v in values %}
-								{{ v }}
-								{% if not forloop.last %}
-									,
-								{% endif %}
-							{% endfor %}
-							</td>
-						</tr>
-					{% endfor %} 
-					{% endwith %}
-					{% else %}
-						<tr>
-							<th>Товара нет в наличии</th>
-							<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-								&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-							</td>
-						</tr>
-					{% endif %}
+					
 					</table>
 				</div>
 				<div class="tab-content" id="tab3">
 					{% if settings.COMMENTS_DISQUS_SHORTNAME %}
 						{% include "generic/includes/disqus_comments.html" %}
 					{% endif %}
+				</div>
+				<div class="tab-content" id="tab4">
+					{% get_shop product.user as shop %}
+					<ul>
+			            {% for fields in shop.get_express_fields|grouped %}
+            <li>
+                {% for field in fields %} {% if field.value == True %}
+                <span> {{ field.label }}: </span> {% else %}
+                <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> {% endif %} 
+            {% endfor %}
+            </li>
+            {% endfor %}
+			        </ul>
 				</div>
 
 			</div>

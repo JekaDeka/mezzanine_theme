@@ -1,0 +1,343 @@
+{% extends "base.html" %} 
+{% load i18n mezzanine_tags pages_tags %} 
+{% block extra_js %} 
+{{ block.super }}
+<script>
+function error_display(data, field) {
+	if (data.is_taken) {
+		field.addClass('error');
+		var error = field.next(".error");
+		if (!$(error).text().length) {
+			$(error).append(data.error_message);
+		}
+		// $(":submit").attr("disabled", true);
+	} else {
+		field.removeClass('error');
+		var error = field.next(".error");
+		if ($(error).text().length) {
+			$(error).empty();
+		}
+		// $(":submit").removeAttr("disabled");
+	}
+}
+
+function empty_error(field) {
+	if (field.val().length == 0) {
+			field.addClass('error');
+			var error = field.next(".error");
+			if (!$(error).text().length) {
+				$(error).append('Обязательное поле.');
+			}
+			$(":submit").attr("disabled", true);
+		} else {
+			field.removeClass('error');
+			var error = field.next(".error");
+			if ($(error).text().length) {
+				$(error).empty();
+			}
+			$(":submit").removeAttr("disabled");
+		}
+}
+
+function empty_image(field) {
+	if (field.val() == '') {
+			console.log('empty image');
+			$(":submit").attr("disabled", true);
+		} else {
+			console.log('non empty image');
+			$(":submit").removeAttr("disabled");
+		}
+}
+
+function ajax_sumbit(url, field) {
+	var form = $("#shop_form");
+	$.ajax({
+		url: url,
+		data: form.serialize(),
+		dataType: 'json',
+		success: function(data) {
+			error_display(data, field);
+		}
+	});
+}
+
+function display_image(file, ext, classname, size) {
+	if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
+		var reader = new FileReader();
+		reader.onload = function(e) {
+			var img = new Image()
+			img.src = reader.result;
+			localStorage.theImage = reader.result;
+			$(classname).html(img);
+		}
+		reader.readAsDataURL(file); //attempts to read the file in question.
+	}
+}
+$(document).ready(function() {
+	var img = new Image();
+	img.src = localStorage.theImage;
+
+	$("body").on("change", "#file-5", function() {
+		var fileInput = $(this)[0];
+		var file = fileInput.files[0];
+		var ext = file.name.split('.').pop().toLowerCase();
+		display_image(file, ext, '.logo-image');
+	});
+
+	$("body").on("change", "#file-1", function() {
+		var fileInput = $(this)[0];
+		var file = fileInput.files[0];
+		var ext = file.name.split('.').pop().toLowerCase();
+		display_image(file, ext, '.background-image');
+	});
+
+	$(".mask").mask('+0 (000) 000-0000');
+
+	$("#id_shopname").focusout(function() {
+		ajax_sumbit('{% url "validate_shopname" %}', $(this));
+	});
+
+	$("#id_country").on('input', function() {
+		empty_error($(this));
+	});
+
+	$("#id_city").on('input', function() {
+		empty_error($(this));
+	});
+
+});
+</script>
+
+
+
+
+
+{% endblock %} 
+{% block breadcrumb_element %}
+{% if shop %}	
+	<li>Редактирование магазина</li>
+{% else %}
+	<li>Создание нового магазина</li>
+{% endif %}
+
+{% endblock %}
+{% block slider %}
+<form method="post" enctype="multipart/form-data" id="shop_form">
+	{% csrf_token %}
+	<div class="container fullwidth-element" style="height: 150px;">
+		{% if form.background.errors %}
+			{% for error in form.background.errors %}
+				<div style="background-color: #ff7373; color: #fff; text-align: center;"> {{ error }} </div>
+			{% endfor %}
+		{% endif %}
+		{{ form.background }}
+		<label for="file-1">
+			<figure class="background-image">
+				{% if shop.background %}
+					<img src="{{ shop.background.url }}">
+				{% endif %}
+			</figure>
+			
+			<span>Выберите обложку</span> </label>
+	</div>
+	<div class="container fullwidth-element" style="height: 150px; margin-top: -15px;">
+		{{ form.image }}
+		<label for="file-5">
+			<figure class="logo-image">
+				{% if shop.image %}
+					<img src="{{ shop.image.url }}">
+				{% endif %}
+			</figure>
+			{% if form.image.errors %}
+				{% for error in form.image.errors %}
+					<span class="error"> {{ error }} </span> 
+				{% endfor %}
+			{% else %}
+					<span>Выберите логотип</span>
+			{% endif %}
+		</label>
+	</div>
+	<div class="container create_shop">
+		<div class="nine columns">
+			<div>
+				{{ form.shopname.label }}: {{ form.shopname }}
+				<div class="error">
+				{% if form.shopname.errors %}
+						{% for error in form.shopname.errors %}
+							{{ error }} 
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ form.phone.label }}: {{ form.phone }}
+			</div>
+			<div>
+				{{ form.country.label }}:
+				{{ form.country }}
+				<div class="error">
+					{% if form.country.errors %}
+						{% for error in form.country.errors %}
+							{{ error }} 
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ form.city.label }}:
+				{{ form.city }}
+				<div class="error">
+					{% if form.city.errors %}
+						{% for error in form.city.errors %}
+							{{ error }} 
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ form.bio.label }}: {{ form.bio }}
+				<p> {{ form.bio.help_text }} </p>
+			</div>
+
+			<h3 class="headline">Правила магазина</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+			<p> {{ form.rules.help_text }}</p>
+			<div>
+				{{ form.rules }}	
+			</div>
+		</div>
+		<div class="seven columns">
+			<h3 class="headline">Доставка</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+
+			<p>Отметьте возможные варианты доставки ваших товаров.
+Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу.</p>
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_point }}
+					{{ form.express_point.label }}:
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+					{{ form.express_point_price }}
+				</div>
+			</div>
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_city }}
+					{{ form.express_city.label }}: 
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_city_price }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_country }}
+					{{ form.express_country.label }}: 
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+					{{ form.express_country_price }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_world }}
+				{{ form.express_world.label }}: 
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_world_price }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_mail }}
+				{{ form.express_mail.label }}: 
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_mail_price }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_personal }}
+				{{ form.express_personal.label }}: 
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_personal_price }}
+				</div>
+			</div>
+			<div class="express">
+				{{ form.express_other }}
+				<p>
+					{{form.express_other.help_text}}
+				</p>
+			</div>
+
+			<h3 class="headline">Оплата</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+			<p>Выберите, какими способами покупатель сможет оплатить заказ. Если у вас есть счета «Яндекс.Деньги» или PayPal — отметьте эти варианты. Так покупатель сможет выбрать удобный ему метод оплаты.</p>
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_personal }}
+				{{ form.payment_personal.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_bank_transfer }}
+				{{ form.payment_bank_transfer.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_card_transfer }}
+				{{ form.payment_card_transfer.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+			<div>
+				{{ form.payment_other }}
+				<p> {{ form.payment_other.help_text }}</p>
+				
+			</div>
+		</div>
+
+		<div class="sixteen columns">
+			<input type="submit" style="float: right;" value="{% if shop %} Сохранить изменения {% else %} Создать магазин {% endif %}" />
+		</div>
+	</div>
+</form>
+{% endblock %}
+
+{% block main %}
+
+{% endblock %}

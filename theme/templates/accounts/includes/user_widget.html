@@ -1,7 +1,6 @@
 {% load i18n mezzanine_tags accounts_tags theme_tags %}
-{% get_user_products as products %}
-{% get_user_blog_posts as posts %}
-{% get_user_by_url as author %}
+{% get_shop_products user as products %}
+{% get_user_blog_posts user as posts %}
     <ul class="tabs-nav my-account">
         <li class="active"><a href="#tab1">Публикации ({{posts|length}})</a></li>
         <li class=""><a href="#tab2">Товары ({{products|length}})</a></li>
@@ -9,7 +8,6 @@
     </ul>
 
     <div class="tabs-container">
-
         <div class="tab-content" id="tab1" style="display: block;">
         {% if posts %}
         <div class="container">
@@ -61,7 +59,7 @@
         </div>
         </div>
         <div class="margin-top-35">
-            <a href="{% url 'blog_post_list_author' author %}" class="button gray" style="float: right; margin-bottom: 25px;">Посмотреть все записи</a>
+            <a href="{% url 'blog_post_list_author' user %}" class="button gray" style="float: right; margin-bottom: 25px;">Посмотреть все записи</a>
         </div>
         {% else %}
             <p>Записи пока отсутствуют</p>
@@ -114,7 +112,7 @@
             </div>
             <div class="clearfix"></div>
             <div class="margin-top-35">
-                <a href="/" class="button gray" style="float: right; margin-bottom: 25px;">Посмотреть все товары</a>
+                <a href="#" class="button gray" style="float: right; margin-bottom: 25px;">Посмотреть все товары</a>
             </div>
             {% else %}
                 <p>Товары пока отсутствуют</p>

@@ -1,0 +1,133 @@
+{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags %} 
+
+{% block meta_title %}{{ title }}{% endblock %} 
+{% block breadcrumbs_title %}
+<h2>Панель быстрого доступа</h2> 
+{% endblock breadcrumbs_title %} 
+{% block breadcrumb_element %}
+	<li>{{ request.user.email }}</li>
+{% endblock breadcrumb_element %}
+
+{% block main %} 
+<div class="eight columns">
+	{% if shop %}
+		<a href="{% url "shop_view" shop.shopname %}">Посмотреть магазин на сайте <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+		<a href="{% url "shop_edit" %}">Редактировать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+	{% else %}
+		<a href="{% url "shop_create" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+	{% endif %}
+</div>
+<div class="eight columns">
+	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
+	<div class="clearfix"></div>
+</div>
+<!--{% if not request.user.is_staff %}
+<div class="sixteen columns">
+	<div class="notification warning">
+		<p>Для того, чтобы воспользоваться всеми возможностям сайта, заполните ниже необходимую информация.</p>
+	</div>
+</div>
+{% endif %}
+
+<div class="nine columns">
+	<h3 class="headline">Блог</h3><span class="line margin-bottom-35"></span>
+	<div class="clearfix"></div>
+	<div class="four columns margin-bottom-5 ">
+		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-4"><i class="fa fa-list"></i></span>
+			<h3>Мои статьи</h3>
+		</a>	
+	</div>
+	
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-4"><i class="fa fa-pencil"></i></span>
+			<h3>Написать в блог</h3>
+		</a>	
+	</div>
+	<div class="clearfix"></div>
+
+
+	<h3 class="headline">Мой магазин</h3><span class="line margin-bottom-35"></span>
+	<div class="clearfix"></div>
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-2"><i class="fa fa-list"></i></span>
+			<h3>Мои товары</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-2"><i class="fa fa-plus"></i></span>
+			<h3>Добавить новый</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-2"><i class="fa fa-gear"></i></span>
+			<h3>Настройки</h3>
+		</a>	
+	</div>
+	
+	<div class="clearfix"></div>
+	<h3 class="headline">Стол заказов</h3><span class="line margin-bottom-35"></span>
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-3"><i class="fa fa-list"></i></span>
+			<h3>Мои заказы</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+				<span class="color-effect-3"><i class="fa fa-plus"></i></span>
+			<h3>Добавить новый</h3>
+		</a>	
+	</div>
+	<div class="clearfix"></div>
+
+
+</div>
+
+<div class="six columns">
+	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
+{% if form and not request.user.is_staff %}
+	<p> {% errors_for form %} </p>
+	<form method="post" {% if form.is_multipart %} enctype="multipart/form-data" {% endif %} class="login">
+		<fieldset>
+			{% fields_for form %}
+			<div class="form-actions">
+				{% block account_form_actions %}
+				<input class="button" type="submit" value="{{ title }}"> {% endblock %}
+			</div>
+		</fieldset>
+	</form>
+</div>
+{% else %}
+	<div class="four columns margin-bottom-5">
+		<a href="/admin/" class="icon-box">
+				<span><i class="fa fa-list"></i></span>
+			<h3>Перейти в панель управления</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a href="{% url 'shop_view' request.user %}" class="icon-box">
+				<span><i class="fa fa-shopping-bag" aria-hidden="true"></i></span>
+			<h3>Посмотреть магазин на сайте</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a href="{% url 'profile_view' %}" class="icon-box">
+				<span><i class="fa fa-user" aria-hidden="true"></i></span>
+			<h3>Изменить профиль</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a href="{% url 'mezzanine_password_reset' %}" class="icon-box">
+				<span><i class="fa fa-lock" aria-hidden="true"></i></span>
+			<h3>Сменить пароль</h3>
+		</a>	
+	</div>
+	<div class="clearfix"></div>
+</div>
+{% endif %}-->
+{% endblock %}
