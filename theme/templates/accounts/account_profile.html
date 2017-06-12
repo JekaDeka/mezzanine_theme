@@ -45,12 +45,18 @@
             {% endfor %}
             </li>
             {% endfor %}
+
         </ul>
-        <p>
-            {% if payment_personal or payment_bank_transfer or payment_card_transfer%} К оплате принимаются: {% if payment_bank_transfer %} банковские переводы {% endif %} {% if payment_card_transfer %} банковские карты {% endif %} {% if payment_personal %} наличные. {% endif %} {% endif %}
-        </p>
+        <div>{{ shop.express_other }}</div>
     </div>
     <div class="clearfix"></div>
+    <h3 class="headline">Оплата</h3>
+    <span class="line" style="margin-bottom:0px;"></span>
+    <div class="clearfix"></div>
+    <div>
+            {% if shop.payment_personal or shop.payment_bank_transfer or shop.payment_card_transfer%} К оплате принимаются: {% if shop.payment_bank_transfer %} банковские переводы {% endif %} {% if shop.payment_card_transfer %} банковские карты {% endif %} {% if shop.payment_personal %} наличные. {% endif %} {% endif %}
+    {{ shop.payment_other }}
+    </div>
 </div>
 <div class="five columns" style="float: right">
     <h3 class="headline">Контакты</h3>
