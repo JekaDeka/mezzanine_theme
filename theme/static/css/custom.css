@@ -798,7 +798,7 @@ a.menu-trigger i {
 .inputfile-1 + label {
     background-color: #c0c0c0;
     border-top: 3px solid #c0c0c0;
-    border-bottom: 3px solid #c0c0c0;  
+    border-bottom: 3px solid #c0c0c0;
     width: 100%;
     height: 100%;
     text-align: center;
@@ -816,7 +816,7 @@ a.menu-trigger i {
 .inputfile-1 + label:hover {
     background-color: #3acf87;
     border-top: 3px solid #3acf87;
-    border-bottom: 3px solid #3acf87; 
+    border-bottom: 3px solid #3acf87;
 }
 
 
@@ -1079,6 +1079,7 @@ input:-moz-placeholder {
 input.error {
     border-bottom: 1px solid #ff7373;
 }
+
 .error {
     color: #ff7373;
 }
@@ -1090,4 +1091,12 @@ input.error {
 .product a.shopname:hover {
     color: #777;
     text-decoration: underline;
+}
+
+textarea,
+input {
+    -webkit-appearance: none;
+    border-radius: 0;
+    -moz-border-radius: 0;
+    -webkit-border-radius: 0;
 }
