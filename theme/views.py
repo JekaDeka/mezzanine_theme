@@ -228,7 +228,7 @@ def shop_create(request, template="accounts/account_shop_create.html"):
             if request.FILES.get('background', False):
                 shop.background = request.FILES['background']
             shop.save()
-            return redirect('shop_view', shopname=shop.shopname)
+            return redirect('shop_view', slug=shop.slug)
 
     templates = []
     context = {"form": form, "shop": shop}
