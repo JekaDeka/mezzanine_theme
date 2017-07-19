@@ -144,6 +144,7 @@
 }
 
 
+
 /*.input_id_phone,
 .input_id_city,
 .input_id_image,
@@ -182,6 +183,7 @@ h5 {
 }
 
 
+
 /*
 nav shit and etc, shop_tree display inline-block
 */
@@ -190,7 +192,7 @@ nav shit and etc, shop_tree display inline-block
     line-height: 23px;
 }
 
-#categories > li {
+#categories>li {
     border-bottom: 1px solid #eee;
 }
 
@@ -237,11 +239,11 @@ nav shit and etc, shop_tree display inline-block
     cursor: pointer;
 }
 
-li.child-1 > .open_nav {
+li.child-1>.open_nav {
     line-height: 46px;
 }
 
-ul.widget-tabs > li:hover {
+ul.widget-tabs>li:hover {
     padding-left: 7px;
     border-bottom: 1px solid #a0a0a0;
 }
@@ -251,13 +253,14 @@ p,
     word-wrap: break-word;
 }
 
-.footer-links > li > a {
+.footer-links>li>a {
     display: inline;
 }
 
-.footer-links > li {
+.footer-links>li {
     padding-top: 6px;
 }
+
 
 
 /* dropdown menu */
@@ -266,7 +269,7 @@ li.dropdown ul li ul {
     left: 198px;
 }
 
-.menu > li .current {
+.menu>li .current {
     color: #fff;
 }
 
@@ -275,23 +278,23 @@ li.dropdown ul li ul {
 }
 
 @media only screen and (max-width: 766px) {
-    #jPanelMenu-menu > li > a {
+    #jPanelMenu-menu>li>a {
         border-bottom: 1px solid #5a5a5a;
     }
     .active_branch ul {
         display: block!important;
     }
-    ul.dropdown-menu > li > a {
+    ul.dropdown-menu>li>a {
         padding-left: 15px!important;
     }
-    ul.dropdown-menu > li ul {
+    ul.dropdown-menu>li ul {
         display: none;
     }
-    ul.dropdown-menu > li ul a {
+    ul.dropdown-menu>li ul a {
         padding-left: 35px!important;
         border-bottom: 1px solid #5a5a5a;
     }
-    ul.dropdown-menu > li ul li ul a {
+    ul.dropdown-menu>li ul li ul a {
         padding-left: 55px!important;
         border-bottom: 1px solid #5a5a5a;
     }
@@ -371,16 +374,16 @@ li.dropdown ul li ul {
     background: #fff;
 }
 
-.onoffswitch-checkbox:checked + .onoffswitch-label {
+.onoffswitch-checkbox:checked+.onoffswitch-label {
     background-color: #2ee8a7;
 }
 
-.onoffswitch-checkbox:checked + .onoffswitch-label,
-.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+.onoffswitch-checkbox:checked+.onoffswitch-label,
+.onoffswitch-checkbox:checked+.onoffswitch-label:before {
     border-color: #2ee8a7;
 }
 
-.onoffswitch-checkbox:checked + .onoffswitch-label:before {
+.onoffswitch-checkbox:checked+.onoffswitch-label:before {
     right: 0;
 }
 
@@ -472,6 +475,7 @@ ul.top-bar-menu li:hover i {
     background-color: #008275;
     padding: 5px 2px;
 }
+
 
 
 /*.share-buttons ul a,
@@ -611,6 +615,7 @@ a.menu-trigger i {
 }
 
 
+
 /*.content-box.color-effect-1:hover h3,
 .content-box.color-effect-2:hover h3,
 .content-box.color-effect-3:hover h3,
@@ -692,6 +697,7 @@ a.menu-trigger i {
 }
 
 
+
 /* Bounce To Right */
 
 
@@ -763,7 +769,7 @@ a.menu-trigger i {
     z-index: -1;
 }
 
-.inputfile + label {
+.inputfile+label {
     max-width: 100%;
     font-size: 1.25rem;
     /* 20px */
@@ -777,25 +783,26 @@ a.menu-trigger i {
     /* 10px 20px */
 }
 
-.no-js .inputfile + label {
+.no-js .inputfile+label {
     display: none;
 }
 
-.inputfile:focus + label,
-.inputfile.has-focus + label {
+.inputfile:focus+label,
+.inputfile.has-focus+label {
     outline: 1px dotted #000;
     outline: -webkit-focus-ring-color auto 5px;
 }
 
-.inputfile + label * {
+.inputfile+label * {
     /* pointer-events: none; */
     /* in case of FastClick lib use */
 }
 
 
+
 /* style 1 */
 
-.inputfile-1 + label {
+.inputfile-1+label {
     background-color: #c0c0c0;
     border-top: 3px solid #c0c0c0;
     border-bottom: 3px solid #c0c0c0;
@@ -807,33 +814,43 @@ a.menu-trigger i {
     background-position: 50% center;
 }
 
-.inputfile-1 + label span {
+.inputfile-1+label span {
     color: white;
     font-weight: 700;
     font-size: 30px;
     line-height: 150px;
+    background-color: #606060;
+    border-radius: 2px;
+    padding: 10px;
+    /*opacity: 0.7;*/
 }
-
-.inputfile-1:focus + label,
-.inputfile-1.has-focus + label,
-.inputfile-1 + label:hover {
+.inputfile-1+label:hover span {
+    background-color: #3acf87;
+    color: white;
+    opacity: 1;
+}
+.inputfile-1:focus+label,
+.inputfile-1.has-focus+label,
+.inputfile-1+label:hover {
     background-color: #3acf87;
     border-top: 3px solid #3acf87;
     border-bottom: 3px solid #3acf87;
 }
 
 
+
 /* style 4 */
 
-.inputfile-4 + label {
+.inputfile-4+label {
     color: #d3394c;
     float: right;
     margin-right: 10px;
 }
 
-.inputfile-4 + label span {
+.inputfile-4+label span {
     margin-left: 15px;
 }
+
 
 
 /*.inputfile-1:focus + label,
@@ -845,7 +862,7 @@ a.menu-trigger i {
     color: #3acf87;
 }*/
 
-.inputfile-4 + label figure {
+.inputfile-4+label figure {
     width: 150px;
     height: 150px;
     border-radius: 50%;
@@ -856,36 +873,37 @@ a.menu-trigger i {
     margin: 0 auto 10px;
 }
 
-.inputfile-4 + label figure img {
+.inputfile-4+label figure img {
     border-radius: 50%;
 }
 
-.inputfile-4:focus + label figure,
-.inputfile-4.has-focus + label figure,
-.inputfile-4 + label:hover figure {
+.inputfile-4:focus+label figure,
+.inputfile-4.has-focus+label figure,
+.inputfile-4+label:hover figure {
     background-color: #3acf87;
 }
 
-.inputfile-4 + label svg {
+.inputfile-4+label svg {
     width: 100%;
     height: 100%;
     fill: #f1e5e6;
 }
 
 
+
 /* style 5 */
 
-.inputfile-5 + label {
+.inputfile-5+label {
     color: #d3394c;
 }
 
-.inputfile-5:focus + label,
-.inputfile-5.has-focus + label,
-.inputfile-5 + label:hover {
+.inputfile-5:focus+label,
+.inputfile-5.has-focus+label,
+.inputfile-5+label:hover {
     color: #722040;
 }
 
-.inputfile-5 + label figure {
+.inputfile-5+label figure {
     width: 100px;
     height: 135px;
     background-color: #d3394c;
@@ -895,14 +913,14 @@ a.menu-trigger i {
     margin: 0 auto 10px;
 }
 
-.inputfile-5:focus + label figure,
-.inputfile-5.has-focus + label figure,
-.inputfile-5 + label:hover figure {
+.inputfile-5:focus+label figure,
+.inputfile-5.has-focus+label figure,
+.inputfile-5+label:hover figure {
     background-color: #722040;
 }
 
-.inputfile-5 + label figure::before,
-.inputfile-5 + label figure::after {
+.inputfile-5+label figure::before,
+.inputfile-5+label figure::after {
     width: 0;
     height: 0;
     content: '';
@@ -911,24 +929,26 @@ a.menu-trigger i {
     right: 0;
 }
 
-.inputfile-5 + label figure::before {
+.inputfile-5+label figure::before {
     border-top: 20px solid #dfc8ca;
     border-left: 20px solid transparent;
 }
 
-.inputfile-5 + label figure::after {
+.inputfile-5+label figure::after {
     border-bottom: 20px solid #722040;
     border-right: 20px solid transparent;
 }
 
-.inputfile-5:focus + label figure::after,
-.inputfile-5.has-focus + label figure::after,
-.inputfile-5 + label:hover figure::after {
+.inputfile-5:focus+label figure::after,
+.inputfile-5.has-focus+label figure::after,
+.inputfile-5+label:hover figure::after {
     border-bottom-color: #d3394c;
 }
+
 .background-image {
-	/*margin-top: -45%;*/
+    /*margin-top: -45%;*/
 }
+
 .background-image img {
     /*height: 150px!important;*/
     width: 100%;
@@ -1018,21 +1038,21 @@ input[type=number]::-webkit-outer-spin-button {
     border-radius: 50%;
 }
 
-.control:hover input ~ .control__indicator,
-.control input:focus ~ .control__indicator {
+.control:hover input~.control__indicator,
+.control input:focus~.control__indicator {
     background: #f2f2f2;
 }
 
-.control input:checked ~ .control__indicator {
+.control input:checked~.control__indicator {
     background: #3acf87;
 }
 
-.control:hover input:not([disabled]):checked ~ .control__indicator,
-.control input:checked:focus ~ .control__indicator {
+.control:hover input:not([disabled]):checked~.control__indicator,
+.control input:checked:focus~.control__indicator {
     background: #3acf87;
 }
 
-.control input:disabled ~ .control__indicator {
+.control input:disabled~.control__indicator {
     background: #e6e6e6;
     /*opacity: 0.6;*/
     pointer-events: none;
@@ -1044,7 +1064,7 @@ input[type=number]::-webkit-outer-spin-button {
     display: none;
 }
 
-.control input:checked ~ .control__indicator:after {
+.control input:checked~.control__indicator:after {
     display: block;
 }
 
@@ -1058,7 +1078,7 @@ input[type=number]::-webkit-outer-spin-button {
     transform: rotate(45deg);
 }
 
-.control--checkbox input:disabled ~ .control__indicator:after {
+.control--checkbox input:disabled~.control__indicator:after {
     border-color: #7b7b7b;
 }
 

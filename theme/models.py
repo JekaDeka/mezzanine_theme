@@ -9,6 +9,7 @@ from mezzanine.utils.models import upload_to
 from cartridge.shop.models import Priced
 from django.utils.timezone import now
 from django.core.urlresolvers import reverse
+from slugify import slugify, Slugify, UniqueSlugify
 from datetime import date
 
 
@@ -40,6 +41,7 @@ class UserShop(models.Model):
 
     shopname = models.CharField(max_length=255, blank=False, unique=True,
                                 verbose_name=("Название магазина"))
+    slug = models.URLField(editable=False, default='')
     bio = RichTextField(default="", verbose_name=("Описание"),
                         help_text="Расскажите интересные факты о создании своего бренда, опишите его особенности и преимущества. Перечислите свои флагманские вещи, расскажите кратко про производство, материалы. Напишите как минимум три предложения о себе. Главная страница магазина будет выглядеть красивее, а мы это учитываем, когда отбираем магазины в раздел «Лучшее» и в редакционные подборки.")
 
@@ -116,6 +118,10 @@ class UserShop(models.Model):
                     }
                 )
         return fields
+
+    def save(self, request=False, *args, **kwargs):
+        self.slug = slugify(self.shopname, to_lower=True)
+        super(UserShop, self).save(*args, **kwargs)
 
 
 class Slider(models.Model):

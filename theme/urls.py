@@ -17,7 +17,7 @@ urlpatterns = [
         views.validate_shopname, name='validate_shopname'),
 
 
-    url('^shop/(?P<shopname>[\w\-]+)/$',
+    url('^shop/(?P<slug>[\w\-]+)/$',
         views.shop_view, name='shop_view'),
     url(r'^promote/$', views.promote_user, name="promote_user"),
     url(r'^settings/$',

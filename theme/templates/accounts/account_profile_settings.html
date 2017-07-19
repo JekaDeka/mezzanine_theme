@@ -11,7 +11,7 @@
 {% block main %} 
 <div class="eight columns">
 	{% if shop %}
-		<a href="{% url "shop_view" shop.shopname %}">Посмотреть магазин на сайте <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+		<a href="{% url "shop_view" shop.slug %}">Посмотреть магазин на сайте <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
 		<a href="{% url "shop_edit" %}">Редактировать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
 	{% else %}
 		<a href="{% url "shop_create" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
