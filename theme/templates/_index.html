@@ -199,7 +199,7 @@
                 {% else %}
                 <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image-80.jpg' 80 80 %}">
                 {% endif %}
-                <div class="product-list-desc with-rating">{{product.title|title}} <i> {{ product.price|rub_currency }} </i>
+                <div class="product-list-desc with-rating">{{product.shopname}} <!--<i> {{ product.price|rub_currency }} </i>-->
                     <div class="rating five-stars">
                         <div class="star-rating"></div>
                         <div class="star-bg"></div>

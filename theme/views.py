@@ -147,7 +147,7 @@ def true_index(request):
         created__range=[startdate, enddate]).order_by('-created')[:4]
 
     most_popular = new_arrivals[:3]
-    best_product = new_arrivals[:3]
+    best_product = UserShop.objects.all()[:3]
     sale_product = new_arrivals[:3]
 
     context = {'featured': featured,

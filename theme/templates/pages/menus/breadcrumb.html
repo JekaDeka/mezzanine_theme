@@ -7,7 +7,7 @@
 
     {% if not has_home and page.is_primary and forloop.first %}
     <li>
-        <a href="{% url "home" %}">{% trans "Home" %}</a>
+        <a href="{% url "true_index" %}">{% trans "Home" %}</a>
     </li>
     {% endif %}
 

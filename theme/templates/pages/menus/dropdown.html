@@ -12,7 +12,7 @@
     {% for page in page_branch %}
     {% if not has_home and page.is_primary and forloop.first %}
     <li>
-        <a class="{% if on_home %}current{% endif %} homepage" id="{% if on_home %}current{% endif %}" href="{% url "home" %}">{% trans "Home" %}</a>
+        <a class="{% if on_home %}current{% endif %} homepage" id="{% if on_home %}current{% endif %}" href="{% url "true_index" %}">{% trans "Home" %}</a>
     </li>
     {% endif %}
     {% if page.in_menu %}

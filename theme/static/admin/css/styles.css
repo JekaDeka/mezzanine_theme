@@ -16566,8 +16566,8 @@ html.full-page-image body {
 }
 .coming-soon {
   background-color: #dedede;
-  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../demo/stockphoto/blog_10.jpg");
-  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url("../demo/stockphoto/blog_10.jpg");
+  background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)), url("../demo/stockphoto/blog_01.jpg");
+  background-image: -webkit-linear-gradient(top, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7)), url("../demo/stockphoto/blog_01.jpg");
   background-size: cover;
   background-position: center;
   background-attachment: fixed;

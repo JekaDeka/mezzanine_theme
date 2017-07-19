@@ -4,106 +4,128 @@
 {{ block.super }}
 <script>
 function error_display(data, field) {
-	if (data.is_taken) {
-		field.addClass('error');
-		var error = field.next(".error");
-		if (!$(error).text().length) {
-			$(error).append(data.error_message);
-		}
-		// $(":submit").attr("disabled", true);
-	} else {
-		field.removeClass('error');
-		var error = field.next(".error");
-		if ($(error).text().length) {
-			$(error).empty();
-		}
-		// $(":submit").removeAttr("disabled");
-	}
+    if (data.is_taken) {
+        field.addClass('error');
+        var error = field.next(".error");
+        if (!$(error).text().length) {
+            $(error).append(data.error_message);
+        }
+        // $(":submit").attr("disabled", true);
+    } else {
+        field.removeClass('error');
+        var error = field.next(".error");
+        if ($(error).text().length) {
+            $(error).empty();
+        }
+        // $(":submit").removeAttr("disabled");
+    }
 }
 
 function empty_error(field) {
-	if (field.val().length == 0) {
-			field.addClass('error');
-			var error = field.next(".error");
-			if (!$(error).text().length) {
-				$(error).append('Обязательное поле.');
-			}
-			$(":submit").attr("disabled", true);
-		} else {
-			field.removeClass('error');
-			var error = field.next(".error");
-			if ($(error).text().length) {
-				$(error).empty();
-			}
-			$(":submit").removeAttr("disabled");
-		}
+    if (field.val().length == 0) {
+        field.addClass('error');
+        var error = field.next(".error");
+        if (!$(error).text().length) {
+            $(error).append('Обязательное поле.');
+        }
+        $(":submit").attr("disabled", true);
+    } else {
+        field.removeClass('error');
+        var error = field.next(".error");
+        if ($(error).text().length) {
+            $(error).empty();
+        }
+        $(":submit").removeAttr("disabled");
+    }
 }
 
 function empty_image(field) {
-	if (field.val() == '') {
-			console.log('empty image');
-			$(":submit").attr("disabled", true);
-		} else {
-			console.log('non empty image');
-			$(":submit").removeAttr("disabled");
-		}
+    if (field.val() == '') {
+        console.log('empty image');
+        $(":submit").attr("disabled", true);
+    } else {
+        console.log('non empty image');
+        $(":submit").removeAttr("disabled");
+    }
 }
 
 function ajax_sumbit(url, field) {
-	var form = $("#shop_form");
-	$.ajax({
-		url: url,
-		data: form.serialize(),
-		dataType: 'json',
-		success: function(data) {
-			error_display(data, field);
-		}
-	});
+    var form = $("#shop_form");
+    $.ajax({
+        url: url,
+        data: form.serialize(),
+        dataType: 'json',
+        success: function(data) {
+            error_display(data, field);
+        }
+    });
 }
 
-function display_image(file, ext, classname, size) {
-	if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			var img = new Image()
-			img.src = reader.result;
-			localStorage.theImage = reader.result;
-			$(classname).html(img);
-		}
-		reader.readAsDataURL(file); //attempts to read the file in question.
-	}
-}
+// function display_image(file, ext, classname, size) {
+// 	if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
+// 		var reader = new FileReader();
+// 		reader.onload = function(e) {
+// 			var img = new Image()
+// 			img.src = reader.result;
+// 			localStorage.theImage = reader.result;
+// 			// $(classname).html(img);
+// 			$(classname).css('background-image', 'url(' + img.src + ')');
+// 		}
+// 		reader.readAsDataURL(file); //attempts to read the file in question.
+// 	}
+// }
 $(document).ready(function() {
-	var img = new Image();
-	img.src = localStorage.theImage;
+    // var img = new Image();
+    // img.src = localStorage.theImage;
 
-	$("body").on("change", "#file-5", function() {
-		var fileInput = $(this)[0];
-		var file = fileInput.files[0];
-		var ext = file.name.split('.').pop().toLowerCase();
-		display_image(file, ext, '.logo-image');
-	});
+    $("body").on("change", "#file-5", function() {
+        var fileInput = $(this)[0];
+        var file = fileInput.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        // display_image(file, ext, '.logo-image');
+        if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image()
+                img.src = reader.result;
+                localStorage.theImage = reader.result;
+                $('.logo-image').html(img);
+                // $(classname).css('background-image', 'url(' + img.src + ')');
+            }
+            reader.readAsDataURL(file); //attempts to read the file in question.
+        }
+    });
 
-	$("body").on("change", "#file-1", function() {
-		var fileInput = $(this)[0];
-		var file = fileInput.files[0];
-		var ext = file.name.split('.').pop().toLowerCase();
-		display_image(file, ext, '.background-image');
-	});
+    $("body").on("change", "#file-1", function() {
+        var fileInput = $(this)[0];
+        var file = fileInput.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        // display_image(file, ext, '.inputfile-1 + label');
+        if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image()
+                img.src = reader.result;
+                localStorage.theImage = reader.result;
+                $('.inputfile-1 + label').css('background-image', 'url(' + img.src + ')');
+            }
+            reader.readAsDataURL(file); //attempts to read the file in question.
+        }
+    });
 
-	$(".mask").mask('+0 (000) 000-0000');
+    $(".mask").mask('+0 (000) 000-0000');
 
-	$("#id_shopname").focusout(function() {
-		ajax_sumbit('{% url "validate_shopname" %}', $(this));
-	});
+    $("#id_shopname").focusout(function() {
+        ajax_sumbit('{% url "validate_shopname" %}', $(this));
+    });
 
-	$("#id_country").on('input', function() {
-		empty_error($(this));
-	});
+    $("#id_country").on('input', function() {
+        empty_error($(this));
+    });
 
-	$("#id_city").on('input', function() {
-		empty_error($(this));
-	});
+    $("#id_city").on('input', function() {
+        empty_error($(this));
+    });
 
 });
 </script>
@@ -131,11 +153,10 @@ $(document).ready(function() {
 			{% endfor %}
 		{% endif %}
 		{{ form.background }}
-		<label for="file-1">
+		<label for="file-1" {% if shop.background %}
+								style="background-image: url({{ MEDIA_URL }}{% thumbnail shop.background 1300 150 %});"
+							{% endif %}>
 			<figure class="background-image">
-				{% if shop.background %}
-					<img src="{{ shop.background.url }}">
-				{% endif %}
 			</figure>
 			
 			<span>Выберите обложку</span> </label>
