@@ -783,7 +783,7 @@ def hard_trim(value):
 
 EXTENSIONS = {
     'Папка': [''],
-    'Изображения': ['.jpg', '.jpeg', '.gif', '.png', '.tif', '.tiff', '.svg'],
+    'Изображения': ['jpg', 'jpeg', 'gif', 'png', 'tif', 'tiff', 'svg', 'bmp'],
 }
 
 
