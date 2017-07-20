@@ -131,6 +131,7 @@
 			<ul class="tabs-nav">
 				<li class="active"><a href="#tab2">Характеристики</a></li>
 				<li><a href="#tab4">Доставка</a></li>
+				<li><a href="#tab5">Правила магазина</a></li>
 				<li><a href="#tab3">Комментарии <span class="tab-reviews"></span></a></li>
 			</ul>
 
@@ -159,18 +160,21 @@
 						{% include "generic/includes/disqus_comments.html" %}
 					{% endif %}
 				</div>
-				<div class="tab-content" id="tab4">
+				<div class="tab-content list-1" id="tab4">
 					{% get_shop product.user as shop %}
 					<ul>
 			            {% for fields in shop.get_express_fields|grouped %}
-            <li>
-                {% for field in fields %} {% if field.value == True %}
-                <span> {{ field.label }}: </span> {% else %}
-                <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> {% endif %} 
-            {% endfor %}
-            </li>
-            {% endfor %}
+				            <li>
+				                {% for field in fields %} {% if field.value == True %}
+				                <span> {{ field.label }}: </span> {% else %}
+				                <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> {% endif %} 
+				            {% endfor %}
+				            </li>
+				        {% endfor %}
 			        </ul>
+				</div>
+				<div class="tab-content" id="tab5">
+				<p>{{ shop.rules|safe }}</p>
 				</div>
 
 			</div>

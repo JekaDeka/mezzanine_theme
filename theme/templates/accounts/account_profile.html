@@ -18,12 +18,12 @@
     <h2 class="headline" style="margin-top:-37px; font-size: 35px!important;">{{ shop.shopname }}</h2>
     <span class="line"></span>
     <div class="clearfix"></div>
-    <div>{{ shop.bio }}</div>
+    <div>{{ shop.bio|safe }}</div>
     {% if shop.rules %}
         <h3 class="headline margin-top-25">Правила магазина</h3>
         <span class="line"></span>
         <div class="clearfix"></div>
-        <div>{{ shop.rules }}</div>
+        <div>{{ shop.rules|safe }}</div>
     {% endif %}
     
 </div>
