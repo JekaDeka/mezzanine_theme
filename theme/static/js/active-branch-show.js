@@ -37,7 +37,6 @@ $(function() {
             if (text.length > 25 ) {
                 offset = 60;
             }
-            console.log(text.length);
             $(val).css('top', -1 * offset);
             $(val).css('height', offset - 12);
         });

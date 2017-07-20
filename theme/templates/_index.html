@@ -155,7 +155,7 @@
 {% endblock %}
 
 {% block product_list %}
-{% if most_popular and user_shops and sale_product %}
+{% if most_popular or user_shops or sale_product %}
 <div class="container margin-bottom-25">
 
     <!-- Best Sellers -->
