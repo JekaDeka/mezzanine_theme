@@ -138,23 +138,25 @@ def true_index(request):
     main_category = Page.objects.filter(slug='catalog')
     featured = Category.objects.filter(parent=main_category)[:4]
 
-    enddate = datetime.datetime.today()
-    startdate = enddate - datetime.timedelta(days=60)
-    new_arrivals = Product.objects.filter(
-        created__range=[startdate, enddate]).filter(status=2).order_by('-created')[:7]
+    # enddate = datetime.datetime.today()
+    # startdate = enddate - datetime.timedelta(days=60)
+    # new_arrivals = Product.objects.filter(
+    # created__range=[startdate,
+    # enddate]).filter(status=2).order_by('-created')[:7]
 
-    recent_posts = BlogPost.objects.filter(
-        created__range=[startdate, enddate]).order_by('-created')[:4]
+    new_arrivals = Product.objects.filter(status=2).order_by('-created')[:7]
+
+    recent_posts = BlogPost.objects.order_by('-created')[:4]
 
     most_popular = new_arrivals[:3]
-    best_product = UserShop.objects.all()[:3]
-    sale_product = new_arrivals[:3]
+    user_shops = UserShop.objects.all()[:3]
+    sale_product = new_arrivals[3:6]
 
     context = {'featured': featured,
                'new_arrivals': new_arrivals,
                'recent_posts': recent_posts,
                'most_popular': most_popular,
-               'best_product': best_product,
+               'user_shops': user_shops,
                'sale_product': sale_product
                }
     return render(request, '_index.html', context)

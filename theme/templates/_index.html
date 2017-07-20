@@ -155,7 +155,7 @@
 {% endblock %}
 
 {% block product_list %}
-{% if most_popular and best_product and sale_product %}
+{% if most_popular and user_shops and sale_product %}
 <div class="container margin-bottom-25">
 
     <!-- Best Sellers -->
@@ -192,14 +192,14 @@
 
 
         <ul class="product-list top-rated">
-        {% for product in best_product %}
-            <li><a href="{{product.get_absolute_url}}">
-                {% if product.image %}
-                <img src="{{ MEDIA_URL }}{% thumbnail product.image 80 80 %}" alt="" />
+        {% for shop in user_shops %}
+            <li><a href="{% url "shop_view" shop.slug %}">
+                {% if shop.image %}
+                <img src="{{ MEDIA_URL }}{% thumbnail shop.image 80 80 %}" alt="" />
                 {% else %}
                 <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image-80.jpg' 80 80 %}">
                 {% endif %}
-                <div class="product-list-desc with-rating">{{product.shopname}} <!--<i> {{ product.price|rub_currency }} </i>-->
+                <div class="product-list-desc with-rating">{{ shop.shopname }} <!--<i> {{ product.price|rub_currency }} </i>-->
                     <div class="rating five-stars">
                         <div class="star-rating"></div>
                         <div class="star-bg"></div>

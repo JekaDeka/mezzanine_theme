@@ -7,7 +7,7 @@ $(function() {
     var main_ul = $(ul).parents('ul').last();
     if (ul.attr('class') == "parent-1") { //either it's 2 or more ul
         ul.css('display', 'block');
-        if (parent_ul.attr('class') == "parent-2" ) {
+        if (parent_ul.attr('class') == "parent-2") {
             $(a_parent_li).addClass('active');
             parent_ul.css('display', 'block');
             $(a_parent_ul).addClass('active');
@@ -17,15 +17,30 @@ $(function() {
             $(top_li).addClass('active-li');
             var a_top_li = top_li.children()[0];
             $(a_top_li).addClass('active');
-        }
-        else {
+        } else {
             $(parent_li).addClass('active-li');
             $(a_parent_li).addClass('active');
         }
-    }
-    else {
+    } else {
         //we are on the top level
         var active_li = ul.children('.active-branch');
         $(active_li).addClass('active-li');
+    }
+
+    //expand active li elements in top nav menu on mobile
+    if ($(window).width() < 960) {
+        $("#jPanelMenu-menu li.top_active_branch").parentsUntil($("ul#jPanelMenu-menu")).css("display", "block");
+        $.each($("#jPanelMenu-menu .top_nav.caret"), function(i, val) {
+            var text = $(this).prev('a').text().trim();
+            $(this).text('▼');
+            var offset = 42
+            if (text.length > 25 ) {
+                offset = 60;
+            }
+            console.log(text.length);
+            $(val).css('top', -1 * offset);
+            $(val).css('height', offset - 12);
+        });
+
     }
 });

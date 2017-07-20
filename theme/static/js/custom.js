@@ -149,21 +149,40 @@
             if ($(this).attr('class') != 'active') {
                 $(this).parent().siblings().find('ul').slideUp();
                 $(this).next().slideToggle();
-                if ($(this).parent().hasClass("has-sublist")) {
-                    $(this).parent().siblings().find('a').removeClass('active');
-                    $(this).addClass('active');
-                } else {
-                    var curlvl = $(this).parent().data('level');
-                    if (curlvl) {
-                        $('#categories li.child-' + curlvl + ' a').removeClass('active');
-                    }
-                }
             } else {
                 $(this).next().slideToggle();
                 $(this).parent().find('ul').slideUp();
+            }
+        });
+        $('.top_nav').click(function(e) {
+            //add click on icon
+            // var icon = $(this);
+            $('.top_nav.caret').css('display', 'none');
+            if ($(this).parent().hasClass('has-sublist')) {
+                e.preventDefault();
+            }
+            if ($(this).attr('class') != 'active') {
+                $(this).parent().siblings().find('ul').slideUp();
+                $(this).next().slideToggle('start', function () {    
+                        $('.top_nav.caret').css('display', 'inherit');
+               }); 
+                if ($(this).parent().hasClass("has-sublist")) {
+                    // $(this).parent().siblings().find('a').removeClass('active');
+                    // $(this).addClass('active');
+                } else {
+                    var curlvl = $(this).parent().data('level');
+                    if (curlvl) {
+                        // $('#categories li.child-' + curlvl + ' a').removeClass('active');
+                    }
+                }
+            } else {
+                $(this).next().slideToggle('start', function () {    
+                        $('.top_nav.caret').css('display', 'inherit');
+               }); 
+                $(this).parent().find('ul').slideUp();
                 var curlvl = $(this).parent().data('level');
                 if (curlvl) {
-                    $('#categories li.child-' + curlvl + ' a').removeClass('active');
+                    // $('#categories li.child-' + curlvl + ' a').removeClass('active');
                 }
             }
         });

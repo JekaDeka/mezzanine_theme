@@ -120,3 +120,17 @@ class ShopForm(forms.ModelForm):
 #             'lastname': forms.TextInput(attrs={'class': 'form-control'}),
 #             'phone': forms.TextInput(attrs={'class': 'form-control mask', 'data-inputmask': "'mask':'9 (999) 999-9999'"}),
 #         }
+
+
+class ThemeProductVariationAdminForm(forms.ModelForm):
+    """
+    Ensure the list of images for the variation are specific to the
+    variation's product.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super(ThemeProductVariationAdminForm, self).__init__(*args, **kwargs)
+        # if "instance" in kwargs:
+        #     product = kwargs["instance"].product
+        #     qs = self.fields["image"].queryset.filter(product=product)
+        #     self.fields["image"].queryset = qs
