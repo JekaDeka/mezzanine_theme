@@ -9,9 +9,11 @@ from copy import copy
 
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+from django.contrib.auth import authenticate, get_user_model
 
 from mezzanine.conf import settings
-from mezzanine.core.forms import TinyMceWidget
+# from mezzanine.core.forms import TinyMceWidget
+from mezzanine.accounts.forms import ProfileForm
 from mezzanine.utils.static import static_lazy as static
 from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
@@ -32,6 +34,7 @@ setattr(Field, 'is_checkbox', lambda self: isinstance(
 # and will use empty values instead of the model defaults, without
 # these specified.
 hidden_field_defaults = ("status", "gen_description", "allow_comments")
+User = get_user_model()
 
 
 class СustomBlogForm(forms.ModelForm):
@@ -135,3 +138,13 @@ class ShopForm(forms.ModelForm):
 #             'lastname': forms.TextInput(attrs={'class': 'form-control'}),
 #             'phone': forms.TextInput(attrs={'class': 'form-control mask', 'data-inputmask': "'mask':'9 (999) 999-9999'"}),
 #         }
+
+
+class ThemeProfileForm(ProfileForm):
+    """docstring for ThemeProfileForm"""
+    agree = forms.BooleanField(
+        required=True, label=mark_safe('Регистрируясь на сайте, вы принимаете <a href="/rules/" target="_blank">Правила сайта</a> и даёте согласие на обработку персональных данных.'))
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email")
