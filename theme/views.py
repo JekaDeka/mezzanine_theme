@@ -230,7 +230,18 @@ def shop_create(request, template="accounts/account_shop_create.html"):
             if request.FILES.get('background', False):
                 shop.background = request.FILES['background']
             shop.save()
+
+            if not shop.user.is_staff:
+                shop.user.is_staff = True
+                group = Group.objects.get(name='custom')
+                siteperms = SitePermission.objects.create(user=shop.user)
+                siteperms.sites.add(settings.SITE_ID)
+                shop.user.groups.add(group)
+                shop.user.save()  # save staff status and permissions
+
             return redirect('shop_view', slug=shop.slug)
+
+        return redirect('shop_create')
 
     templates = []
     context = {"form": form, "shop": shop}
