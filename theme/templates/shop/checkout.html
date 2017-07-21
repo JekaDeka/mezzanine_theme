@@ -99,8 +99,18 @@
             </tr>
             {% endfor %}
             </table>
+            <table class="cart-table bottom">
+                <tbody>
+                    <tr>
+                        <th class="checkout-totals">
+                            <div class="checkout-subtotal">
+                               <a class="pull-right" href="{% url "shop_cart" %}">Редактировать корзину</a>
+                            </div>
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
             <div class="margin-top-5">
-                <a class="button color pull-right" href="{% url "shop_cart" %}">Редактировать корзину</a>
             </div>
             
             {% order_totals %}

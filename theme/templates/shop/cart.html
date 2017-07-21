@@ -85,10 +85,11 @@
 		                <div class="cart-btns">
 		                    <!--<a href="checkout-billing-details.html" class="button color cart-btns proceed">Proceed to Checkout</a>-->
 		                    <a href="{% url "shop_checkout" %}" class="button color cart-btns proceed">
-											{% if request.session.order.step %}Вернуться к оплате{% else %}{% trans "Go to Checkout" %}{% endif %}
+											{% if request.session.order.step %}К оплате
+											{% else %}Далее{% endif %}
 										</a>
 		                    <!--<a href="#" class="button gray cart-btns">Update Cart</a>-->
-		                    <input type="submit" name="update_cart" class="button gray cart-btns" value="{% trans " Update Cart " %}">
+		                    <input type="submit" name="update_cart" class="button gray cart-btns" value="Обновнить">
 		                </div>
 		            </th>
 		        </tr>
