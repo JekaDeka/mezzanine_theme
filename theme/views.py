@@ -259,7 +259,7 @@ def profile_settings(request, template="accounts/account_profile_settings.html",
     try:
         shop = UserShop.objects.get(user=user)
     except:
-        shop = None
+        return redirect('shop_create')
 
     # if request.method == "POST":
     #     form = SmallProfileForm(request.POST, instance=user)
