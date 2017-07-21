@@ -96,29 +96,14 @@
 
 {% block header %}
 <div class="container">
-	<div class="eight columns">
+	<div class="four columns">
 		<div id="logo">
 			<a href="{% url 'true_index' %}"><img src="{% static 'images/logo/hm3.png' %}" alt="logo" /></a>
 		</div>
 	</div>
-	<div class="eight columns">
-		<div id="additional-menu">
-		<ul> 
-		{% if not request.user.is_authenticated %}
-			<li><a href="{% url "signup" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a></li>
-			<li><a href="{% url "login" %}">Войти <!--<i class="fa fa-sign-out" aria-hidden="true"></i>--></a></li>
-		{% else %}
-			{% if not request.user.usershop %}
-				<li><a href="{% url "shop_create" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a></li>
-			{% endif %}
-			<li><a href="{% url "profile_settings" %}">{{ request.user.email }}</a></li>
-			<li><a href="{% url 'logout' %}?next={{ request.path }}">Выйти</a></li> 
-		{% endif %}
-		</ul>
-		</div>
-	</div>
-
-
+		{% nevercache %}
+    		{% include "includes/user_panel.html" %}
+    	{% endnevercache %}
 </div>
 {% endblock %}
 
@@ -299,6 +284,8 @@
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/active-branch-show.js' %}"></script>
 <script src="{% static 'js/mask.js' %}"></script>
+
+
 {% block extra_js %}
 {% endblock %}
 {% endcompress %}

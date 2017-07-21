@@ -1,12 +1,27 @@
 from __future__ import unicode_literals
+from django.utils.translation import ugettext_lazy as _
 
 from django import forms
 from django.forms.fields import Field
 
+from datetime import date
+from copy import copy
+
+from django.utils.safestring import mark_safe
+from django.utils.timezone import now
+
+from mezzanine.conf import settings
 from mezzanine.core.forms import TinyMceWidget
 from mezzanine.utils.static import static_lazy as static
 from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
+
+from cartridge.shop import checkout
+from cartridge.shop.models import Cart, CartItem, Order, DiscountCode
+from cartridge.shop.forms import FormsetForm, DiscountForm
+from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
+                                  clear_session)
+
 from theme.models import UserShop
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
@@ -120,17 +135,3 @@ class ShopForm(forms.ModelForm):
 #             'lastname': forms.TextInput(attrs={'class': 'form-control'}),
 #             'phone': forms.TextInput(attrs={'class': 'form-control mask', 'data-inputmask': "'mask':'9 (999) 999-9999'"}),
 #         }
-
-
-class ThemeProductVariationAdminForm(forms.ModelForm):
-    """
-    Ensure the list of images for the variation are specific to the
-    variation's product.
-    """
-
-    def __init__(self, *args, **kwargs):
-        super(ThemeProductVariationAdminForm, self).__init__(*args, **kwargs)
-        # if "instance" in kwargs:
-        #     product = kwargs["instance"].product
-        #     qs = self.fields["image"].queryset.filter(product=product)
-        #     self.fields["image"].queryset = qs

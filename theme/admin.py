@@ -12,7 +12,6 @@ from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.core.admin import TabularDynamicInlineAdmin
 from mezzanine.pages.admin import PageAdmin
 from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory
-from theme.forms import ThemeProductVariationAdminForm
 
 # Lists of field names.
 option_fields = []

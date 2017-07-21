@@ -46,9 +46,9 @@
     </tr>
     {% for item in order.items.all %}
     <tr>
-        <td align="left" valign="top">{{ item.total_price|currency }}</td>
+        <td align="left" valign="top">{{ item.total_price }}</td>
         <td align="left" valign="top">{{ item.quantity }}</td>
-        <td align="left" valign="top">{{ item.unit_price|currency }}</td>
+        <td align="left" valign="top">{{ item.unit_price }}</td>
         <td align="right">{{ item.description }}</td>
 
 

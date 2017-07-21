@@ -19,11 +19,10 @@
 <!-- <link rel="stylesheet" href="{% static "mezzanine/css/magnific-popup.css" %}"> -->
 {% endblock %}
 
-{% block extra_head %}
+{% block extra_js %}
 {{ block.super }}
-
-<!-- <script>var variations = {{ variations_json|safe }};</script>
-<script src="{% static "cartridge/js/product_variations.js" %}"></script> -->
+<script>var variations = {{ variations_json|safe }};</script>
+<script src="{% static "cartridge/js/product_variations.js" %}"></script>
 {% endblock %}
 
 {% block breadcrumbs_title %}
@@ -81,7 +80,19 @@
 			</p>
 
 				<!-- Share Buttons -->
-			<a href="{% url "true_index" %}" class="button">Купить</a>
+			<!--<a href="{% url "true_index" %}" class="button">Купить</a>-->
+			
+{% if has_available_variations %}
+{% errors_for add_product_form %}
+<form method="post" id="add-cart" class="shop-form">
+    {% fields_for add_product_form %}
+    <div class="form-actions">
+        <input type="submit" class="button" name="add_cart" value="{% trans "Buy" %}">
+    </div>
+</form>
+{% else %}
+<p class="error-msg">{% trans "This product is currently unavailable." %}</p>
+{% endif %}
 			<!--<div class="share-buttons">
 				<ul>
 					<li><a href="#">Поделиться</a></li>

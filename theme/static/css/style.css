@@ -8481,7 +8481,7 @@ html[xmlns] .slides {
 
 @media only screen and (max-width: 479px) {
     .top-search input {
-        width: 95px
+        width: 78px;
     }
     .apply-coupon input {
         width: 112px;

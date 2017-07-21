@@ -1,12 +1,23 @@
 {% load mezzanine_tags %}
-<div class="panel panel-default user-panel">
-<div class="panel-body">
+<div class="twelve columns">
+		<div id="additional-menu">
+			<ul>
+				<li><a href="#"><i class="fa fa-facebook-official" aria-hidden="true"></i></a></li>
+				<li><a href="#"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
+				<li><a href="#"><i class="fa fa-vk" aria-hidden="true"></i></a></li>
+			</ul>
+		</div>
+	</div>
 {% ifinstalled cartridge.shop %}
-{% include "shop/includes/user_panel.html" %}
+<div class="twelve columns margin-top-10">
+	{% include "shop/includes/user_panel.html" %}
+</div>
 {% endifinstalled %}
+
 {% ifinstalled mezzanine.accounts %}
-{% ifinstalled cartridge.shop %}<br>{% endifinstalled %}
-{% include "accounts/includes/user_panel.html" %}
+<div class="twelve columns margin-top-10">
+	{% include "accounts/includes/user_panel.html" %}
+</div>
 {% endifinstalled %}
-</div>
-</div>
+
+

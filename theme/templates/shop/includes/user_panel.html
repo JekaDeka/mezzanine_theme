@@ -1,18 +1,42 @@
-{% load i18n shop_tags mezzanine_tags %}
+{% load i18n shop_tags mezzanine_tags theme_tags %}
 {% spaceless %}
-<a href="{% url "shop_cart" %}">
-<span class="glyphicon glyphicon-shopping-cart"></span>
-{% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}
-{% trans "in cart" %}:
-{{ request.cart.total_price|currency }}</a><br>
-{% if request.cart.total_quantity != 0 %}
-<a href="{% url "shop_checkout" %}" class="btn btn-primary">
-    {% if request.session.order.step %}{% trans "Return to Checkout" %}{% else %}{% trans "Go to Checkout" %}{% endif %}
-</a><br>
-{% endif %}
-{% if settings.SHOP_USE_WISHLIST %}
-<a href="{% url "shop_wishlist" %}" class="btn-wishlist">
-<span class="glyphicon glyphicon-star"></span>
-{% blocktrans count request.wishlist|length as wishlist_count %}Wishlist contains 1 item{% plural %} Wishlist contains {{ wishlist_count }} items{% endblocktrans %}</a>
-{% endif %}
+<div id="cart">
+<!-- Button -->
+	<div class="cart-btn">
+		<a href="#" class="button adc">{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0.00 ₽{% endif %}</a>
+			</div>
+			<div class="cart-list">
+			<div class="arrow"></div>
+			<div class="cart-amount">
+				<span>{% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}{% trans "in cart" %}</span>
+			</div>
+			
+			<ul>
+			{% if request.cart.has_items %}
+				{% for item in request.cart %}
+					<li>
+						{% if item.image %}
+                        	<a href="{{ item.get_absolute_url }}"><img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"></a>
+                   		{% endif %}
+						<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
+						<span>{{ item.quantity }} x {{ item.unit_price|rub_currency }}</span>
+						<div class="clearfix"></div>
+					</li>
+				{% endfor %}
+			{% else %}
+				<li class="empty">{% trans "Your Cart is empty." %}</li>
+			{% endif %}
+			</ul>
+			
+			<div class="cart-buttons button">
+				<a href="{% url "shop_cart" %}" class="view-cart" ><span data-hover="View Cart"><span>Корзина</span></span></a>
+				{% if request.cart.total_quantity != 0 %}
+					<a href="{% url "shop_checkout" %}" class="checkout"><span data-hover="Checkout">{% if request.session.order.step %}{% trans "Return to Checkout" %}{% else %}{% trans "Go to Checkout" %}{% endif %}</span></a>
+				{% endif %}
+			</div>
+			<div class="clearfix">
+		</div>
+	</div>
+</div>
+{% search_form "all" %}
 {% endspaceless %}

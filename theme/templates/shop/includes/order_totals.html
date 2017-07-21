@@ -1,59 +1,23 @@
 {% load shop_tags theme_tags i18n %}
-    <div class="box" id="order-summary">
-        <div class="box-header">
-            <h3>Итого</h3>
-        </div>
-    <!-- <p class="text-muted">Shipping and additional costs are calculated based on the values you have entered.</p> -->
-    <div class="table-responsive">
-        <table class="table">
-            <tbody>
-            {% if discount_total or shipping_total %}
+<div class="eight columns cart-totals">
+    <h3 class="headline">Итого</h3><span class="line"></span>
+    <div class="clearfix"></div>
+    <table class="cart-table margin-top-5">
+        <tbody>
             <tr>
-                <td>{% trans "Sub total" %}</td>
-                <th>{{ item_total|rub_currency }}</th>
+                <th>Стоимость товаров</th>
+                <td><strong>{{ item_total|rub_currency }}</strong></td>
             </tr>
-            {% endif %}
-            {% if discount_total %}
             <tr>
-                <td>
-                {% if discount_type %}
-                {{ discount_type }}:
-                {% else %}
-                {% trans "Discount" %}:
-                {% endif %}
-                </td>
-                <th>{{ discount_total|rub_currency }}</th>
+                <th>{% trans "Shipping" %}</th>
+                <td>Бесплатно</td>
             </tr>
-            {% endif %}
-            {% if shipping_type or shipping_total %}
             <tr>
-                <td>
-                {% if shipping_type %}
-                {{ shipping_type }}:
-                {% else %}
-                {% trans "Shipping" %}:
-                {% endif %}
-                </td> 
-                <th>{{ shipping_total|rub_currency }}</th>
-            </tr>
-            {% endif %}
-            {% if tax_total %}
-            <tr>
-                <td>
-                {% if tax_type %}
-                {{ tax_type }}:
-                {% else %}
-                {% trans "Tax" %}:
-                {% endif %}
-                </td> 
-                <th>{{ tax_total|rub_currency }}</th>
-            </tr>
-            {% endif %}
-            <tr class="total">
-                <td>{% trans "Total" %}</td>
-                <th>{{ order_total|rub_currency }}</th>
+                <th>{% trans "Total" %}</th>
+                <td><strong>{{ order_total|rub_currency }}</strong></td>
             </tr>
         </tbody>
-        </table>
-    </div>
-    </div>
+    </table>
+    <br>
+    <!-- <a href="#" class="calculate-shipping"><i class="fa fa-arrow-circle-down"></i> Calculate Shipping</a> -->
+</div>

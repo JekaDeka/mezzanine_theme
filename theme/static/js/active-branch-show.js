@@ -1,3 +1,14 @@
+function adjust_search_bar() {
+    if ($(window).width() < 752) {
+        var cart_width = $("#cart").width();
+        var div_parent_width = $("#cart").parent().width();
+        $(".top-search input").width(div_parent_width - cart_width - 80);
+
+    } else {
+        $(".top-search input").width('192px')
+    }
+}
+
 $(function() {
     var ul = $('.active-branch').parent(); //curent active ul
     var parent_li = $(ul).parent();
@@ -34,7 +45,7 @@ $(function() {
             var text = $(this).prev('a').text().trim();
             $(this).text('▼');
             var offset = 42
-            if (text.length > 25 ) {
+            if (text.length > 25) {
                 offset = 60;
             }
             $(val).css('top', -1 * offset);
@@ -42,4 +53,12 @@ $(function() {
         });
 
     }
+
+    //adjust search input in header
+    adjust_search_bar();
+    $(window).on('resize', function() {
+        adjust_search_bar();
+    });
+
+
 });

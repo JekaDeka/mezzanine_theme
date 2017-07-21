@@ -5,140 +5,159 @@
 {# {% block title %}{% trans "Your Cart" %}{% endblock %} #}
 {% block body_id %}cart{% endblock %}
 
-{% block breadcrumb_menu %}
-<ul class="breadcrumb">
-	{% spaceless %}
-	{% page_menu "pages/menus/breadcrumb.html" %}
-	{% endspaceless %}
+{% block breadcrumbs_title %}
+	<h2>{% trans "Your Cart" %}</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
 	<li>{% trans "Your Cart" %}</li>
-</ul>
 {% endblock %}
 
-{% block left_panel %}
-{% endblock %}
+
 
 {% block main %}
-<div id="content">
-<div class="col-md-9" id="basket">
-<div class="box">
-<h1>{% trans "Your Cart" %}</h1>
-{% if cart_formset.forms %}
-<form method="post" class="cart-form">
-{% csrf_token %}
-{% if cart_formset.errors %}
-{% for error in cart_formset.errors %}
-{% if error.values.0 %}{{ error.values.0 }}{% endif %}
-{% endfor %}
-{% endif %}
-{{ cart_formset.management_form }}
-<table class="table table-striped">
-	<thead>
-	<tr>
-		<th colspan="2" class="left">{% trans "Item" %}</th>
-		<th>{% trans "Unit Price" %}</th>
-		<th class="center">{% trans "Qty" %}</th>
-		<th>{% trans "Price" %}</th>
-		<th class="center">{% trans "Remove" %}</th>
-	</tr>
-	</thead>
-	<tbody>
-	{% for form in cart_formset.forms %}
-	{% with form.instance as item %}
-	<tr>
-		<td>
-			{{ form.id }}
-			{% if item.image %}
-			<a href="{{ item.get_absolute_url }}">
-				<img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 30 30 %}">
-			</a>
-			{% endif %}
-		</td>
-		<td class="center">
-			<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
-		</td>
-		<td>{{ item.unit_price|rub_currency }}</td>
-		<td class="quantity">{{ form.quantity }}</td>
-		<td>{{ item.total_price|rub_currency }}</td>
-		<td class="center">{{ form.DELETE }}</td>
-	</tr>
-	{% endwith %}
-	{% endfor %}
-	</tbody>
-</table>
+<div class="container cart">
 
-<div class="box-footer">
-	<a href="{% url "shop_checkout" %}" class="btn btn-primary pull-right">
-		{% if request.session.order.step %}Вернуться к оплате{% else %}{% trans "Go to Checkout" %}{% endif %}
-	</a>
-	<input type="submit" name="update_cart" class="btn btn-default" value="{% trans "Update Cart" %}">
-</div>
-</form>
+	<div class="sixteen columns">
 
-{% if discount_form %}
-<form method="post" class="discount-form col-md-12 text-right">
-	{% fields_for discount_form %}
-	<input type="submit" class="btn btn-default" value="{% trans "Apply" %}">
-</form>
-{% endif %}
+		<!-- Cart -->
+		{% if cart_formset.forms %}
+		<form method="post" class="cart-form">
+		{% csrf_token %}
+		{% if cart_formset.errors %}
+		{% for error in cart_formset.errors %}
+		{% if error.values.0 %}{{ error.values.0 }}{% endif %}
+		{% endfor %}
+		{% endif %}
+		{{ cart_formset.management_form }}
 
-{% if settings.SHOP_USE_UPSELL_PRODUCTS %}
-{% with request.cart.upsell_products as upsell_products %}
-{% if upsell_products %}
-<h2>{% trans "You may also like:" %}</h2>
-<div class="row">
-	{% for product in upsell_products %}
-	<div class="col-xs-6 col-md-3">
-			<div class="product">
-			{% if product.image %}
-				<div class="flip-container">
-				<div class="flipper">
-					<div class="front">
-						<a href="{{ product.get_absolute_url }}">
-							<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 260 %}" alt="{{ product.image.description }}" class="img-responsive">
+		<table class="stacktable small-only">
+		    <tbody>
+		    {% for form in cart_formset.forms %}
+				{% with form.instance as item %}
+				<tr class="st-space">
+		            <td></td>
+		            <td></td>
+		        </tr>
+		        <tr class="st-new-item">
+		            <td class="st-key"></td>
+		            <td class="st-val st-head-row">
+		            	{{ form.id }}
+						{% if item.image %}
+						<a href="{{ item.get_absolute_url }}">
+							<img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 30 30 %}">
 						</a>
-					</div>
-					<div class="back">
-						<a href="{{ product.get_absolute_url }}">
-							<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 245 %}" alt="{{ product.image.description }}" class="img-responsive">
-						</a>
-					</div>
-				</div>
-				</div>
-				<a href="{{ product.get_absolute_url }}" class="invisible">
-					<img src="{{ MEDIA_URL }}{% thumbnail product.image 260 260 %}" alt="{{ product.image.description }}" class="img-responsive">
-				</a>
-			{% endif %}
-				<div class="text">
-					<h3><a href="{{ product.get_absolute_url }}">{{ product }}</a></h3>
-					{% if product.has_price %}
-						<p class="price">
-						{% if product.on_sale %}
-							<del>{{ product.unit_price|rub_currency }}</del>
 						{% endif %}
-						{{ product.price|rub_currency }}
-						</p>
-					{% else %}
-						<p class="coming-soon">{% trans "Coming soon" %}</p>
-					{% endif %}
-				</div>
-			</div>
-		</div>
-	{% endfor %}
-</div>
-{% endif %}
-{% endwith %}
-{% endif %}
+					</td>
+		        </tr>
+		        <tr>
+		            <td class="st-key">Название</td>
+		            <td class="st-val"><a href="{{ item.get_absolute_url }}">{{ item.description }}</a></td>
+		        </tr>
+		        <tr>
+		            <td class="st-key">Цена</td>
+		            <td class="st-val">{{ item.unit_price|rub_currency }}</td>
+		        </tr>
+		        <tr>
+		            <td class="st-key">Кол-во</td>
+		            <td class="st-val">
+		                <form action="#">
+		                    <div class="qtyminus"></div>
+		                    <input type="text" name="quantity" value="1" class="qty">
+		                    <div class="qtyplus"></div>
+		                </form>
+		                {{ form.quantity }}
+		            </td>
+		        </tr>
+		        <tr>
+		            <td class="st-key">Всего</td>
+		            <td class="st-val">{{ item.total_price|rub_currency }}</td>
+		        </tr>
+		        <tr>
+		            <td class="st-key"></td>
+		            <td class="st-val">
+		            	<!--<a href="#" class="cart-remove"></a>-->
+		            	{{ form.DELETE }}
+		            </td>
+		        </tr>
+				{% endwith %}
+			{% endfor %}
+		    </tbody>
+		</table>
 
-{% else %}
-<p>{% trans "Your Cart is empty." %}</p>
-{% endif %}
-</div>
-</div>
-</div>
-{% endblock %}
+		<table class="cart-table responsive-table stacktable large-only">
+		    <tbody>
+		        <tr>
+		            <th>Товар</th>
+		            <th></th>
+		            <th>Цена</th>
+		            <th>Кол-во</th>
+		            <th>Всего</th>
+		            <th></th>
+		        </tr>
+		        {% for form in cart_formset.forms %}
+				{% with form.instance as item %}
+				<tr>
+					<td>
+						{{ form.id }}
+						{% if item.image %}
+						<a href="{{ item.get_absolute_url }}">
+							<img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 30 30 %}">
+						</a>
+						{% endif %}
+					</td>
+					<td class="cart-title">
+						<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
+					</td>
+					<td>{{ item.unit_price|rub_currency }}</td>
+					<td>
+					    <form action="#">
+					        <div class="qtyminus"></div>
+					        <input type="text" name="quantity" value="1" class="qty">
+					        <div class="qtyplus"></div>
+					    </form>
+					    {{ form.quantity }}
+					</td>
+					<td class="cart-total">{{ item.total_price|rub_currency }}</td>
+					<td><a href="#" class="cart-remove">{{ form.DELETE }}</a></td>
+				</tr>
+				{% endwith %}
+				{% endfor %}
+			</tbody>
+		</table>
 
-{% block right_panel %}
-<div class="col-md-3">
-	{% order_totals %}
+		<!-- Apply Coupon Code / Buttons -->
+		<table class="cart-table bottom">
+		    <tbody>
+		        <tr>
+		            <th>
+		                {% if discount_form %}
+		                <form action="#" method="get" class="apply-coupon">
+		                    <input class="search-field" type="text" placeholder="Coupon Code" value="">
+		                    <a href="#" class="button gray">Apply Coupon</a>
+		                </form>
+		                {% endif %}
+		                <div class="cart-btns">
+		                    <!--<a href="checkout-billing-details.html" class="button color cart-btns proceed">Proceed to Checkout</a>-->
+		                    <a href="{% url "shop_checkout" %}" class="button color cart-btns proceed">
+											{% if request.session.order.step %}Вернуться к оплате{% else %}{% trans "Go to Checkout" %}{% endif %}
+										</a>
+		                    <!--<a href="#" class="button gray cart-btns">Update Cart</a>-->
+		                    <input type="submit" name="update_cart" class="button gray cart-btns" value="{% trans " Update Cart " %}">
+		                </div>
+		            </th>
+		        </tr>
+		    </tbody>
+		</table>
+		</form>
+		{% order_totals %}
+	{% else %}
+			<p>{% trans "Your Cart is empty." %}</p>
+		{% endif %}
+	</div>
+	<!-- Cart Totals -->
+
 </div>
+
+
 {% endblock %}
