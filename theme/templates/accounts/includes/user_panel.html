@@ -7,7 +7,7 @@
 		{% if not request.user.usershop %}
 			<a class="button gray" href="{% url "shop_create" %}">Создать магазин</a>
 		{% else %}
-			<a class="button gray" href="{% url "profile_settings" %}">{{ request.user|username_or:"email" }}</a>
+			<a class="button gray" href="{% url "profile_settings" %}">Панель управления</a>
 		{% endif %}
 			<a class="button dark" href="{% url 'logout' %}?next={{ request.path }}">{% trans "Log out" %}</a>
 		{% endif %}
