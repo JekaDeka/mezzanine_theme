@@ -819,6 +819,14 @@ def get_shop_slug(user):
     return shop.slug
 
 
+@register.filter
+def get_shop_name(user):
+    if not user:
+        return "/"
+    shop = get_object_or_404(UserShop, user=user)
+    return shop.shopname
+
+
 @register.assignment_tag
 def get_shop(user):
     shop = get_object_or_404(UserShop, user=user)
