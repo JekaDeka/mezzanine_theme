@@ -30,61 +30,6 @@
 		{% endfor %}
 		{% endif %}
 		{{ cart_formset.management_form }}
-
-		<table class="stacktable small-only">
-		    <tbody>
-		    {% for form in cart_formset.forms %}
-				{% with form.instance as item %}
-				<tr class="st-space">
-		            <td></td>
-		            <td></td>
-		        </tr>
-		        <tr class="st-new-item">
-		            <td class="st-key"></td>
-		            <td class="st-val st-head-row">
-		            	{{ form.id }}
-						{% if item.image %}
-						<a href="{{ item.get_absolute_url }}">
-							<img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 30 30 %}">
-						</a>
-						{% endif %}
-					</td>
-		        </tr>
-		        <tr>
-		            <td class="st-key">Название</td>
-		            <td class="st-val"><a href="{{ item.get_absolute_url }}">{{ item.description }}</a></td>
-		        </tr>
-		        <tr>
-		            <td class="st-key">Цена</td>
-		            <td class="st-val">{{ item.unit_price|rub_currency }}</td>
-		        </tr>
-		        <tr>
-		            <td class="st-key">Кол-во</td>
-		            <td class="st-val">
-		                <form action="#">
-		                    <div class="qtyminus"></div>
-		                    <input type="text" name="quantity" value="1" class="qty">
-		                    <div class="qtyplus"></div>
-		                </form>
-		                {{ form.quantity }}
-		            </td>
-		        </tr>
-		        <tr>
-		            <td class="st-key">Всего</td>
-		            <td class="st-val">{{ item.total_price|rub_currency }}</td>
-		        </tr>
-		        <tr>
-		            <td class="st-key"></td>
-		            <td class="st-val">
-		            	<!--<a href="#" class="cart-remove"></a>-->
-		            	{{ form.DELETE }}
-		            </td>
-		        </tr>
-				{% endwith %}
-			{% endfor %}
-		    </tbody>
-		</table>
-
 		<table class="cart-table responsive-table stacktable large-only">
 		    <tbody>
 		        <tr>
