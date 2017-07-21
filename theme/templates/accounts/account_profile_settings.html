@@ -9,22 +9,22 @@
 {% endblock breadcrumb_element %}
 
 {% block main %} 
-<div class="eight columns">
+<!--<div class="eight columns">
 	{% if shop %}
-		<a href="{% url "shop_view" shop.slug %}">Посмотреть магазин на сайте <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
-		<a href="{% url "shop_edit" %}">Редактировать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+		<a href="{% url "shop_view" shop.slug %}">Посмотреть магазин на сайте <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
+		<a href="{% url "shop_edit" %}">Редактировать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
 	{% else %}
-		<a href="{% url "shop_create" %}">Создать магазин <!--<i class="fa fa-plus-circle" aria-hidden="true"></i>--></a>
+		<a href="{% url "shop_create" %}">Создать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
 	{% endif %}
 </div>
 <div class="eight columns">
 	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
 	<div class="clearfix"></div>
-</div>
-<!--{% if not request.user.is_staff %}
+</div>-->
+{% if not shop %}
 <div class="sixteen columns">
 	<div class="notification warning">
-		<p>Для того, чтобы воспользоваться всеми возможностям сайта, заполните ниже необходимую информация.</p>
+		<p>Для того, чтобы воспользоваться всеми возможностям сайта, <a href="{% url "shop_create" %}">создайте магазин</a></p>
 	</div>
 </div>
 {% endif %}
@@ -90,7 +90,7 @@
 
 <div class="six columns">
 	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
-{% if form and not request.user.is_staff %}
+{% if form and not shop %}
 	<p> {% errors_for form %} </p>
 	<form method="post" {% if form.is_multipart %} enctype="multipart/form-data" {% endif %} class="login">
 		<fieldset>
@@ -129,5 +129,5 @@
 	</div>
 	<div class="clearfix"></div>
 </div>
-{% endif %}-->
+{% endif %}
 {% endblock %}
