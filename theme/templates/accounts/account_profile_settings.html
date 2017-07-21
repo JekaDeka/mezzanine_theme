@@ -33,14 +33,14 @@
 	<h3 class="headline">Блог</h3><span class="line margin-bottom-35"></span>
 	<div class="clearfix"></div>
 	<div class="four columns margin-bottom-5 ">
-		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-4"><i class="fa fa-list"></i></span>
 			<h3>Мои статьи</h3>
 		</a>	
 	</div>
 	
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-4"><i class="fa fa-pencil"></i></span>
 			<h3>Написать в блог</h3>
 		</a>	
@@ -51,19 +51,19 @@
 	<h3 class="headline">Мой магазин</h3><span class="line margin-bottom-35"></span>
 	<div class="clearfix"></div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-list"></i></span>
 			<h3>Мои товары</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-plus"></i></span>
 			<h3>Добавить новый</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-gear"></i></span>
 			<h3>Настройки</h3>
 		</a>	
@@ -72,13 +72,13 @@
 	<div class="clearfix"></div>
 	<h3 class="headline">Стол заказов</h3><span class="line margin-bottom-35"></span>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-3"><i class="fa fa-list"></i></span>
 			<h3>Мои заказы</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not request.user.is_staff %}disabled{% endif %}">
+		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-3"><i class="fa fa-plus"></i></span>
 			<h3>Добавить новый</h3>
 		</a>	
