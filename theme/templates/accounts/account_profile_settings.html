@@ -63,7 +63,7 @@
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+		<a href="{% url 'shop_edit' %}" class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-gear"></i></span>
 			<h3>Настройки</h3>
 		</a>	
