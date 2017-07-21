@@ -56,7 +56,7 @@
 					<tr>
 						<th><i class="fa fa-user"></i> Заказчик</th>
 						<td>
-							<a href="{% url 'shop_view' order.author|get_shop_name %}">{{ order.author.get_full_name }}</a>
+							<a href="{% url 'shop_view' order.author|get_shop_slug %}">{{ order.author.get_full_name }}</a>
 						</td>
 					</tr>
 					<tr>

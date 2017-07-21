@@ -116,7 +116,7 @@
 			<div class="widget margin-top-10">
 			{% get_shop product.user as shop %}
 			    <h3 class="headline">Информация о магазине</h3><span class="line"></span><div class="clearfix"></div>
-				<a href="{% url 'shop_view' shop.shopname %}">
+				<a href="{% url 'shop_view' shop.slug %}">
 				<img src="
 				{% if shop.image %}
 					{{ MEDIA_URL }}{% thumbnail shop.image 80 80 %}

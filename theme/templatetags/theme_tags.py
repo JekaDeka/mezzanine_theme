@@ -812,11 +812,11 @@ def grouped(l):
 
 
 @register.filter
-def get_shop_name(user):
+def get_shop_slug(user):
     if not user:
         return "/"
     shop = get_object_or_404(UserShop, user=user)
-    return shop.shopname
+    return shop.slug
 
 
 @register.assignment_tag
