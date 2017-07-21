@@ -147,6 +147,7 @@
 
 
 
+
 /*.input_id_phone,
 .input_id_city,
 .input_id_image,
@@ -183,6 +184,7 @@ h5 {
 .active-link {
     color: #3acf87!important;
 }
+
 
 
 
@@ -264,6 +266,7 @@ p,
 .footer-links>li {
     padding-top: 6px;
 }
+
 
 
 
@@ -482,6 +485,7 @@ ul.top-bar-menu li:hover i {
 
 
 
+
 /*.share-buttons ul a,
 .tags a,
 .tabs-nav li a,
@@ -622,6 +626,7 @@ a.menu-trigger i {
 
 
 
+
 /*.content-box.color-effect-1:hover h3,
 .content-box.color-effect-2:hover h3,
 .content-box.color-effect-3:hover h3,
@@ -701,6 +706,7 @@ a.menu-trigger i {
     background-color: #f5f5f5!important;
     color: #888!important;
 }
+
 
 
 
@@ -810,6 +816,7 @@ a.menu-trigger i {
 
 
 
+
 /* style 1 */
 
 .inputfile-1+label {
@@ -853,6 +860,7 @@ a.menu-trigger i {
 
 
 
+
 /* style 4 */
 
 .inputfile-4+label {
@@ -864,6 +872,7 @@ a.menu-trigger i {
 .inputfile-4+label span {
     margin-left: 15px;
 }
+
 
 
 
@@ -904,6 +913,7 @@ a.menu-trigger i {
     height: 100%;
     fill: #f1e5e6;
 }
+
 
 
 
@@ -1138,8 +1148,9 @@ input.error {
 }
 
 textarea,
-input {
-    /*-webkit-appearance: none;*/
+input[type="text"],
+input[type="submit"] {
+    -webkit-appearance: none;
     border-radius: 0;
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
