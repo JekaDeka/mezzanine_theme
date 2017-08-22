@@ -39,10 +39,11 @@
 	<div class="eight columns">
 		<div class="slider-padding">
 			<div id="product-slider-vertical" class="royalSlider rsDefault">
+			{% get_device_width as width %}
 			{% for image in images %}
-				<a href="{{ MEDIA_URL }}{% thumbnail image.file 450 400 %}" class="mfp-gallery" title="{{product.title}}">
-					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 450 400 %}" 
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 100 100 %}" alt="{{ image.description }}" />
+				<a href="{{ MEDIA_URL }}{% thumbnail image.file width width True 80 %}" class="mfp-gallery" title="{{product.title}}">
+					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file width width True 80 %}" 
+					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ image.description }}" />
 				</a>
 			 {% endfor %}
 			 </div>

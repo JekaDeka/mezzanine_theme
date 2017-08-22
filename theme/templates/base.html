@@ -2,7 +2,7 @@
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
 <html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}> <!--<![endif]-->
-{% load pages_tags theme_tags mezzanine_tags accounts_tags i18n staticfiles %}
+{% load pages_tags theme_tags mezzanine_tags accounts_tags i18n staticfiles compress %}
 
 <head>
 
@@ -284,7 +284,6 @@
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/active-branch-show.js' %}"></script>
 <script src="{% static 'js/mask.js' %}"></script>
-
 
 {% block extra_js %}
 {% endblock %}

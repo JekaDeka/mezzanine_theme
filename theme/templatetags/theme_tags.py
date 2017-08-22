@@ -5,6 +5,7 @@ from decimal import Decimal
 
 from collections import defaultdict
 
+from django.core.files.storage import default_storage
 from django.contrib.auth import get_user_model
 from django.contrib.admin import site
 from django.apps import apps
@@ -36,8 +37,9 @@ import os
 # Depending on you python version, reduce has been moved to functools
 try:
     from functools import reduce
+    from urllib.parse import quote, unquote
 except ImportError:
-    pass
+    from urllib import quote, unquote
 
 User = get_user_model()
 
@@ -843,3 +845,22 @@ def get_shop_products(user):
 def get_user_blog_posts(user):
     posts = get_list_or_404(BlogPost, user=user)
     return posts
+
+
+@register.simple_tag(takes_context=True)
+def get_device_width(context):
+    request = context['request']
+    width = 194
+    if request.device.is_medium:
+        # width = 767
+        width = 314
+    if request.device.is_large:
+        # width = 990
+        width = 248
+    if request.device.is_xlarge:
+        # width = 1389
+        width = 334
+    if request.device.is_xxlarge:
+        # width = 1389
+        width = 454
+    return width
