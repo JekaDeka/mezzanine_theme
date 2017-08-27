@@ -1167,3 +1167,11 @@ input[type="password"],
     -moz-border-radius: 0;
     -webkit-border-radius: 0;
 }
+
+.img-caption figcaption h4,
+.img-caption figcaption ul li {
+    color: #f4f4f4;
+}
+.img-caption figcaption ul li {
+    opacity: 0.8;
+}

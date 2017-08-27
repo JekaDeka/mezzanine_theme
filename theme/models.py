@@ -2,8 +2,10 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
+from django.db.models.signals import m2m_changed, post_save
+from django.contrib.auth.models import User, Group
 from mezzanine.core.fields import FileField, RichTextField
-from mezzanine.core.models import Displayable, Ownable, RichText, Slugged
+from mezzanine.core.models import Displayable, Ownable, RichText, Slugged, SitePermission
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.models import upload_to
 from cartridge.shop.models import Priced
@@ -28,6 +30,46 @@ Priced.add_to_class("on_custom_sale", on_custom_sale)
 #                                  verbose_name=("Имя"))
 #     lastname = models.CharField(max_length=255, blank=False,
 #                                 verbose_name=("Фамилия"))
+
+
+@receiver(post_save, sender=User)
+def ensure_profile_exists(sender, **kwargs):
+    if kwargs.get('created', False):
+        user = kwargs.get('instance')
+        user.is_staff = True
+        group = Group.objects.get(name='blog_only')
+        siteperms = SitePermission.objects.create(user=user)
+        siteperms.sites.add(settings.SITE_ID)
+        user.groups.add(group)
+        user.save()  # save staff status and permissions
+# def user_postsave_handler(sender, instance, **kwargs):
+#     if not instance.is_staff:
+#         try:
+#             group = Group.objects.get(name='custom')
+#             siteperms = SitePermission.objects.create(user=instance)
+#             siteperms.sites.add(settings.SITE_ID)
+#             instance.groups.add(group)
+#         except:
+#             pass
+#         else:
+#             instance.save()
+
+
+class UserProfile(models.Model):
+    """docstring for UserPro"""
+    user = models.OneToOneField("auth.User")
+    image = models.ImageField(
+        upload_to="profile_images/", verbose_name=_("Ваше изображение"), blank=False, default="")
+
+    phone = models.CharField(max_length=255, blank=True,
+                             verbose_name=("Телефон"))
+    country = models.CharField(max_length=255, blank=False,
+                               verbose_name=("Страна"), default="")
+    city = models.CharField(max_length=255, blank=False,
+                            verbose_name=("Город"), default="")
+
+    bio = RichTextField(default="", verbose_name=("Описание"),
+                        help_text="Расскажите о себе.")
 
 
 class UserShop(models.Model):
@@ -195,7 +237,7 @@ class OrderItem(models.Model):
 
     class Meta:
         verbose_name = _("Заказ")
-        verbose_name_plural = _("Мои заказы")
+        verbose_name_plural = _("Мои заявки")
         ordering = ("-created",)
 
     def __str__(self):              # __unicode__ on Python 2

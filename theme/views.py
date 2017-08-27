@@ -200,10 +200,12 @@ def profile_view(request, template_name='admin/index.html',
     return TemplateResponse(request, template_name, context)
 
 
-def shop_view(request, slug, template_name='accounts/account_profile.html', extra_context=None):
-    lookup = {"slug__iexact": slug}
-    shop = get_object_or_404(UserShop, slug=slug)
-    user = get_object_or_404(User, usershop=shop)
+def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_context=None):
+    # lookup = {"slug__iexact": slug}
+    # shop = get_object_or_404(UserShop, slug=slug)
+    # user = get_object_or_404(User, usershop=shop)
+    shop = UserShop.objects.get(slug=slug)
+    user = User.objects.get(usershop=shop)
     context = {'shop': shop, 'user': user}
     if extra_context is not None:
         context.update(extra_context)

@@ -24,7 +24,7 @@ from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
 
-from theme.models import UserShop
+from theme.models import UserShop, UserProfile
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
     self.widget, forms.CheckboxInput))

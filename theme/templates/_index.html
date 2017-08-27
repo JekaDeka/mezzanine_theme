@@ -5,11 +5,41 @@
 
 {% block breadcrumbs %}
 {% endblock %}
+
+{% block first_time_user %}
+<div class="container fullwidth-element margin-top-15">
+    <div class="one-third columns alpha omega">
+        <a href="#" class="img-caption">
+            <figure>
+                <img src="{% static 'images/change_small.jpg' %}" alt="">
+                <figcaption>
+                    <h3>Обновите свой профиль</h3>
+                    <ul>
+                        <li>Повысьте уровень доверия</li>
+                    </ul>
+                </figcaption>
+            </figure>
+        </a>
+    </div>
+    <div class="two-third columns omega">
+        <a href="#" class="img-caption">
+            <figure>
+                <img src="{% static 'images/shop.jpg' %}" alt="">
+                <figcaption>
+                    <h3>Создайте собственный магазин</h3>
+                    <ul>
+                        <li>Продавайте товары</li>
+                    </ul>
+                </figcaption>
+            </figure>
+        </a>
+    </div>
+</div>
+{% endblock first_time_user %}
+
 {% block slider %}
 {% get_slideshow as images %}
-
 {% if images %}
-
 <div class="container fullwidth-element home-slider">
 	<div class="tp-banner-container">
 		<div class="tp-banner">
