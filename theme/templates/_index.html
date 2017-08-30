@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles %} 
+{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles imagefit %} 
 
 {% block meta_title %}{% trans "Home" %} {% endblock %} 
 
@@ -7,34 +7,62 @@
 {% endblock %}
 
 {% block first_time_user %}
-<div class="container fullwidth-element margin-top-15">
-    <div class="one-third columns alpha omega">
-        <a href="#" class="img-caption">
-            <figure>
-                <img src="{% static 'images/change_small.jpg' %}" alt="">
-                <figcaption>
-                    <h3>Обновите свой профиль</h3>
-                    <ul>
-                        <li>Повысьте уровень доверия</li>
-                    </ul>
-                </figcaption>
-            </figure>
-        </a>
+{% if request.user.is_authenticated %}
+	<div class="container fullwidth-element userpanel">
+    <div class="two-third columns alpha omega margin-bottom-10">
+    {% if shop %}
+    	<figure>
+            <img src="{% static 'images/edit_shop.jpg'|resize:"860x400,C" %}">
+            <figcaption>
+                <h3>Управление магазином</h3>
+                <ul>
+                    <li>
+                        <a class="button color">Добавить новый товар</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'shop_edit' %}"class="button color">Настройки</a>
+                    </li>
+                </ul>
+            </figcaption>
+        </figure>
+    {% else %}
+   		<figure>
+            <img src="{% static 'images/open_shop.jpg'|resize:"860x400,C" %}">
+            <a href="{% url 'shop_create' %}">
+			    <figcaption>
+			        <time>Начните продавать уже сейчас</time>
+			        <h3>Создайте собственный магазин</h3>
+			    </figcaption>
+			</a>
+        </figure>
+
+    {% endif %}
     </div>
-    <div class="two-third columns omega">
-        <a href="#" class="img-caption">
-            <figure>
-                <img src="{% static 'images/shop.jpg' %}" alt="">
-                <figcaption>
-                    <h3>Создайте собственный магазин</h3>
-                    <ul>
-                        <li>Продавайте товары</li>
-                    </ul>
-                </figcaption>
-            </figure>
-        </a>
+    <div class="one-third columns omega margin-bottom-10">
+        <figure>
+            <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}">
+            <figcaption>
+            <a href="">
+                <span>Хочешь индивидуальности?</span>
+                <h3>Сделай личный заказ у мастера</h3>
+            </figcaption>
+            </a>
+        </figure>
+    </div>
+    <div class="one-third columns omega margin-bottom-10">
+        <figure>
+            <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}">
+            <a href="">
+            <figcaption>
+                <span>Открой в себе автора</span>
+                <h3>Сделай запись в Блог</h3>
+            </figcaption>
+            </a>
+        </figure>
     </div>
 </div>
+{% endif %}
+
 {% endblock first_time_user %}
 
 {% block slider %}
@@ -100,7 +128,7 @@
 
 {% block new_arrivals %}
 {% if new_arrivals %}
-<div class="container">
+<div class="container hide-on-mobile">
 
     <!-- Headline -->
     <div class="sixteen columns">

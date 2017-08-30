@@ -59,13 +59,13 @@
 	<div class="four columns margin-bottom-5">
 		<a {% if request.user.is_staff %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-plus"></i></span>
-			<h3>Добавить новый</h3>
+			<h3>Добавить новый товар</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
 		<a href="{% url 'shop_edit' %}" class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-2"><i class="fa fa-gear"></i></span>
-			<h3>Настройки</h3>
+			<h3>Редактировать магазин</h3>
 		</a>	
 	</div>
 	
@@ -80,7 +80,7 @@
 	<div class="four columns margin-bottom-5">
 		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class="color-effect-3"><i class="fa fa-plus"></i></span>
-			<h3>Добавить новый</h3>
+			<h3>Создать новый заказ</h3>
 		</a>	
 	</div>
 	<div class="clearfix"></div>

@@ -854,13 +854,13 @@ def get_device_width(context):
     if request.device.is_medium:
         # width = 767
         width = 314
-    if request.device.is_large:
+    elif request.device.is_large:
         # width = 990
         width = 248
-    if request.device.is_xlarge:
+    elif request.device.is_xlarge:
         # width = 1389
         width = 334
-    if request.device.is_xxlarge:
+    elif request.device.is_xxlarge:
         # width = 1389
         width = 454
     return width

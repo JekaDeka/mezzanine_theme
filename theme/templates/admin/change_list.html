@@ -196,26 +196,26 @@
 							</div>
 
 							<!-- Date Hierarchy -->
-							<div class="col-sm-6 col-md-6 col-lg-12">
-							{% block date_hierarchy %}
-								{% date_hierarchy cl %}
-							{% endblock %}
-							</div>
+							<!--<div class="col-sm-6 col-md-6 col-lg-12">-->
+							{# {% block date_hierarchy %} #}
+								{# {% date_hierarchy cl %} #}
+							{# {% endblock %} #}
+							<!--</div>-->
 
-							<div class="col-sm-6 col-md-6 col-lg-12">
-							{% if cl.has_filters %}
-							<div class="panel panel-midnightblue">
-    							<div class="panel-heading">
-								<h2>{% trans 'Filter' %}</h2>
-								</div>
-								<div class="panel-body">
-								{% for spec in cl.filter_specs %}
-									{% admin_list_filter cl spec %}
-								{% endfor %}
-								</div>
-							</div>
-							{% endif %}
-							</div>
+							<!--<div class="col-sm-6 col-md-6 col-lg-12">-->
+							{# {% if cl.has_filters %} #}
+							<!--<div class="panel panel-midnightblue">-->
+    							<!--<div class="panel-heading">-->
+								<!--<h2>{# {% trans 'Filter' %} #}</h2>-->
+								<!--</div>-->
+								<!--<div class="panel-body">-->
+								{# {% for spec in cl.filter_specs %} #}
+									{# {% admin_list_filter cl spec %} #}
+								{# {% endfor %} #}
+								<!--</div>-->
+							<!--</div>-->
+							{# {% endif %} #}
+							<!--</div>-->
 						</div>
 					{% endif %}
 					</div>

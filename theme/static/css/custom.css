@@ -59,6 +59,46 @@
     padding: 17px 0 17px 5px;
 }
 
+
+@media only screen and (min-width: 1040px) and (max-width: 1389px) {
+    .userpanel .two-third figure {
+        width: 648px;
+    }
+    .userpanel .one-third figure {
+        width: 362px;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1039px) {
+    .container.fullwidth-element.userpanel {
+        width: 768px;
+    }
+    .userpanel .two-third figure {}
+
+    .userpanel .one-third figure {
+        width: 374px;
+    }
+    .column.omega,
+    .columns.omega {
+        margin-left: 0;
+        margin-right: 10px;
+    }
+}
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+    .container.fullwidth-element.userpanel {
+        width: 420px;
+    }
+}
+
+
+
+/*@media only screen and (min-width: 960px) and (max-width: 1289px) {}
+
+@media only screen and (min-width: 768px) and (max-width: 959px) {}
+
+@media only screen and (max-width: 479px) {}*/
+
 @media only screen and (max-width: 767px) {
     .custom_column {
         width: 144px!important;
@@ -106,6 +146,34 @@
     .hide-top-search {
         display: block;
     }
+
+    #jPanelMenu-menu>li>a {
+        border-bottom: 1px solid #5a5a5a;
+    }
+    .active_branch ul {
+        display: block!important;
+    }
+    ul.dropdown-menu>li>a {
+        padding-left: 15px!important;
+    }
+    ul.dropdown-menu>li ul {
+        display: none;
+    }
+    ul.dropdown-menu>li ul a {
+        padding-left: 35px!important;
+        border-bottom: 1px solid #5a5a5a;
+    }
+    ul.dropdown-menu>li ul li ul a {
+        padding-left: 55px!important;
+        border-bottom: 1px solid #5a5a5a;
+    }
+    .caret {
+        position: relative;
+        float: right;
+        width: 20px;
+        vertical-align: middle;
+        border-top: 11px solid transparent;
+    }
 }
 
 @media only screen and (max-width: 767px) and (min-width: 480px) {
@@ -149,6 +217,17 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /*.input_id_phone,
 .input_id_city,
 .input_id_image,
@@ -185,6 +264,17 @@ h5 {
 .active-link {
     color: #3acf87!important;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -275,6 +365,17 @@ p,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* dropdown menu */
 
 li.dropdown ul li ul {
@@ -287,36 +388,6 @@ li.dropdown ul li ul {
 
 #jPanelMenu-menu li li a {
     padding-left: 30px;
-}
-
-@media only screen and (max-width: 766px) {
-    #jPanelMenu-menu>li>a {
-        border-bottom: 1px solid #5a5a5a;
-    }
-    .active_branch ul {
-        display: block!important;
-    }
-    ul.dropdown-menu>li>a {
-        padding-left: 15px!important;
-    }
-    ul.dropdown-menu>li ul {
-        display: none;
-    }
-    ul.dropdown-menu>li ul a {
-        padding-left: 35px!important;
-        border-bottom: 1px solid #5a5a5a;
-    }
-    ul.dropdown-menu>li ul li ul a {
-        padding-left: 55px!important;
-        border-bottom: 1px solid #5a5a5a;
-    }
-    .caret {
-        position: relative;
-        float: right;
-        width: 20px;
-        vertical-align: middle;
-        border-top: 11px solid transparent;
-    }
 }
 
 .disabled {
@@ -490,6 +561,17 @@ ul.top-bar-menu li:hover i {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /*.share-buttons ul a,
 .tags a,
 .tabs-nav li a,
@@ -632,6 +714,17 @@ a.menu-trigger i {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /*.content-box.color-effect-1:hover h3,
 .content-box.color-effect-2:hover h3,
 .content-box.color-effect-3:hover h3,
@@ -711,6 +804,17 @@ a.menu-trigger i {
     background-color: #f5f5f5!important;
     color: #888!important;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -824,6 +928,17 @@ a.menu-trigger i {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* style 1 */
 
 .inputfile-1+label {
@@ -869,6 +984,17 @@ a.menu-trigger i {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
 /* style 4 */
 
 .inputfile-4+label {
@@ -880,6 +1006,17 @@ a.menu-trigger i {
 .inputfile-4+label span {
     margin-left: 15px;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -922,6 +1059,17 @@ a.menu-trigger i {
     height: 100%;
     fill: #f1e5e6;
 }
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -998,13 +1146,18 @@ a.menu-trigger i {
     height: 150px!important;
 }
 
-textarea {
-    resize: none;
-    width: 90%;
-}
 
+
+/*
+ {
+    resize: none;
+    width: 95%;
+}*/
+
+textarea,
 .create_shop input[type="text"] {
     width: 90%;
+    resize: none;
 }
 
 input[type="number"] {
@@ -1169,9 +1322,130 @@ input[type="password"],
 }
 
 .img-caption figcaption h4,
-.img-caption figcaption ul li {
+.img-caption figcaption ul li,
+.img-caption figcaption time {
     color: #f4f4f4;
 }
-.img-caption figcaption ul li {
+
+.img-caption figcaption ul li,
+.img-caption figcaption time {
     opacity: 0.8;
 }
+
+.userpanel img {
+    position: relative;
+}
+
+.userpanel figure {
+    max-height: 432px;
+    overflow: hidden;
+    position: relative;
+}
+
+.userpanel figcaption {
+    background: rgba(0, 0, 0, 0.4);
+    position: absolute;
+    padding: 30px;
+    bottom: 0;
+    display: block;
+    width: 100%;
+    -webkit-transition: background-color 0.2s ease-in-out;
+    -moz-transition: background-color 0.2s ease-in-out;
+    -ms-transition: background-color 0.2s ease-in-out;
+    -o-transition: background-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.userpanel figcaption h3 {
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 24px;
+}
+
+.userpanel figcaption h3 a {
+    color: #fff
+}
+
+.userpanel .lead-post:first-child {
+    margin-bottom: 5px;
+}
+
+.userpanel .lead-post figcaption {
+    padding: 20px;
+}
+
+.userpanel .lead-post figcaption h3 {
+    font-weight: 600;
+    font-size: 14px;
+    margin-top: -2px;
+}
+
+.userpanel time,
+.userpanel span {
+    color: #f4f4f4;
+    opacity: 0.8
+}
+
+.userpanel ul {
+    margin-top: 15px;
+    overflow: hidden;
+}
+
+.userpanel ul li {
+    float: left;
+    margin-right: 10px;
+}
+
+.userpanel figcaption:hover time {
+    opacity: 1
+}
+
+.userpanel figcaption:hover {
+    background-color: #3acf87;
+}
+
+.userpanel figcaption:hover .button {
+    background-color: #606060;
+}
+
+.userpanel figcaption:hover .button:hover {
+    background-color: #c0c0c0;
+}
+
+.mega .headline-link a {
+    margin-left: 0px;
+}
+
+.mega .headline-link:hover span {
+    color: #3acf87;
+}
+
+#jPanelMenu-menu ol,
+.mega ol {
+    list-style: none;
+    background-color: #f4f4f4;
+    margin-left: 5px;
+}
+.mega ol li, .mega ul li {
+    padding: 2px;
+}
+
+#jPanelMenu-menu ol li a {
+    background-color: #505050;
+}
+
+
+
+
+
+
+
+/*.userpanel figcaption .button {
+    ba
+}*/
+
+
+/*.userpanel figcaption:hover .button {
+    background-color: #606060;
+}*/

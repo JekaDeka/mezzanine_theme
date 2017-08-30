@@ -25,16 +25,16 @@
 <div class="twelve columns">
 	<div class="extra-padding">
 		<article class="post single">
-		{% block blog_post_detail_featured_image %}
-			{% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %}
-			<figure class="post-img">
-				<a href="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 0 0 %}" class="mfp-image" title="{{ blog_post.title|title }}">
-					<img src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 900 0 %}" />
-					<div class="hover-icon"></div>
-				</a>
-			{% endif %}
-			</figure>
-		{% endblock %}
+		{# {% block blog_post_detail_featured_image %} #}
+			{# {% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %} #}
+			<!--<figure class="post-img">-->
+				<!--<a href="{# {{ MEDIA_URL }}{% thumbnail blog_post.featured_image 0 0 %} #}" class="mfp-image" title="{{ blog_post.title|title }}">
+					<img src="{# {{ MEDIA_URL }}{% thumbnail blog_post.featured_image 900 0 %} #}" />-->
+					<!--<div class="hover-icon"></div>
+				</a>-->
+			{# {% endif %} #}
+			<!--</figure>-->
+		{# {% endblock %} #}
 
 			<section class="date">
 			{% with day=blog_post.publish_date|date:"d"  month=blog_post.publish_date|date:"M"  %} 

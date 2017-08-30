@@ -5,7 +5,7 @@
 {% if branch_level == 0 %}
 <a href="#menu" class="menu-trigger"><i class="fa fa-bars"></i> Меню</a>
 <!--<div class="hide-top-search">
-{% search_form "all" %}
+{# {% search_form "all" %} #}
 </div>-->
 <nav id="navigation">
 <ul class="menu" id="responsive">
@@ -16,10 +16,10 @@
     </li>
     {% endif %}
     {% if page.in_menu %}
-    <li class="{% if page.has_children_in_menu %}dropdown{% endif %}">
-        <a class="{% if page.is_current %} current{% endif %}" href="{{ page.get_absolute_url }}"
+    <li class="{# {% if page.has_children_in_menu %}dropdown{% endif %} #}">
+        <a href="{{ page.get_absolute_url }}"
         {% if page.has_children_in_menu %}
-        
+            class="with-ul"
         {% endif %}>
             {{ page.title }}
         </a>
@@ -29,28 +29,46 @@
         {% endif %}
         
         {% if page.has_children_in_menu %}
+        <div class="mega" style="display: none;">
+        <div class="mega-container">
             {% page_menu page %}
+        </div>
+        </div>
         {% endif %}
     </li>
     {% endif %}
     {% endfor %}
-    <!--<li style="float: right; margin: 5px 0px;">{% search_form "all" %}</li>-->
+    
+    <!--<li style="float: right; margin: 5px 0px;">{# {% search_form "all" %} #}</li>-->
 </ul>
 </nav>
 
+{% elif branch_level == 1 %}
+    {% for page in page_branch %}
+    <div class="two-columns margin-bottom-15">
+    <ul>
+        {% if page.in_menu %}
+        <li class="headline-link">
+            <a href="{{ page.get_absolute_url }}"> <span class="mega-headline"> {{ page.title }} </span> </a>
+            {% if page.has_children_in_menu %}{% page_menu page %}{% endif %} 
+        </li>
+        {% endif %}
+    </ul>
+    </div>
+    {% endfor %}
 {% else %}
-<ul class="dropdown-menu">
+
     {% for page in page_branch %}
     {% if page.in_menu %}
-    <li class="{% if page.has_children_in_menu %}dropdown{% endif %} {% if page.is_current_or_ascendant %}top_active_branch{% endif %}">
-        <a class="{% if page.is_current%}current{% endif %}" href="{{ page.get_absolute_url }}">{{ page.title }}
-        </a>
-        {% if page.has_children_in_menu %}<b class="top_nav caret"></b>{% endif %}
-        {% if page.has_children_in_menu %}{% page_menu page %}{% endif %} 
+    <li>
+        <a href="{{ page.get_absolute_url }}"> {{ page.title }} </a>
+        {% if page.has_children_in_menu %}
+            <ol>{% page_menu page %}</ol>
+        {% endif %} 
     </li>
     {% endif %}
     {% endfor %}
-</ul>
+
 {% endif %}
 
 {% endif %}

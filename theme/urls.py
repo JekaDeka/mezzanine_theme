@@ -1,5 +1,6 @@
-from django.conf.urls import url
+from django.conf.urls import include, url
 from theme import views
+from imagefit import urls
 
 # prefix in main HelloDjango project
 urlpatterns = [
@@ -23,5 +24,6 @@ urlpatterns = [
     url(r'^settings/$',
         views.profile_settings, name="profile_settings"),
     url(r'^$', views.true_index, name="true_index"),
+    url(r'^imagefit/', include('imagefit.urls')),
 
 ]

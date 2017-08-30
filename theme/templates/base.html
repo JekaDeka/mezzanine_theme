@@ -171,7 +171,7 @@
 		{% block product_info %}
 		{% endblock %}
 	</div>
-	<div class="container margin-top-10">
+	<div class="container">
 		{% block related_products %}
 		{% endblock %}
 	</div>
@@ -199,43 +199,44 @@
 <div id="footer">
 	<div class="container">
 		<div class="four columns">
-			<h3 class="headline footer">Каталог</h3>
-			<span class="line"></span>
-			<div class="clearfix"></div>
-
-			<ul class="footer-links">
-				<li><a href="#">Аксессуары</a></li>
-				<li><a href="#">Интерьер</a></li>
-				<li><a href="#">Косметика ручной работы</a></li>
-				<li><a href="#">Куклы и игрушки</a></li>
-				<li><a href="#">Одежда</a></li>
-			</ul>
-
+		    <div class="footer-widget widget_text">
+		        <div class="textwidget"><img src="{% static "images/logo/logo-footer.png" %}" alt="">
+		            <p class="margin-top-15">
+		            	Сайт для творческих людей.
+		            </p>
+		        </div>
+		    </div>
 		</div>
-
 		<div class="four columns">
-
-			<!-- Headline -->
-			<h3 class="headline footer">Управление магазином</h3>
+			<h3 class="headline footer">Правила сайта</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
-
 			<ul class="footer-links">
-				<li><a href="#">Мой магазин</a></li>
-				<li><a href="#">Мой блог</a></li>
-				<li><a href="#">Мой магазин</a></li>
-			</ul>
-
+		            <li><a href="/rules/">Временное соглашение</a></li>
+		            <li><a href="/copyrights/">Защита авторских прав</a></li>
+		            <li><a href="">Требование к фото</a></li>
+		            </ul>
 		</div>
-
-		<div class="four columns">
-			<!-- Headline -->
-			<h3 class="headline footer">Контакты</h3>
+		<div class="{% if request.user.is_staff %}four{% else %} eight {% endif %} columns">
+			<h3 class="headline footer">Меню</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
-			<p>(499)123-45-67</p>
+			<ul class="footer-links">
+			{% page_menu "pages/menus/footer.html" %}
+			</ul>
 		</div>
-
+		{% if request.user.is_staff %}
+		<div class="four columns">
+			<h3 class="headline footer">Мой магазин</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+			<ul class="footer-links">
+				<li><a href="/admin/shop/product/">Список моих товаров</a></li>
+				<li><a href="{% url 'shop_edit' %}">Редактировать магазин</a></li>
+				<li><a href="/admin/shop/product/add/">Добавить новый товар</a></li>
+			</ul>
+		</div>
+		{% endif %}
 	</div>
 	<!-- Container / End -->
 
@@ -248,8 +249,8 @@
 	<!-- Container -->
 	<div class="container">
 
-		<div class="eight columns"><a href="{% url 'true_index' %}">handmaker.top</a></div>
-		<div class="eight columns">
+		<!--<div class="eight columns"><!~~<a href="{# {% url 'true_index' %} #}">handmaker.top</a>~~></div>-->
+		<div class="sixteen columns" style="text-align: right">© Theme by <a href="http://themeforest.net/user/purethemes/portfolio?ref=purethemes">Purethemes.net</a>. All Rights Reserved.</div>
 		</div>
 
 	</div>
