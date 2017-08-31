@@ -705,6 +705,7 @@
         overflow: hidden;
         width: 550px;
         padding-bottom: 65px;
+        min-height: 500px;
     }
     .cd-dropdown-content .cd-secondary-dropdown::before {
         /* this is the separation line in the middle of the .cd-secondary-dropdown element */
@@ -713,7 +714,7 @@
         top: 290px;
         left: 15px;
         height: 1px;
-        width: 520px;
+        width: 550px;
         /*background-color: #ebebeb;*/
     }
     .cd-dropdown-content .cd-secondary-dropdown>li>a {
@@ -756,7 +757,7 @@
         border-style: solid;
         padding: 0 30px;
         /*height: 250px;*/
-        min-height: 250px;
+        min-height: 241px;
     }
     .cd-dropdown-content .cd-secondary-dropdown>li {
         padding: 20px;
