@@ -708,7 +708,7 @@
         overflow: hidden;
         width: 550px;
         padding-bottom: 65px;
-        min-height: 500px;
+        min-height: 550px;
     }
     .cd-dropdown-content .cd-secondary-dropdown::before {
         /* this is the separation line in the middle of the .cd-secondary-dropdown element */
