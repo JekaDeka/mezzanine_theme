@@ -59,163 +59,6 @@
     padding: 17px 0 17px 5px
 }
 
-@media only screen and (min-width: 1040px) and (max-width: 1389px) {
-    .userpanel .two-third figure {
-        width: 648px
-    }
-
-    .userpanel .one-third figure {
-        width: 362px
-    }
-}
-
-@media only screen and (min-width: 991px) and (max-width: 1039px) {
-    .container.fullwidth-element.userpanel {
-        width: 960px
-    }
-
-    .userpanel .two-third figure {
-        width: 603px
-    }
-
-    .userpanel .one-third figure {
-        width: 336px
-    }
-}
-
-@media only screen and (min-width: 768px) and (max-width: 990px) {
-    .container.fullwidth-element.userpanel {
-        width: 768px
-    }
-
-    .userpanel .one-third figure {
-        width: 374px
-    }
-
-    .column.omega,
-    .columns.omega {
-        margin-left: 0;
-        margin-right: 10px
-    }
-
-    #categories li a,
-    #categories li ul li a,
-    #categories li ul li a:hover {
-        width: 85%
-    }
-}
-
-@media only screen and (min-width: 480px) and (max-width: 767px) {
-    .container.fullwidth-element.userpanel {
-        width: 420px
-    }
-}
-
-@media only screen and (max-width: 767px) {
-    .custom_column {
-        margin-left: 3px!important;
-        margin-right: 3px!important;
-        width: 144px!important
-    }
-
-    .product h5 {
-        font-size: 15px
-    }
-
-    .product span {
-        display: block;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap
-    }
-
-    .product section {
-        padding: 3px 0;
-        padding-left: 5px
-    }
-
-    .product .product-category {
-        font-weight: 600;
-        padding: 0 6px 2px 0;
-        word-break: break-word
-    }
-
-    .product .product-price {
-        padding: 0 6px 6px 0;
-        white-space: nowrap
-    }
-
-    .item-description span {
-        font-size: 11px;
-        font-weight: 500
-    }
-
-    .item-description h5 {
-        font-size: 14px
-    }
-
-    a.menu-trigger {
-        background: #505050;
-        padding-right: 15px;
-        width: auto
-    }
-
-    #cart,
-    .top-search {
-        margin: 18px 0 0
-    }
-
-    .hide-top-search {
-        display: block
-    }
-
-    #jPanelMenu-menu>li>a {
-        border-bottom: 1px solid #5a5a5a
-    }
-
-    .active_branch ul {
-        display: block!important
-    }
-
-    ul.dropdown-menu>li>a {
-        padding-left: 15px!important
-    }
-
-    ul.dropdown-menu>li ul {
-        display: none
-    }
-
-    ul.dropdown-menu>li ul a {
-        border-bottom: 1px solid #5a5a5a;
-        padding-left: 35px!important
-    }
-
-    ul.dropdown-menu>li ul li ul a {
-        border-bottom: 1px solid #5a5a5a;
-        padding-left: 55px!important
-    }
-
-    .caret {
-        border-top: 11px solid transparent;
-        float: right;
-        position: relative;
-        vertical-align: middle;
-        width: 20px
-    }
-}
-
-@media only screen and (max-width: 767px) and (min-width: 480px) {
-    .custom_column {
-        margin-left: 5px!important;
-        margin-right: 5px!important;
-        width: 200px!important
-    }
-
-    .top-search input {
-        width: 195px
-    }
-}
-
 .selectric {
     min-width: 240px
 }
@@ -1090,4 +933,161 @@ input[type="password"],
 
 .userpanel figcaption:hover .button:hover {
     background-color: silver
+}
+
+@media only screen and (min-width: 1040px) and (max-width: 1389px) {
+    .userpanel .two-third figure {
+        width: 648px
+    }
+
+    .userpanel .one-third figure {
+        width: 362px
+    }
+}
+
+@media only screen and (min-width: 991px) and (max-width: 1039px) {
+    .container.fullwidth-element.userpanel {
+        width: 960px
+    }
+
+    .userpanel .two-third figure {
+        width: 603px
+    }
+
+    .userpanel .one-third figure {
+        width: 336px
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 990px) {
+    .container.fullwidth-element.userpanel {
+        width: 768px
+    }
+
+    .userpanel .one-third figure {
+        width: 374px
+    }
+
+    .column.omega,
+    .columns.omega {
+        margin-left: 0;
+        margin-right: 10px
+    }
+
+    #categories li a,
+    #categories li ul li a,
+    #categories li ul li a:hover {
+        width: 85%
+    }
+}
+
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+    .container.fullwidth-element.userpanel {
+        width: 420px
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .custom_column {
+        margin-left: 3px!important;
+        margin-right: 3px!important;
+        width: 144px!important
+    }
+
+    .product h5 {
+        font-size: 15px
+    }
+
+    .product span {
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap
+    }
+
+    .product section {
+        padding: 3px 0;
+        padding-left: 5px
+    }
+
+    .product .product-category {
+        font-weight: 600;
+        padding: 0 6px 2px 0;
+        word-break: break-word
+    }
+
+    .product .product-price {
+        padding: 0 6px 6px 0;
+        white-space: nowrap
+    }
+
+    .item-description span {
+        font-size: 11px;
+        font-weight: 500
+    }
+
+    .item-description h5 {
+        font-size: 14px
+    }
+
+    a.menu-trigger {
+        background: #505050;
+        padding-right: 15px;
+        width: auto
+    }
+
+    #cart,
+    .top-search {
+        margin: 18px 0 0
+    }
+
+    .hide-top-search {
+        display: block
+    }
+
+    #jPanelMenu-menu>li>a {
+        border-bottom: 1px solid #5a5a5a
+    }
+
+    .active_branch ul {
+        display: block!important
+    }
+
+    ul.dropdown-menu>li>a {
+        padding-left: 15px!important
+    }
+
+    ul.dropdown-menu>li ul {
+        display: none
+    }
+
+    ul.dropdown-menu>li ul a {
+        border-bottom: 1px solid #5a5a5a;
+        padding-left: 35px!important
+    }
+
+    ul.dropdown-menu>li ul li ul a {
+        border-bottom: 1px solid #5a5a5a;
+        padding-left: 55px!important
+    }
+
+    .caret {
+        border-top: 11px solid transparent;
+        float: right;
+        position: relative;
+        vertical-align: middle;
+        width: 20px
+    }
+}
+
+@media only screen and (max-width: 767px) and (min-width: 480px) {
+    .custom_column {
+        margin-left: 5px!important;
+        margin-right: 5px!important;
+        width: 200px!important
+    }
+
+    .top-search input {
+        width: 195px
+    }
 }
