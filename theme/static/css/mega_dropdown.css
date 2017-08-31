@@ -8,18 +8,15 @@
 .cd-dropdown-wrapper {
     display: inline-block;
     position: relative;
-    /*height: 40px;*/
-    /*margin: 30px 0 0 5%;*/
-    -webkit-font_-smoothing: antialiased;
-    -moz-osx-font_-smoothing: grayscale;
 }
 
 .cd-dropdown-wrapper ul li:hover>a,
 .cd-dropdown-content .cd-secondary-dropdown>li.empty-children:hover>a {
-    color: #3acf87;
+    color: #fff;
     -webkit-transition: color 0.15s, -webkit-transform 0.15s;
     -moz-transition: color 0.15s, -moz-transform 0.15s;
     transition: color 0.15s, transform 0.15s;
+    background-color: #3acf87;
 }
 
 .cd-dropdown-trigger {
@@ -28,7 +25,7 @@
     padding: 0 40px 0 20px;
     line-height: 50px;
     /* background-color: #111433; */
-    color: #ffffff;
+    color: #fff!important;
     /*border-radius: 3px;*/
     text-transform: uppercase;
     font-weight: 600;
@@ -78,9 +75,6 @@
 }
 
 @media only screen and (min-width: 991px) {
-    .cd-dropdown-trigger {
-        font_-size: 1.5rem;
-    }
     .cd-dropdown-trigger.dropdown-is-active {
         background-color: #3acf87;
     }
@@ -107,6 +101,11 @@
         -ms-transform: rotate(45deg);
         -o-transform: rotate(45deg);
         transform: rotate(45deg);
+    }
+    .cd-dropdown-wrapper ul li:hover>a,
+    .cd-dropdown-content .cd-secondary-dropdown>li.empty-children:hover>a {
+        background-color: white;
+        color: #3acf87;
     }
 }
 
@@ -149,7 +148,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #111433;
+    background-color: #606060;
     color: #ffffff;
     visibility: hidden;
     /* Force Hardware Acceleration */
@@ -174,9 +173,9 @@
     /* dropdown title - mobile version only */
     position: relative;
     z-index: 1;
-    color: #585a70;
-    background-color: #111433;
-    border-bottom: 1px solid #242643;
+    color: #fff;
+    background-color: #505050;
+    border-bottom: 1px solid #505050;
 }
 
 .cd-dropdown .cd-close {
@@ -319,7 +318,7 @@
     text-overflow: ellipsis;
     white-space: nowrap;
     border-top-width: 1px;
-    border-color: #242643;
+    border-color: #505050;
     border-style: solid;
 }
 
@@ -338,8 +337,6 @@
     padding-top: 10px;
     padding-bottom: 10px;
     background-color: #0b0e23;
-    font_-size: 1.1rem;
-    font_-weight: bold;
     letter-spacing: 1px;
     color: #585a70;
     text-transform: uppercase;
@@ -419,10 +416,6 @@
     .cd-dropdown-content ul {
         padding-top: 60px;
     }
-    .cd-dropdown-content a,
-    .cd-dropdown-content ul a {
-        font_-size: 1.8rem;
-    }
 }
 
 @media only screen and (min-width: 991px) {
@@ -436,7 +429,6 @@
         color: #111433;
         height: 50px;
         line-height: 50px;
-        font_-size: 1.5rem;
         border-color: #ebebeb;
     }
     .cd-dropdown-content .cd-divider,
@@ -467,8 +459,14 @@
 }
 
 .cd-dropdown-content .see-all a {
-    /* different style for the See all links */
-    color: #3acf87;
+    color: #c0c0c0;
+}
+
+@media only screen and (max-width: 990px) {
+    .cd-dropdown-content .see-all a {
+        color: white;
+        background-color: #808080;
+    }
 }
 
 .cd-dropdown-content .cd-dropdown-gallery .cd-dropdown-item,
@@ -507,7 +505,6 @@
 
 .cd-dropdown-content .cd-dropdown-icons .cd-dropdown-item p {
     color: #111433;
-    font_-size: 1.3rem;
     /* hide description on small devices */
     display: none;
 }
@@ -722,7 +719,6 @@
     }
     .cd-dropdown-content .cd-secondary-dropdown>li>a {
         color: #606060;
-        font_-size: 1.6rem;
         margin-bottom: 5px;
         line-height: 30px;
         height: 30px;
@@ -762,7 +758,7 @@
         /*height: 250px;*/
         min-height: 241px;
     }
-    .cd-dropdown-content .cd-secondary-dropdown>li {
+    .cd-dropdown-content .cd-secondary-dropdown>li.empty-children {
         padding: 20px;
         height: 40px;
     }
@@ -789,7 +785,6 @@
     .cd-dropdown-content .cd-secondary-dropdown a {
         line-height: 25px;
         height: 25px;
-        font_-size: 1.3rem;
         padding-left: 0;
     }
     .no-touch .cd-dropdown-content .cd-secondary-dropdown a:hover {
@@ -859,11 +854,9 @@
     }
     .cd-dropdown-content .cd-dropdown-icons .cd-dropdown-item h3 {
         color: #3acf87;
-        font_-weight: bold;
     }
     .cd-dropdown-content .cd-dropdown-icons .cd-dropdown-item p {
         display: block;
-        font_-size: 1.2rem;
     }
     .cd-dropdown-content .cd-dropdown-icons .cd-dropdown-item::before {
         left: 25px;

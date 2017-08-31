@@ -68,8 +68,19 @@
         width: 362px;
     }
 }
+@media only screen and (min-width: 991px) and (max-width: 1039px) {
+    .container.fullwidth-element.userpanel {
+        width: 960px;
+    }
+    .userpanel .two-third figure {
+        width: 603px;
+    }
+    .userpanel .one-third figure {
+        width: 336px;
+    }
+}
 
-@media only screen and (min-width: 768px) and (max-width: 1039px) {
+@media only screen and (min-width: 768px) and (max-width: 990px) {
     .container.fullwidth-element.userpanel {
         width: 768px;
     }
@@ -1413,39 +1424,3 @@ input[type="password"],
     background-color: #c0c0c0;
 }
 
-/*.mega .headline-link a {
-    margin-left: 0px;
-}
-
-.mega .headline-link:hover span {
-    color: #3acf87;
-}
-
-#jPanelMenu-menu ol,
-.mega ol {
-    list-style: none;
-    background-color: #f4f4f4;
-    margin-left: 5px;
-}
-.mega ol li, .mega ul li {
-    padding: 2px;
-}
-
-#jPanelMenu-menu ol li a {
-    background-color: #505050;
-}
-*/
-
-
-
-
-
-
-/*.userpanel figcaption .button {
-    ba
-}*/
-
-
-/*.userpanel figcaption:hover .button {
-    background-color: #606060;
-}*/
