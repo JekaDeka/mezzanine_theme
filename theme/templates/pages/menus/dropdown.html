@@ -3,12 +3,12 @@
 {% if page_branch_in_menu %}
 
 {% if branch_level == 0 %}
-<a href="#menu" class="menu-trigger"><i class="fa fa-bars"></i> Меню</a>
+<a href="javascript:void(0);" class="menu-trigger"><i class="fa fa-bars"></i> Меню</a>
 <!--<div class="hide-top-search">
 {# {% search_form "all" %} #}
 </div>-->
 <!--<nav id="navigation">-->
-<ul class="menu" id="responsive">
+<ul class="menu responsive">
     {% for page in page_branch %}
     {% if not has_home and page.is_primary and forloop.first %}
     <li>

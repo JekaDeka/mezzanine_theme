@@ -57,11 +57,12 @@
         //         jPanelMenu.close();
         //     }
         // });
-        // $(document).on('touchend', '.menu-trigger', function(e) {
-        //     jPanelMenu.trigger();
-        //     e.preventDefault();
-        //     return false;
-        // });
+        $(document).on('touchend click', '.menu-trigger', function(e) {
+            // jPanelMenu.trigger();
+            $(".menu").toggleClass( "responsive" );;
+            e.preventDefault();
+            return false;
+        });
         // $('#jPanelMenu-menu').removeClass('menu');
         // $('ul#jPanelMenu-menu li').removeClass('dropdown');
         // $('ul#jPanelMenu-menu li ul').removeAttr('style');
