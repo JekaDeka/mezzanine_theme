@@ -7,7 +7,7 @@
 <!--<div class="hide-top-search">
 {# {% search_form "all" %} #}
 </div>-->
-<nav id="navigation">
+<!--<nav id="navigation">-->
 <ul class="menu" id="responsive">
     {% for page in page_branch %}
     {% if not has_home and page.is_primary and forloop.first %}
@@ -16,24 +16,18 @@
     </li>
     {% endif %}
     {% if page.in_menu %}
-    <li class="{# {% if page.has_children_in_menu %}dropdown{% endif %} #}">
-        <a href="{{ page.get_absolute_url }}"
+    <li>
         {% if page.has_children_in_menu %}
-            class="with-ul"
-        {% endif %}>
-            {{ page.title }}
-        </a>
-        {% if page.has_children_in_menu %}
-            <!--<span class="fa-caret-down"></span>-->
-            <b class="top_nav caret"></b>
-        {% endif %}
-        
-        {% if page.has_children_in_menu %}
-        <div class="mega" style="display: none;">
-        <div class="mega-container">
-            {% page_menu page %}
+        <div class="cd-dropdown-wrapper">
+            <a class="cd-dropdown-trigger" href="#{{branch_level}}">{{ page.title }}</a>
+                <nav class="cd-dropdown">
+                    <h2>Меню</h2>
+                        <a href="#{{branch_level}}" class="cd-close">Закрыть</a>
+                    {% page_menu page %}
+                </nav>
         </div>
-        </div>
+        {% else %}
+        <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
         {% endif %}
     </li>
     {% endif %}
@@ -44,28 +38,40 @@
 </nav>
 
 {% elif branch_level == 1 %}
+<ul class="cd-dropdown-content">
     {% for page in page_branch %}
-    <div class="one-column margin-bottom-15">
-    <ul>
         {% if page.in_menu %}
-        <li class="headline-link">
-            <a href="{{ page.get_absolute_url }}"> <span class="mega-headline"> {{ page.title }} </span> </a>
-            {% if page.has_children_in_menu %}{% page_menu page %}{% endif %} 
-        </li>
+            <li class="{% if page.has_children_in_menu %}has-children{% endif %}">
+                <a href="{{ page.get_absolute_url }}"> {{ page.title }} </a>
+                {% if page.has_children_in_menu %} 
+                <ul class="cd-secondary-dropdown is-hidden">
+                    <li class="go-back"><a href="#{{branch_level}}">Меню</a></li>
+                    <li class="see-all"><a href="{{ page.get_absolute_url }}">{{ page.title }} полностью </a></li>
+                    {% if page.has_children_in_menu %}
+                        {% page_menu page %}
+                    {% endif %}
+                </ul>
+                {% endif %}
+            </li>
         {% endif %}
-    </ul>
-    </div>
     {% endfor %}
+</ul>
 {% else %}
-
     {% for page in page_branch %}
     {% if page.in_menu %}
-    <li>
-        <a href="{{ page.get_absolute_url }}"> {{ page.title }} </a>
         {% if page.has_children_in_menu %}
-            <ol>{# {% page_menu page %} #}</ol>
-        {% endif %} 
-    </li>
+        <li class="has-children">
+            <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+            <ul class="is-hidden">
+                <li class="go-back"><a href="#{{branch_level}}">{{ page.parent.title }}</a></li>
+                <li class="see-all"><a href="{{ page.get_absolute_url }}">{{ page.title }} полностью</a></li>
+            {% page_menu page %}
+            </ul>
+        </li>
+        {% else %}
+            <li class="empty-children"><a class="cd-dropdown-item" href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+        {% endif %}
+        
     {% endif %}
     {% endfor %}
 

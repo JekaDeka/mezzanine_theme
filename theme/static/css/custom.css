@@ -609,7 +609,7 @@ a.menu-trigger i {
     top: 0px;
     right: 0px;
     width: 162px;
-    z-index: 99;
+    z-index: 20;
 }
 
 .product-discnt,
@@ -621,7 +621,7 @@ a.menu-trigger i {
     display: block;
     /*position: absolute;*/
     color: #fff;
-    z-index: 99;
+    z-index: 20;
     float: right;
     /*right: -7px;*/
 }
@@ -1413,7 +1413,7 @@ input[type="password"],
     background-color: #c0c0c0;
 }
 
-.mega .headline-link a {
+/*.mega .headline-link a {
     margin-left: 0px;
 }
 
@@ -1434,7 +1434,7 @@ input[type="password"],
 #jPanelMenu-menu ol li a {
     background-color: #505050;
 }
-
+*/
 
 
 
