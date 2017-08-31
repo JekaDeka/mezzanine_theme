@@ -30,7 +30,10 @@
     /* background-color: #111433; */
     color: #ffffff;
     /*border-radius: 3px;*/
+    text-transform: uppercase;
+    font-weight: 600;
 }
+
 .cd-dropdown-trigger:hover {
     color: #fff;
 }
@@ -74,7 +77,7 @@
     transform: rotate(-45deg);
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-dropdown-trigger {
         font_-size: 1.5rem;
     }
@@ -123,7 +126,7 @@
     }
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-dropdown h2,
     .cd-dropdown-content a,
     .cd-dropdown-content ul a {
@@ -244,7 +247,7 @@
     }
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-dropdown {
         position: absolute;
         top: 100%;
@@ -422,7 +425,7 @@
     }
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-dropdown-content,
     .cd-dropdown-content ul {
         padding-top: 0;
@@ -572,7 +575,7 @@
     background-image: url("../img/nucleo-icon-12.svg");
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-dropdown-content {
         /* reset mobile style */
         position: static;
@@ -1009,7 +1012,7 @@
     color: rgba(17, 20, 51, 0.4);
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .cd-search input[type="search"] {
         background-color: #ebebeb;
     }
@@ -1067,7 +1070,7 @@
     transform: rotate(-45deg);
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .has-children>a::before,
     .has-children>a::after,
     .go-back a::before,
@@ -1091,7 +1094,7 @@
     transform-origin: 9px 50%;
 }
 
-@media only screen and (min-width: 926px) {
+@media only screen and (min-width: 991px) {
     .open-to-left .cd-dropdown-content>.has-children>a {
         padding-left: 40px;
         padding-right: 20px;
