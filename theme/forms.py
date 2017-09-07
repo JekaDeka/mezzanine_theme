@@ -18,7 +18,6 @@ from django.utils.datastructures import MultiValueDict
 
 
 from mezzanine.conf import settings
-# from mezzanine.core.forms import TinyMceWidget
 from mezzanine.accounts.forms import ProfileForm
 from mezzanine.utils.static import static_lazy as static
 from mezzanine.blog.models import BlogPost
@@ -30,7 +29,6 @@ from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
 from theme.models import UserShop, UserProfile
-from fancytree.widgets import FancyTreeWidget
 
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
@@ -61,7 +59,6 @@ class СustomBlogForm(forms.ModelForm):
             self.fields[field].widget = forms.HiddenInput()
 
 
-# our new form
 class ContactForm(forms.Form):
     contact_email = forms.EmailField(required=True)
 
@@ -206,9 +203,6 @@ class DataGroupModelChoiceField(forms.ModelMultipleChoiceField):
 
 class SelectForm(forms.ModelForm):
 
-    class Media:
-        js = ('/static/admin/js/sel.js',)
-
     def get_tree_data(node, data):
         level = 0
 
@@ -225,33 +219,6 @@ class SelectForm(forms.ModelForm):
         return data
 
     data = list()
-    # categories = forms.ModelMultipleChoiceField(
-    #     Category.objects.all(),
-    #     # Add this line to use the double list widget
-    #     widget=admin.widgets.FilteredSelectMultiple('Category', False),
-    #     required=False,
-    #     label="Категории",
-    # )
     categories = DataGroupModelChoiceField(
         queryset=Category.objects.all(),
         label="Категории")
-
-    # def __init__(self, *args, **kwargs):
-    #     super(AuthorForm, self).__init__(*args, **kwargs)
-    #     if self.instance.pk:
-    #         # if this is not a new object, we load related books
-    #         self.initial['categories'] = self.instance.categories.values_list(
-    #             'pk', flat=True)
-
-    # def save(self, *args, **kwargs):
-    #     instance = super(AuthorForm, self).save(*args, **kwargs)
-    #     if instance.pk:
-    #         for category in instance.categories.all():
-    #             if category not in self.cleaned_data['categories']:
-    #                 # we remove books which have been unselected
-    #                 instance.categories.remove(category)
-    #         for category in self.cleaned_data['categories']:
-    #             if category not in instance.categories.all():
-    #                 # we add newly selected books
-    #                 instance.categories.add(category)
-    #     return instance
