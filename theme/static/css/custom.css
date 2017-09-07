@@ -28,24 +28,47 @@
 }
 
 .item-description {
-    padding: 10px 0
+    padding: 5px 0;
 }
 
-.item-description h5,
 .item-description span,
-.product h5,
+.item-description h5 {
+    display: block;
+    font-size: 15px;
+    font-weight: 400;
+    height: 23px;
+    text-transform: none;
+    line-height: 15px;
+    overflow: hidden;
+}
+
+.item-description h5 {
+
+    font-weight: 500;
+}
+
+#portfolio-wrapper figure:hover {
+    border-bottom: 2px solid #3acf87;
+}
+
+
+
+
+
+
+/*.product h5,
 .product span {
     display: block;
+    font-weight: 500;
     line-height: 15px;
-    max-height: 28px;
-    min-height: 28px;
     overflow: hidden;
-    padding: 5px 10px
-}
+    padding: 5px 10px;
+}*/
 
-.product span {
+
+/*.product span {
     display: block
-}
+}*/
 
 .product section {
     padding: 3px 0
@@ -86,11 +109,14 @@ h5 {
 }
 
 .product section h5 {
-    line-height: 22px;
-    max-height: 44px;
-    min-height: 44px;
+    height: 20px;
+    padding: 0 8px;
+    font-size: 15px;
+    line-height: 18px;
+    white-space: nowrap;
     overflow: hidden;
-    word-break: break-word
+    text-overflow: ellipsis;
+    /*word-break: break-word;*/
 }
 
 .product-price-discount {
@@ -824,7 +850,12 @@ input.error {
 }
 
 .product a.shopname {
-    color: #798185
+    color: #aaa;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    padding: 0px 10px;
 }
 
 .product a.shopname:hover {
@@ -935,6 +966,25 @@ input[type="password"],
     background-color: silver
 }
 
+.rsMainSlideImage {
+    width: 100%;
+}
+
+.products figure:hover .no-anim .cover {
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+}
+
+
+.products figure:hover .mediaholder.no-anim img {
+    -webkit-transform: translateX(0);
+    -moz-transform: translateX(0);
+    -ms-transform: translateX(0);
+    transform: translateX(0);
+}
+
 @media only screen and (min-width: 1040px) and (max-width: 1389px) {
     .userpanel .two-third figure {
         width: 648px
@@ -942,6 +992,20 @@ input[type="password"],
 
     .userpanel .one-third figure {
         width: 362px
+    }
+    .item-description span,
+    .item-description h5 {
+        font-size: 14px;
+        line-height: 16px;
+    }
+    .item-description span {
+        height: 34px;
+    }
+    .item-description h5 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0px 7px;
     }
 }
 
@@ -957,6 +1021,21 @@ input[type="password"],
     .userpanel .one-third figure {
         width: 336px
     }
+    .item-description span,
+    .item-description h5 {
+        font-size: 14px;
+        line-height: 16px;
+    }
+    .item-description span {
+        height: 34px;
+    }
+    .item-description h5 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        margin: 0px 7px;
+    }
+
 }
 
 @media only screen and (min-width: 768px) and (max-width: 990px) {
@@ -979,6 +1058,13 @@ input[type="password"],
     #categories li ul li a:hover {
         width: 85%
     }
+    .item-description span,
+    .item-description h5 {
+        font-size: 14px;
+        line-height: 16px;
+        height: 36px;
+        overflow: hidden;
+    }
 }
 
 
@@ -988,18 +1074,16 @@ input[type="password"],
         margin-right: 3px!important;
         width: 144px!important
     }
-
+    /*
     .product h5 {
         font-size: 15px
-    }
-
-    .product span {
+    }*/
+    /*.product span {
         display: block;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap
-    }
-
+    }*/
     .product section {
         padding: 3px 0;
         padding-left: 5px
@@ -1016,15 +1100,14 @@ input[type="password"],
         white-space: nowrap
     }
 
-    .item-description span {
-        /*font-size: 11px;*/
+    /*.item-description span {
+        font-size: 11px;
         font-weight: 500
-    }
-
-    .item-description h5 {
+    }*/
+    /*.item-description h5 {
         font-size: 14px
     }
-
+*/
     a.menu-trigger {
         background: #505050;
         padding-right: 15px;
@@ -1088,16 +1171,25 @@ input[type="password"],
     .top-search input {
         width: 195px
     }
-    /*.item-description span {
-        max-height: 45px;
-        min-height: 45px;
-    }*/
+    .item-description span,
+    .item-description h5 {
+        font-size: 14px;
+        line-height: 16px;
+        height: 36px;
+        overflow: hidden;
+    }
 }
 
 @media only screen and (max-width: 479px) {
-    .item-description span {
-        max-height: 35px;
-        min-height: 35px;
+    .item-description span,
+    .item-description h5 {
+        font-size: 13px;
+        line-height: 16px;
+        height: 40px;
+        overflow: hidden;
+    }
+    .item-description h5 {
+        font-size: 14px;
     }
     .img-caption figcaption h3 {
         font-size: 15px;

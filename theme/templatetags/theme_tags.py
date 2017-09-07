@@ -27,7 +27,7 @@ from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from mezzanine.blog.models import BlogPost, BlogCategory
 from theme.models import Slider, SliderItem, UserShop
-from cartridge.shop.models import Category, Product
+from cartridge.shop.models import Category, Product, ProductImage
 from mezzanine.pages.models import Page
 from mezzanine.generic.models import Keyword
 
@@ -864,3 +864,8 @@ def get_device_width(context):
         # width = 1389
         width = 454
     return width
+
+
+@register.assignment_tag
+def get_product_images(product):
+    return ProductImage.objects.filter(product=product)[:2]

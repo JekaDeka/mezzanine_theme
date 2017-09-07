@@ -220,5 +220,5 @@ class SelectForm(forms.ModelForm):
 
     data = list()
     categories = DataGroupModelChoiceField(
-        queryset=Category.objects.all(),
+        queryset=Category.objects.all().order_by('id'),
         label="Категории")

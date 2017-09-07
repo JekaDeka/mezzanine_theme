@@ -68,11 +68,7 @@
 
 				<a href="{{ category.get_absolute_url }}">
 					<section class="item-description">
-						<span>
-						<!-- {% if category.parent.parent.title and category.parent.parent.title != 'Каталог'  %}
-							{{ category.parent.parent.title }} <i class="fa fa-caret-right"></i>
-						{% endif %} -->
-						{{ category.parent.title }}</span>
+						<span>{{ category.parent.title }}</span>
 						<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
 					</section>
 				</a>
@@ -155,18 +151,18 @@
 					<div class="product-discnt">СКИДКА</div>
 				{% endif %}
 				</div>
-				<div class="mediaholder">
+				{% get_product_images product as images %}
+				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
 				<a href="{{ product.get_absolute_url }}">
-					{% if product.image %}
-					<img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}">
-					<div class="cover">
-						<img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}">
-					</div>
+					{% if images %}
+					<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+						{% if images.count != 1 %}
+						<div class="cover">
+								<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+						</div>
+						{% endif %}
 					{% else %}
 					<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
-					<div class="cover">
-						<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 380 %}">
-					</div>
 					{% endif %}
 				</a>
 				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
