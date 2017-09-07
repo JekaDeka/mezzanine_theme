@@ -850,6 +850,7 @@ input.error {
 }
 
 .product a.shopname {
+    display: block;
     color: #aaa;
     font-weight: 700;
     white-space: nowrap;
@@ -1194,5 +1195,11 @@ input[type="password"],
     .img-caption figcaption h3 {
         font-size: 15px;
         line-height: 22px;
+    }
+    .product section h5 {
+        font-size: 14px;
+        height: 37px;
+        white-space: normal;
+        text-overflow: inherit;
     }
 }

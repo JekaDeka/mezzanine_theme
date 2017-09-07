@@ -5635,7 +5635,7 @@ ul.product-list li {
     display: inline;
     font-size: 16px;
     color: #666;
-    top: 16px;
+    /*top: 16px;*/
     -webkit-transition: all 0.2s ease-in-out;
     -moz-transition: all 0.2s ease-in-out;
     -o-transition: all 0.2s ease-in-out;
@@ -7037,7 +7037,7 @@ a.cart-remove:hover {
 }
 
 .linking a.button {
-    margin: 0 0 0 25px;
+    /*margin: 0 0 0 25px;*/
     padding: 8px 15px 8px 52px;
     float: left;
 }

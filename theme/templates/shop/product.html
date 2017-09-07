@@ -38,7 +38,7 @@
 {% if images %}
 	<div class="eight columns">
 		<div class="slider-padding">
-			<div id="product-slider-vertical" class="royalSlider rsDefault">
+			<div id="product-slider" class="royalSlider rsDefault">
 			{% get_device_width as width %}
 			{% for image in images %}
 				<a href="{{ MEDIA_URL }}{% thumbnail image.file width width True 80 %}" class="mfp-gallery" title="{{product.title}}">
@@ -85,12 +85,19 @@
 			
 {% if has_available_variations %}
 {% errors_for add_product_form %}
+<section class="linking">
 <form method="post" id="add-cart" class="shop-form">
-    {% fields_for add_product_form %}
+    {# {% fields_for add_product_form %} #}
     <div class="form-actions">
-        <input type="submit" class="button" name="add_cart" value="{% trans "Buy" %}">
+        <!--<input type="submit" class="button dark adc" name="add_cart" value="{% trans "Buy" %}">-->
+        {% if settings.SHOP_USE_WISHLIST %}
+        <!--<input type="submit" class="btn btn-default btn-lg pull-left" name="add_wishlist" value="{% trans "Save for later" %}">-->
+        {% endif %}
     </div>
 </form>
+<a href="#" class="button dark adc">{% trans "Buy" %}</a>
+<div class="clearfix"></div>
+</section>
 {% else %}
 <p class="error-msg">{% trans "This product is currently unavailable." %}</p>
 {% endif %}

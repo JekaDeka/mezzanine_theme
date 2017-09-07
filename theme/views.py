@@ -138,7 +138,7 @@ def promote_user(request, template="accounts/account_signup.html",
 
 def true_index(request):
     main_category = Page.objects.filter(slug='catalog')
-    featured = Category.objects.filter(parent=main_category)[:4]
+    featured = None  # Category.objects.filter(parent=main_category)[:4]
 
     # enddate = datetime.datetime.today()
     # startdate = enddate - datetime.timedelta(days=60)
@@ -154,6 +154,7 @@ def true_index(request):
     user_shops = UserShop.objects.all()[:3]
     sale_product = new_arrivals[3:6]
 
+    new_arrivals = None
     context = {'featured': featured,
                'new_arrivals': new_arrivals,
                'recent_posts': recent_posts,
