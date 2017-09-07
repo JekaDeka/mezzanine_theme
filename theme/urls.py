@@ -2,6 +2,7 @@ from django.conf.urls import include, url
 from theme import views
 from imagefit import urls
 
+
 # prefix in main HelloDjango project
 urlpatterns = [
     url("^ordertable/(?P<pk>\w+)/",
@@ -16,6 +17,8 @@ urlpatterns = [
 
     url(r'^ajax/validate_shopname/$',
         views.validate_shopname, name='validate_shopname'),
+    url(r'^ajax/get_categories/$',
+        views.get_categories, name='get_categories'),
 
 
     url('^shop/(?P<slug>[\w\-]+)/$',

@@ -8,7 +8,7 @@
 {% endfor %}
 {% if not line.fields|length_is:'1' %} field-box {{ css_field_box }}{% endif %}
 {% if not css_field_box and not is_tabular %}
-  {% if field.field|widget_type == 'tinymcewidget' or field.field|widget_type == 'filteredselectmultiple' %}
+  {% if field.field|widget_type == 'tinymcewidget' or field.field|widget_type == 'filteredselectmultiple' or field.field|widget_type == 'datagroupselect' %}
   col-sm-12
   {% else %}
   col-sm-6

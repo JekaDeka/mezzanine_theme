@@ -9,7 +9,13 @@ from copy import copy
 
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
+from django.utils.encoding import force_text
+from django.utils.html import format_html
+from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
+from django.forms.utils import flatatt, to_current_timezone
+from django.utils.datastructures import MultiValueDict
+
 
 from mezzanine.conf import settings
 # from mezzanine.core.forms import TinyMceWidget
@@ -19,12 +25,13 @@ from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
 
 from cartridge.shop import checkout
-from cartridge.shop.models import Cart, CartItem, Order, DiscountCode
+from cartridge.shop.models import Cart, CartItem, Order, DiscountCode, Category
 from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
-
 from theme.models import UserShop, UserProfile
+from fancytree.widgets import FancyTreeWidget
+
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
     self.widget, forms.CheckboxInput))
@@ -148,3 +155,103 @@ class ThemeProfileForm(ProfileForm):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email")
+
+
+class DataGroupSelect(forms.widgets.SelectMultiple):
+    allow_multiple_selected = True
+
+    def render(self, name, value, attrs=None, choices=()):
+        if value is None:
+            value = []
+        final_attrs = self.build_attrs(attrs, name=name)
+        output = [format_html(
+            '<select multiple="multiple" "{}>', flatatt(final_attrs))]
+        options = self.render_options(choices, value)
+        if options:
+            output.append(options)
+        output.append('</select>')
+        output.append(
+            '<script type="text/javascript" src="/static/admin/js/select_append.js"></script>')
+        return mark_safe('\n'.join(output))
+
+    def value_from_datadict(self, data, files, name):
+        if isinstance(data, MultiValueDict):
+            return data.getlist(name)
+        return data.get(name)
+
+    def render_option(self, selected_choices, option_value, option_label):
+        option_value = force_text(option_value)
+        if option_value in selected_choices:
+            selected_html = mark_safe(' selected="selected"')
+            if not self.allow_multiple_selected:
+                # Only allow for a single selection.
+                selected_choices.remove(option_value)
+        else:
+            selected_html = ''
+        # get class attrs (customize class_attr by yourself)
+        class_attr = 'sub'
+        return format_html('<option value="{0}"{1} class="{3}">{2}</option>',
+                           option_value,
+                           selected_html,
+                           force_text(option_label),
+                           class_attr)
+
+
+class DataGroupModelChoiceField(forms.ModelMultipleChoiceField):
+
+    def __init__(self, *args, **kwargs):
+        kwargs['widget'] = DataGroupSelect
+        super(DataGroupModelChoiceField, self).__init__(*args, **kwargs)
+
+
+class SelectForm(forms.ModelForm):
+
+    class Media:
+        js = ('/static/admin/js/sel.js',)
+
+    def get_tree_data(node, data):
+        level = 0
+
+        def allChildren(self, l=None, level=0):
+            if(l == None):
+                l = list()
+            if level != 0:
+                l.append(tuple((self.id, self.title)))
+            level += 1
+            for child in self.children.all():
+                l = allChildren(child, l, level)
+            return l
+        allChildren(node, data)
+        return data
+
+    data = list()
+    # categories = forms.ModelMultipleChoiceField(
+    #     Category.objects.all(),
+    #     # Add this line to use the double list widget
+    #     widget=admin.widgets.FilteredSelectMultiple('Category', False),
+    #     required=False,
+    #     label="Категории",
+    # )
+    categories = DataGroupModelChoiceField(
+        queryset=Category.objects.all(),
+        label="Категории")
+
+    # def __init__(self, *args, **kwargs):
+    #     super(AuthorForm, self).__init__(*args, **kwargs)
+    #     if self.instance.pk:
+    #         # if this is not a new object, we load related books
+    #         self.initial['categories'] = self.instance.categories.values_list(
+    #             'pk', flat=True)
+
+    # def save(self, *args, **kwargs):
+    #     instance = super(AuthorForm, self).save(*args, **kwargs)
+    #     if instance.pk:
+    #         for category in instance.categories.all():
+    #             if category not in self.cleaned_data['categories']:
+    #                 # we remove books which have been unselected
+    #                 instance.categories.remove(category)
+    #         for category in self.cleaned_data['categories']:
+    #             if category not in instance.categories.all():
+    #                 # we add newly selected books
+    #                 instance.categories.add(category)
+    #     return instance

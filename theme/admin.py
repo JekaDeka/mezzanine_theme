@@ -1,7 +1,7 @@
 from copy import deepcopy
 from django.contrib import admin
 from django.db import models
-# from django import forms
+from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from mezzanine.forms.admin import FormAdmin
@@ -12,6 +12,8 @@ from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.core.admin import TabularDynamicInlineAdmin
 from mezzanine.pages.admin import PageAdmin
 from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory
+from theme.forms import SelectForm
+
 
 # Lists of field names.
 option_fields = []
@@ -50,6 +52,11 @@ class MyBlogPostAdmin(BlogPostAdmin):
 
 
 class MyProductAdmin(ProductAdmin):
+    # formfield_overrides = {
+    #     models.ManyToManyField: {
+    #         'widget': ToolBoxEditForm},
+    # }
+    form = SelectForm
     inlines = (ProductImageAdmin, ProductVariationAdmin)
     # ProductVariationAdmin.form = ThemeProductVariationAdminForm
     ProductVariationAdmin.extra = 0

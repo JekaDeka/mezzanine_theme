@@ -33,10 +33,12 @@ from mezzanine.utils.urls import login_redirect, next_url
 from mezzanine.accounts.forms import LoginForm, PasswordResetForm
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
+from django.views.generic.detail import BaseDetailView
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import info, error
 from mezzanine.utils.urls import login_redirect, next_url
 import datetime
+import json
 from PIL import Image
 
 
@@ -335,3 +337,53 @@ def validate_shopname(request):
         data['error_message'] = 'Магазин с таким именем уже существует.'
 
     return JsonResponse(data)
+
+
+def get_categories(request):
+    def get_tree_data(node):
+        level = 0
+        data = list()
+
+        def allChildren(self, l=None, level=0):
+            if(l == None):
+                l = list()
+            # if level != 0:
+            l.append(
+                tuple((self.parent.id if self.parent else None, self.title, self.id)))
+            level += 1
+            for child in self.children.all():
+                l = allChildren(child, l, level)
+            return l
+        data = allChildren(node, data)
+        return data
+
+    data = get_tree_data(Category.objects.filter(parent=None)[0])
+    # print(data)
+    links = data
+    # parents, children, ids = zip(*links)
+    # print(parents)
+    # print("------")
+    # print(children)
+    # root_nodes = {x for x in parents if x not in children}
+    # for node in root_nodes:
+    #     links.append(('Root', node))
+
+    def get_nodes(node):
+        d = {}
+        d['parent'] = node[0]
+        d['title'] = node[1]
+        d['id'] = node[2]
+        children = get_children(node)
+        if children:
+            d['children'] = [get_nodes(child) for child in children]
+        return d
+
+    def get_children(node):
+        # print("node:__", node)
+        # for x in links:
+        #     print(x)
+        return [x for x in links if x[0] == node[2]]
+
+    tree = get_nodes((None, 'Каталог', 1))
+    return HttpResponse(json.dumps(tree, ensure_ascii=False, indent=4), content_type="application/json")
+    # return JsonResponse(json.dumps(tree, ensure_ascii=False), safe=False)

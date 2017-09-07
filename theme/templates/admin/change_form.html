@@ -3,7 +3,7 @@
 
 {% block extrahead %}
 {{ block.super }}
-    <script type="text/javascript" src="{% static "admin/js/mezz/product_variations.js" %}"></script>
+    <!--<script type="text/javascript" src="{% static "admin/js/mezz/product_variations.js" %}"></script>-->
 	
     <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
     <script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
@@ -15,7 +15,8 @@
     <script type="text/javascript" src="/static/mezzanine/tinymce/tinymce.min.js"></script>
     <script type="text/javascript" src="/static/mezzanine/js/tinymce_setup.js"></script>
     <script type="text/javascript" src="{% static "admin/js/mezz/keywords_field.js" %}"></script>
-
+    <script type="text/javascript" src="{% static "admin/js/jquery.chained.min.js" %}"></script>
+    <!--<script type="text/javascript" src="{% static "admin/js/jquery.chained.remote.min.js" %}"></script>-->
 {% endblock %}
 
 {% if not is_popup %}
