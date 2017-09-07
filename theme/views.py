@@ -384,6 +384,6 @@ def get_categories(request):
         #     print(x)
         return [x for x in links if x[0] == node[2]]
 
-    tree = get_nodes((None, 'Каталог', 1))
+    tree = get_nodes(data[0])
     return HttpResponse(json.dumps(tree, ensure_ascii=True, indent=4), content_type="application/json")
     # return JsonResponse(json.dumps(tree, ensure_ascii=False), safe=False)
