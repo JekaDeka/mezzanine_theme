@@ -28,7 +28,7 @@ from cartridge.shop.models import Cart, CartItem, Order, DiscountCode, Category
 from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
-from theme.models import UserShop, UserProfile
+from theme.models import UserShop, UserProfile, OrderItem
 
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
@@ -162,7 +162,7 @@ class DataGroupSelect(forms.widgets.SelectMultiple):
             value = []
         final_attrs = self.build_attrs(attrs, name=name)
         output = [format_html(
-            '<select multiple="multiple" "{}>', flatatt(final_attrs))]
+            '<select multiple="multiple" style="display: none;" "{}>', flatatt(final_attrs))]
         options = self.render_options(choices, value)
         if options:
             output.append(options)
@@ -222,3 +222,15 @@ class SelectForm(forms.ModelForm):
     categories = DataGroupModelChoiceField(
         queryset=Category.objects.all().order_by('id'),
         label="Категории")
+
+
+class OrderItemAdminForm(forms.ModelForm):
+
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super(OrderItemAdminForm, self).__init__(*args, **kwargs)
+        self.fields['ended'].widget.format = '%d/%m/%Y'
+        self.fields['ended'].input_formats = ['%d/%m/%Y']

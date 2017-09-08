@@ -1,7 +1,7 @@
 {% extends "admin/base_site.html" %}
 
 <!-- LOADING -->
-{% load staticfiles admin_list i18n %}
+{% load staticfiles admin_urls admin_list i18n %}
 
 {% block extrahead %}
   {{ block.super }}
@@ -76,6 +76,10 @@
 
 <!-- BREADCRUMBS -- >
 {% block breadcrumbs %}
+<ol class="breadcrumb">
+      <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+      <li><a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+  </ol>
 {% endblock %}
 
 <!-- CONTENT -->

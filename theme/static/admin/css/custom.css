@@ -271,5 +271,5 @@ ul li {
 
 select#id_categories {
     width: 100%;
-    display: none;
+    /*display: none;*/
 }

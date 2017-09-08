@@ -1,0 +1,66 @@
+{% extends "admin/base_site.html" %}
+{% load i18n l10n admin_urls theme_tags %}
+
+{% block breadcrumbs %}
+<ol class="breadcrumb">
+    <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+    <li><a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+    <li class="active">{% trans 'Delete multiple objects' %}</li>
+</ol>
+{% endblock %}
+{% block page_heading %}
+<div class="page-heading">
+    <h1>{% trans 'Delete multiple objects' %}</h1>
+</div>
+{% endblock %}
+
+{% block content %}
+{% if perms_lacking %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would result in deleting related objects, but your account doesn't have permission to delete the following types of objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in perms_lacking %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% elif protected %}
+    <p>{% blocktrans %}Deleting the selected {{ objects_name }} would require deleting the following protected related objects:{% endblocktrans %}</p>
+    <ul>
+    {% for obj in protected %}
+        <li>{{ obj }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p></p>
+    {# {% include "admin/includes/object_delete_summary.html" %} #}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="panel panel-midnightblue">
+                <div class="panel-heading">
+                    <h2>{{ title }}</h2>
+                </div>
+                <div class="panel-body">
+                <p>
+                    {% blocktrans %}Are you sure you want to delete the selected {{ objects_name }}? All of the following objects and their related items will be deleted:{% endblocktrans %}
+                </p>
+                {% for deletable_object in deletable_objects %}
+                    <ul class="fa-ul">{{ deletable_object|theme_parent_list }}</ul>
+                {% endfor %}
+                <form method="post">{% csrf_token %}
+                <div>
+                {% for obj in queryset %}
+                    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk|unlocalize }}" />
+                {% endfor %}
+                <input type="hidden" name="action" value="delete_selected" />
+                <input type="hidden" name="post" value="yes" />
+                <input type="submit" class="btn-raised btn-primary btn" value="{% trans "Yes, I'm sure" %}" />
+                <a href="#" onclick="window.history.back(); return false;" class="btn-default btn">{% trans "No, take me back" %}</a>
+                </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+{% endif %}
+{% endblock %}

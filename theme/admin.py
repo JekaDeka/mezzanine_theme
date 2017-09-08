@@ -12,7 +12,7 @@ from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.core.admin import TabularDynamicInlineAdmin
 from mezzanine.pages.admin import PageAdmin
 from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory
-from theme.forms import SelectForm
+from theme.forms import SelectForm, OrderItemAdminForm
 
 
 # Lists of field names.
@@ -189,7 +189,8 @@ class SliderAdmin(admin.ModelAdmin):
 
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created', 'price', 'ended')
+    list_display = ('title', 'created', 'price', 'ended', )
+    form = OrderItemAdminForm
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'author', None) is None:
@@ -201,6 +202,17 @@ class OrderItemAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         return qs.filter(author=request.user)
+
+    # def format_date(self, obj):
+    #     return obj.ended.strftime('%d %b %Y %H:%M')
+
+    # def formfield_for_dbfield(self, db_field, **kwargs):
+    #     field = super(OrderItemAdmin, self).formfield_for_dbfield(
+    #         db_field, **kwargs)
+
+    #     if isinstance(db_field, models.DateField):
+    #         return forms.DateField(input_formats=('%d/%m/%Y',))
+    #     return field
 
 
 admin.site.unregister(BlogPost)

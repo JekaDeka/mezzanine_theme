@@ -10,6 +10,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.admin import site
 from django.apps import apps
 from django.utils.text import capfirst
+from django.utils.html import conditional_escape
+from django.utils.safestring import SafeData, mark_for_escaping, mark_safe
+from django.utils.encoding import force_text, iri_to_uri
 from django.core.urlresolvers import reverse, resolve, NoReverseMatch
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import get_object_or_404, get_list_or_404
@@ -869,3 +872,45 @@ def get_device_width(context):
 @register.assignment_tag
 def get_product_images(product):
     return ProductImage.objects.filter(product=product)[:2]
+
+
+@register.filter(is_safe=True, needs_autoescape=True)
+def theme_parent_list(value, autoescape=True):
+    if autoescape:
+        escaper = conditional_escape
+    else:
+        escaper = lambda x: x
+
+    def walk_items(item_list):
+        item_iterator = iter(item_list)
+        try:
+            item = next(item_iterator)
+            while True:
+                try:
+                    next_item = next(item_iterator)
+                except StopIteration:
+                    yield item, None
+                    break
+                if not isinstance(next_item, six.string_types):
+                    try:
+                        iter(next_item)
+                    except TypeError:
+                        pass
+                    else:
+                        yield item, next_item
+                        item = next(item_iterator)
+                        continue
+                yield item, None
+                item = next_item
+        except StopIteration:
+            pass
+
+    def list_formatter(item_list, tabs=1):
+        indent = '\t' * tabs
+        output = []
+        for item, children in walk_items(item_list):
+            output.append('%s<li><i class="fa fa-li fa-trash-o"></i>%s</li>' % (
+                indent, escaper(force_text(item))))
+        return '\n'.join(output)
+
+    return mark_safe(list_formatter(value))

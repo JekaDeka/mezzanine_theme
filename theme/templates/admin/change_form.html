@@ -19,8 +19,13 @@
     <!--<script type="text/javascript" src="{% static "admin/js/jquery.chained.remote.min.js" %}"></script>-->
 {% endblock %}
 
+
 {% if not is_popup %}
   {% block breadcrumbs %}
+  <ol class="breadcrumb">
+      <li><a href="{% url 'admin:index' %}">{% trans 'Home' %}</a></li>
+      <li><a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a></li>
+  </ol>
   {% endblock %}
 {% endif %}
 
@@ -113,5 +118,16 @@ $('.field-default :checkbox').change(function() {
 
 $('.fb_show').append("Добавить изображение");
 })(jQuery);
+  </script>
+  <script type="text/javascript" src="{% static "admin/js/moment.min.js" %}"></script>
+  <script type="text/javascript" src="{% static "admin/js/bootstrap-datepicker.js" %}"></script>
+  <script type="text/javascript">
+  $(function() {
+      $(".vDateField").datepicker({
+          todayHighlight: true,
+          format: 'dd/mm/yyyy',
+          orientation: "top right",
+      });
+  });
   </script>
 {% endblock extrascript %}

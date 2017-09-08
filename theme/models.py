@@ -203,8 +203,8 @@ class OrderItem(models.Model):
     active = models.BooleanField(_("Активен"), default=True, editable=False)
     created = models.DateField(
         _("Дата добавления"), editable=False, default=date.today)
-    ended = models.DateTimeField(
-        _("Крайний срок"), null=True, editable=True, blank=True, help_text="оставьте пустым, если срок неограничен.")
+    ended = models.DateField(
+        _("Крайний срок"), null=True, editable=True, blank=True, help_text="Оставьте пустым, если срок неограничен.")
     price = models.DecimalField(
         _("Бюджет"), max_digits=8, decimal_places=2, default=0, blank=True,
         help_text="Если Вы не представляете, сколько подобная работа могла бы стоить, оставьте поле незаполненным.")
@@ -223,9 +223,9 @@ class OrderItem(models.Model):
         default="", verbose_name=("Подробное описание"),
         help_text="Как можно более подробно опишите желаемое изделие.")
 
-    categories = models.ManyToManyField("OrderItemCategory",
-                                        verbose_name=_("Виды работ"),
-                                        blank=True, related_name="orderitems")
+    categories = models.ForeignKey("OrderItemCategory",
+                                   verbose_name=_("Виды работ"),
+                                   blank=False, null=False, related_name="orderitems")
 
     featured_image = FileField(verbose_name=_("Изображение"),
                                upload_to=upload_to(
@@ -247,6 +247,10 @@ class OrderItem(models.Model):
         url_name = "order_detail"
         kwargs = {"pk": self.pk}
         return reverse(url_name, kwargs=kwargs)
+
+    @property
+    def lifespan(self):
+        return '%s - present' % self.ended.strftime('%m/%d/%Y')
 
 
 class OrderItemCategory(Slugged):
