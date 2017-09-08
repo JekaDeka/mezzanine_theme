@@ -1,5 +1,5 @@
 {% load i18n mezzanine_tags accounts_tags theme_tags %}
-{# {% get_shop_products user as products %} #}
+{% get_shop_products user as products %}
 {% get_user_blog_posts user as posts %}
     <ul class="tabs-nav my-account">
         <li class="active"><a href="#tab1">Публикации ({{posts|length}})</a></li>

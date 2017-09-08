@@ -121,7 +121,7 @@
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{{ model.admin_url }}">Уйти на каникулы</a></li>
                     <li class="divider"></li>
-                    <li><a href="{{ model.admin_url }}">Посмотреть магазин на сайте</a></li>
+                    <li><a href="{% url 'shop_view' shop.slug %}">Посмотреть магазин на сайте</a></li>
                 </ul>
             </div>
             <div class="panel-heading">
