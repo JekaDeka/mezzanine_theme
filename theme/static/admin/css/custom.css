@@ -420,6 +420,7 @@ select#id_categories {
 .panel-image img {
     position: relative;
     width: 100%;
+    max-width: 100%;
     /*height: 80px;*/
     /* for IE 6 */
 }
