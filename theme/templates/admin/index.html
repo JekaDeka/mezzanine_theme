@@ -1,183 +1,168 @@
 {% extends "admin/base_site.html" %} 
 {% load staticfiles accounts_tags mezzanine_tags theme_tags %}
-
-{% block extrahead %}
+{% block extrastyle %}
 {{ block.super }}
-    <script type="text/javascript" src="{% static "admin/js/mezz/product_variations.js" %}"></script>
-	
-    <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
-    <script type="text/javascript" src="/static/admin/js/SelectBox.js"></script>
-    <script type="text/javascript" src="{% static "admin/js/mezz/SelectFilter2.js" %}"></script>
-
-    <script type="text/javascript" src="{% static "admin/js/mezz/inlines.js" %}"></script>
-
-    <script type="text/javascript" src="/static/filebrowser/js/AddFileBrowser.js"></script>
-    <script type="text/javascript" src="/static/mezzanine/tinymce/tinymce.min.js"></script>
-    <script type="text/javascript" src="/static/mezzanine/js/tinymce_setup.js"></script>
-    <script type="text/javascript" src="{% static "admin/js/mezz/keywords_field.js" %}"></script>
-
 {% endblock %}
 
 {% block page_heading %}
+<div class="page-heading">
+    <h1>Главная страница<small>Просмотр статистики</small></h1>
+</div>
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-12 profile-area">
-        <div class="media col-md-6 col-sm-6 col-xs-6">
-            <a class="media-left pr-n" href="{% url 'profile_view' %}">
-            {% if request.user.myprofile.image %}
-            	<img class="media-object img-resposnive" src="{{ MEDIA_URL }}{% thumbnail request.user.myprofile.image 88 88 %}" alt="profile image" width="88" height="88">
-            {% else %}
-            	<img class="media-object img-resposnive" src="{% static 'admin/img/3.jpg' %}" alt="profile image" width="88" height="88">
-            {% endif %}
-                
-            </a>
-            <div class="media-body pl-xl">
-                <h4 class="media-heading">{{ request.user|username_or:"get_full_name" }}</h4> 
-				{% if request.user.email %}
-                	<p>{{request.user.email}}</p>
-                {% endif %}
+{% get_shop request.user as shop %}
+{% get_user_blog_posts request.user as posts %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-4 col-xs-12">
+            <div class="info-tile info-tile-alt tile-primary">
+                <div class="info">
+                    <div class="tile-heading"><span>Записей в блоге</span></div>
+                    <div class="tile-body "><span>{% if posts %}{{ posts|length }}{% else %}0{% endif %}</span></div>
+                </div>
             </div>
         </div>
-        <div>
-        	<a href="{% url 'profile' request.user.username %}" class="btn-raised btn pull-right" >Посмотреть магазин на сайте</a>
+        {% if shop %}
+        <div class="col-sm-4 col-xs-6">
+            <div class="info-tile info-tile-alt tile-indigo">
+                <div class="info">
+                    <div class="tile-heading"><span>Товаров</span></div>
+                    <div class="tile-body"><span>{{ shop.get_products_count }}</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-4 col-xs-6">
+            <div class="info-tile info-tile-alt tile-danger">
+                <div class="info">
+                    <div class="tile-heading"><span>Продаж</span></div>
+                    <div class="tile-body "><span>{{ shop.get_active_orders }}</span></div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="panel panel-white">
+            <div class="panel-heading">
+                <h2>Мой Блог</h2>
+            </div>
+            <div class="panel-image">
+                <img src="{% static 'admin/img/blog_add.jpg' %}" alt="Обложка">
+            </div>
+            <div class="panel-body">
+                <ul class="demo-btns">
+                    <li>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:blog_blogpost_add' %}"><i class="fa fa-plus"></i> Написать в Блог</a>
+                    </li>
+                    <li>
+                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:blog_blogpost_changelist' %}"><i class="fa fa-list"></i> Мои статьи</a>
+                    </li>
+                </ul>
+                <div class="pull-left">
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего записей</small>{% if posts %}{{ posts|length }}{% else %}0{% endif %}</h4>
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-md-12 pl-n pr-n">
-        <ul class="nav nav-tabs material-nav-tabs mb-lg">
-            <li class="dropdown pull-right tabdrop hide"><a class="dropdown-toggle" data-toggle="dropdown" href="#"><i class="fa fa-angle-down"></i> </a>
-                <ul class="dropdown-menu"></ul>
-            </li>
-            <li {% if not profile_tab %}class="active"{% endif %}><a href="{% url 'admin:index' %}"> Информация </a></li>
-            <li {% if profile_tab %}class="active"{% endif %}><a href="{% url 'profile_view' %}">Редактировать профиль</a></li>
-            <li {% if profile_tab %}class="active"{% endif %}><a href="{% url 'profile_view' %}">Редактировать магазин</a></li>
-        </ul>
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="panel panel-white">
+            <div class="panel-heading">
+                <h2>Стол заказов</h2>
+            </div>
+            <div class="panel-image">
+                <img src="{% static 'admin/img/desk.jpg' %}" alt="Обложка">
+            </div>
+            <div class="panel-body">
+                <ul class="demo-btns">
+                    <li>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:theme_orderitem_add' %}"><i class="fa fa-plus"></i> Создать заявку</a>
+                    </li>
+                    <li>
+                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:theme_orderitem_changelist' %}"><i class="fa fa-list"></i> Мои заявки</a>
+                    </li>
+                </ul>
+                <div class="pull-left">
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего заявок</small>0</h4>
+                </div>
+            </div>
+        </div>
     </div>
-    {% if not profile_tab %}
-    <div class="col-md-3">
-        <div class="panel panel-profile">
+    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+        <div class="panel panel-white">
             <div class="panel-heading">
                 <h2>Мой профиль</h2>
             </div>
+            <div class="panel-image">
+                <img src="{% static 'admin/img/profile.jpg' %}" alt="Обложка">
+            </div>
             <div class="panel-body">
-                <div>
-                    <div class="personel-info pt-n">
-                        <span class="icon"><i class="material-icons">email</i></span>
-                        <span>{{request.user.email}}</span>
-                    </div>
-                    {% if request.user.myprofile.phone %}
-                     <div class="personel-info">
-                        <span class="icon"><i class="material-icons">call</i></span>
-                        <span>{{request.user.myprofile.phone}}</span>
-                    </div>
-                    {% endif %}
-                   	{% if request.user.myprofile.city %}
-                    <div class="personel-info">
-                        <span class="icon"><i class="material-icons">place</i></span>
-                        <span>{{ request.user.myprofile.city }}</span>
-                    </div>
-                    {% endif %}
-
-                    {% if request.user.myprofile.site %}
-                    <div class="personel-info pb-n">
-                        <span class="icon"><i class="material-icons">language</i></span>
-                        <span>{{ request.user.myprofile.site }}</span>
-                    </div>
-                    {% endif %}
-                </div>
-<!--                 <ul class="list-inline text-center">
-    <li><a href="#" class=""><i class="fa fa-facebook"></i></a></li>
-    <li><a href="#" class=""><i class="fa fa-twitter"></i></a></li>
-    <li><a href="#" class=""><i class="fa fa-dribbble"></i></a></li>
-    <li><a href="#" class=""><i class="fa fa-linkedin"></i></a></li>
-    <li><a href="#" class=""><i class="fa fa-instagram"></i></a></li>
-</ul> -->
-            </div>
-        </div>
-    </div>
-    <!-- col-sm-3 -->
-    <div class="col-md-9">
-        <div class="tab-content">
-            <div class="panel-profile">
-                <div class="tab-content">
-                    <div class="tab-pane p-md {% if not profile_tab %}active{% endif %}" id="tab-8-1">
-                        <div class="about-area">
-                            <h4>Информация</h4>
-                            {% if request.user.myprofile.bio  %}
-								{{ request.user.myprofile.bio|safe }}
-							{% else %}
-								<p>Не указана</p>
-							{% endif %}
-                        </div>
-                        <div class="about-area">
-                            <h4>Личные данные</h4>
-                            <div class="table-responsive">
-                                <table class="table about-table">
-                                    <tbody>
-                                        <tr>
-                                            <th>ФИО</th>
-                                            <td>{{request.user.first_name}} {{request.user.last_name}}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Расположение: </th>
-                                            <td>{{request.user.myprofile.city}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                <ul class="demo-btns">
+                    <li>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="#">Изменить профиль</a>
+                    </li>
+                    <li>
+                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="#">Изменить пароль</a>
+                    </li>
+                </ul>
+                <div class="pull-left">
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Число просмотров</small>12</h4>
                 </div>
             </div>
         </div>
-        <!-- .tab-content -->
     </div>
-    {% else %}
-		<div class="col-sm-12">
-			<div class="panel panel-default" data-widget='{"draggable": "false"}'>
-				<div class="panel-body">
-					<form role="form" class="form-horizontal" method="post">
-					{% csrf_token %}
-					{% for field in form %}
-					{{ field.errors }}
-					<div class="form-group">
-                        {% if field.field.is_checkbox %}
-                        <label for="checkbox" class="col-sm-2 control-label"></label>
-                        <div class="col-sm-8">
-                            <div class="checkbox block">
-                                <label>
-                                    {{ field }} {{ field.label }}
-                                </label>
-                            </div>
-                        </div>
-                        {% else %}
-                            <label class="col-sm-2 control-label">{{ field.label }}</label>
-    						<div class="col-sm-8">						
-    							{{ field }}
-    						</div>
-                        {% endif %}
-						
-                        {% if field.help_text %}
-						  <div class="col-sm-2">
-								<p class="help-block">{{ field.help_text|safe }}</p>
-							</div>
-						{% endif %}
-					</div>
-					{% endfor %}
-					<div class="panel-footer">
-					<div class="row">
-						<div class="col-sm-8 col-sm-offset-3">
-							<input type="submit" value="Сохранить" class="btn-raised btn-success btn" name="_save" />
-							<a href="{% url 'admin:index' %}" class="btn-default btn">Отмена</a>
-						</div>
-					</div>
-				</div>
-					</form>
-					
-				</div>
-				
-			</div>
-		</div>
+    {% if shop %}
+        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
+        <div class="panel panel-white">
+            <div class="panel-controls dropdown">
+                <a class="btn btn-icon-rounded dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="material-icons inverted">more_vert</span>
+                    <div class="ripple-container"></div>
+                </a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="{{ model.admin_url }}">Уйти на каникулы</a></li>
+                    <li class="divider"></li>
+                    <li><a href="{{ model.admin_url }}">Посмотреть магазин на сайте</a></li>
+                </ul>
+            </div>
+            <div class="panel-heading">
+                <h2>Мой магазин</h2>
+            </div>
+            <div class="panel-image">
+                <img src="{{MEDIA_URL}}{% thumbnail shop.background 1300 150 %}" alt="Обложка">
+            </div>
+            <div class="panel-body">
+                <h3>{{shop.shopname}}</h3>
+                <p class="text-danger">Магазин в данное время закрыт и не примиает заказы</p>
+                <p>{{ shop.country }}, {{ shop.city }}</p>
+                <ul class="demo-btns">
+                <li>
+                    <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shop_product_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>
+                </li>
+                <li>
+                    <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:shop_product_changelist' %}"><i class="fa fa-list"></i> Мои товары</a>
+                </li>
+                <li>
+                    <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'shop_edit' %}"><i class="fa fa-gears"></i> Настройки</a>
+                </li>
+                <li>
+                    <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'admin:shop_order_changelist' %}"><i class="fa fa-book"></i> Список заказов</a>
+                </li>
+            </ul>
+                <div class="pull-left">
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего товаров</small>{{ shop.get_products_count }}</h4>
+                </div>
+                <div class="pull-right text-right">
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Активных заказов</small>{{ shop.get_active_orders }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
     {% endif %}
+    
+</div>
 </div>
 {% endblock content %}
+
+{% block extrascript %}
+{{ block.super }}
+{% endblock extrascript %}

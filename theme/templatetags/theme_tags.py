@@ -834,19 +834,30 @@ def get_shop_name(user):
 
 @register.assignment_tag
 def get_shop(user):
-    shop = get_object_or_404(UserShop, user=user)
+    try:
+        shop = UserShop.objects.get(user=user)
+    except Exception as e:
+        return None
     return shop
 
 
 @register.assignment_tag
 def get_shop_products(user):
-    products = get_list_or_404(Product, user=user)
+    try:
+        # products = get_list_or_404(Product, user=user)
+        products = Product.objects.filter(user=user)
+    except Exception as e:
+        return None
     return products
 
 
 @register.assignment_tag
 def get_user_blog_posts(user):
-    posts = get_list_or_404(BlogPost, user=user)
+    try:
+        posts = BlogPost.objects.filter(user=user)
+    except Exception as e:
+        return Npne
+    # posts = get_list_or_404(BlogPost, user=user)
     return posts
 
 

@@ -2,13 +2,14 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
+from django.db.models import Count, Q
 from django.db.models.signals import m2m_changed, post_save
 from django.contrib.auth.models import User, Group
 from mezzanine.core.fields import FileField, RichTextField
 from mezzanine.core.models import Displayable, Ownable, RichText, Slugged, SitePermission
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.models import upload_to
-from cartridge.shop.models import Priced
+from cartridge.shop.models import Priced, Product
 from django.utils.timezone import now
 from django.core.urlresolvers import reverse
 from slugify import slugify, Slugify, UniqueSlugify
@@ -164,6 +165,12 @@ class UserShop(models.Model):
     def save(self, request=False, *args, **kwargs):
         self.slug = slugify(self.shopname, to_lower=True)
         super(UserShop, self).save(*args, **kwargs)
+
+    def get_products_count(self):
+        return Product.objects.filter(user=self.user).count()
+
+    def get_active_orders(self):
+        return 0
 
 
 class Slider(models.Model):

@@ -1,6 +1,5 @@
 {% load i18n pages_tags staticfiles %}
 <header id="topnav" class="navbar navbar-fixed-top navbar-bleachedcedar" role="banner">
-    <!-- <div id="page-progress-loader" class="show"></div> -->
     <div class="logo-area">
         <div class="navbar-brand navbar-brand-inverse">
             <img class="show-on-collapse img-logo-white" alt="handmaker" src="{% static 'images/logo/bird.png' %}">
@@ -14,49 +13,16 @@
         </a>
         </span>
     </div>
-    <!-- logo-area -->
     <ul class="nav navbar-nav toolbar pull-right">
-        <li class="toolbar-icon-bg appear-on-search ov-h" id="trigger-search-close">
-            <a class="toggle-fullscreen"><span class="icon-bg">
-	        	<i class="material-icons">close</i>
+        <!--<li class="toolbar-icon-bg">
+            <a href="{# {% url 'admin:password_change' %} #}" class="toggle-fullscreen"><span class="icon-bg">
+                <i class="material-icons">lock</i>
+            </span></a>
+        </li>-->
+        <li class="toolbar-icon-bg">
+            <a href="{% url 'logout' %}?next={{ request.path }}" class="toggle-fullscreen"><span class="icon-bg">
+	        	<i class="material-icons">exit_to_app</i>
 	        </span></a>
-        </li>
-        <li class="toolbar-icon-bg hidden-xs" id="trigger-fullscreen">
-            <a href="#" class="toggle-fullscreen"><span class="icon-bg">
-	        	<i class="material-icons">fullscreen</i>
-	        </span></a>
-        </li>
-        <li class="dropdown toolbar-icon-bg">
-            <a href="#" class="hasnotifications dropdown-toggle" data-toggle="dropdown"><span class="icon-bg"><i class="material-icons">account_circle</i></span><span class="badge badge-info"></span></a>
-            <div class="dropdown-menu animated notifications">
-                <div class="topnav-dropdown-header">
-                    <span>{{ request.user.username }}</span>
-                </div>
-                <div class="scroll-pane has-scrollbar">
-                    <ul class="media-list scroll-content" tabindex="0" style="right: -17px;">
-                        <li class="media notification-success">
-                            <a href="{% url 'admin:index' %}">
-                                <div class="media-left">
-                                    <span class="notification-icon"><i class="material-icons">lock</i></span>
-                                </div>
-                                <div class="media-body">
-                                    <h4 class="notification-heading">Изменить пароль</h4>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="media notification-info">
-                            <a href="{% url 'logout' %}?next={{ request.path }}">
-                                <div class="media-left">
-                                    <span class="notification-icon"><i class="material-icons">exit_to_app</i></span>
-                                </div>
-                                <div class="media-body">
-                                    <h4 class="notification-heading">Выход</h4>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
         </li>
     </ul>
 </header>
