@@ -10,7 +10,7 @@ from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
 from django.template.loader import get_template
 from django.core.urlresolvers import reverse
-from django.core.mail import EmailMessage
+from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
@@ -331,6 +331,7 @@ def order_detail(request, pk, template="order/order_detail.html",
                 [order.author.email],
                 headers={'Reply-To': request.user.email}
             )
+            email.content_subtype = 'html'
             email.send(fail_silently=True)
             order_request_add(request, pk)
             return render(request, 'order/order_request_approved.html', {'order': order})
