@@ -210,6 +210,11 @@ class SliderItem(models.Model):
 
 class OrderItem(models.Model):
 
+    class Meta:
+        verbose_name = _("Заказы")
+        verbose_name_plural = _("Мои заявки")
+        ordering = ("-created",)
+
     title = models.CharField(_("Название"), max_length=500, null=False)
     active = models.BooleanField(_("Открыт"), default=True, editable=False)
     created = models.DateField(
@@ -248,11 +253,6 @@ class OrderItem(models.Model):
 
     performer = models.ForeignKey(
         'auth.User', on_delete=models.SET_NULL, editable=False, null=True)
-
-    class Meta:
-        verbose_name = _("Заказ")
-        verbose_name_plural = _("Мои заявки")
-        ordering = ("-created",)
 
     def __str__(self):              # __unicode__ on Python 2
         return str(self.title)
