@@ -325,7 +325,7 @@ def order_detail(request, pk, template="order/order_detail.html",
             content = template.render(context)
 
             email = EmailMessage(
-                "Для вашего заказа нашелся исполнитель",
+                "Для вашего заказа нашелся исполнитель handmaker.top",
                 content,
                 settings.EMAIL_HOST_USER,
                 [order.author.email],
@@ -363,7 +363,24 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
             order.performer = performer
             order.save()
         except Exception as e:
-            raise
+            pass
+        else:
+            template = get_template('order/order_request_assign.txt')
+            context = Context({
+                'order': order,
+                'performer': performer,
+            })
+            content = template.render(context)
+
+            email = EmailMessage(
+                "Ваша заявка на исполнение заказа одобрена handmaker.top",
+                content,
+                settings.EMAIL_HOST_USER,
+                [order.author.email],
+                headers={'Reply-To': performer.email}
+            )
+            email.content_subtype = 'html'
+            email.send(fail_silently=True)
 
     return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
 
