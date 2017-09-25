@@ -333,7 +333,7 @@ def order_detail(request, pk, template="order/order_detail.html",
             )
             email.send(fail_silently=True)
             order_request_add(request, pk)
-            return render(request, 'order/order_request_approved.html', {})
+            return render(request, 'order/order_request_approved.html', {'order': order})
 
     context = {"order": order, "form": form}
 
@@ -350,7 +350,7 @@ def order_request_add(request, order_pk):
         orderRequest.save()
     except Exception as e:
         pass
-    return render(request, 'order/order_request_approved.html', {})
+    return render(request, 'order/order_request_approved.html', {'order': order})
 
 
 @login_required

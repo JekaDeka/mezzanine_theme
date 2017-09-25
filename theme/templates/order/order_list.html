@@ -27,13 +27,9 @@
 
 {% block main %}
 <div class="four columns">
-	<div class="widget margin-top-0">
-		<h3 class="headline"></h3><span class="line"></span><div class="clearfix"></div>
-		{{ page.richtextpage.content|richtext_filters|safe }}
-	</div>
 	{% block order_categories %}
 		{% if order_categories %}
-		<div class="widget">
+		<div class="widget margin-top-10">
 			<h3 class="headline">Виды работ </h3><span class="line"></span><div class="clearfix"></div>
 			<nav class="categories">
 				<ul>

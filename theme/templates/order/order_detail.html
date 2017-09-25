@@ -135,16 +135,15 @@
 						</td>
 					</tr>
 				</table>
-				<a class="popup-with-zoom-anim button color" href="#small-dialog"><i class="fa fa-info-circle"></i> Open Popup</a>
+				<a class="popup-with-zoom-anim button color" href="#small-dialog">Откликнуться</a>
 				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-				    <h2 class="margin-bottom-10">Отправьте сообщение заказчику</h2>
+				    <h2 class="margin-bottom-10">Отправьте дополнительное сообщение заказчику</h2>
 				    <form action="" method="POST">
 				    {% csrf_token %}
 				    {{ form.as_p }}
-				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Submit</button>
+				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить заявку</button>
 				  </form>
 				</div>
-				<a href="{% url 'order_request_add' order.id %}" class="button">Откликнуться</a>
 				<div class="clearfix"></div>
 			</section>
 		</div>

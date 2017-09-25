@@ -23,6 +23,7 @@
 {% block main %}
 <div class="sixteen columns">
 	<div class="notification closeable success"><p>Ваша заявка успешно отправлена.</p></div>
-	<a href="{% url 'order_list' %}" class="button color">К столку заказов</a>
+	<a href="{% url 'order_detail' order.pk %}" class="button dark">Назад</a>
+	<a href="{% url 'order_list' %}" class="button dark">К столку заказов</a>
 </div>
 {% endblock %}
