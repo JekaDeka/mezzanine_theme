@@ -86,12 +86,7 @@
 							<i class="fa fa-wrench" aria-hidden="true"></i> Вид работы
 						</th>
 						<td>
-						{% for place in order.categories.all %}
-					    	{{ place }}
-					    	{% if not forloop.last %}
-                            	,
-                         	{% endif %}
-						{% endfor %}
+							{{ order.categories }}
 						</td>
 					</tr>
 					<tr>
@@ -140,6 +135,16 @@
 						</td>
 					</tr>
 				</table>
+				<a class="popup-with-zoom-anim button color" href="#small-dialog"><i class="fa fa-info-circle"></i> Open Popup</a>
+				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+				    <h2 class="margin-bottom-10">Отправьте сообщение заказчику</h2>
+				    <form action="" method="POST">
+				    {% csrf_token %}
+				    {{ form.as_p }}
+				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Submit</button>
+				  </form>
+				</div>
+				<a href="{% url 'order_request_add' order.id %}" class="button">Откликнуться</a>
 				<div class="clearfix"></div>
 			</section>
 		</div>

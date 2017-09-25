@@ -183,9 +183,8 @@ li.child-1>.open_nav {
     line-height: 46px
 }
 
-ul.widget-tabs>li:hover {
-    border-bottom: 1px solid #a0a0a0;
-    padding-left: 7px
+ul.widget-tabs>li:hover a{
+    color: #3acf87;
 }
 
 p,

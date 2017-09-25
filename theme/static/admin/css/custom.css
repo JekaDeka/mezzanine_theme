@@ -18,6 +18,8 @@ body,
 
 
 
+
+
 /*------------------------------*/
 
 tr.form-row>td {
@@ -32,6 +34,8 @@ tr.form-row>td {
     max-width: 100%;
     white-space: normal;
 }
+
+
 
 
 
@@ -259,6 +263,8 @@ a.selector-clearall {
 
 
 
+
+
 /*------------*/
 
 .widget_type__readonlypasswordhashwidget {
@@ -284,6 +290,8 @@ ul li {
     content: "\f0ab";
     margin-left: 10px;
 }
+
+
 
 
 
@@ -417,10 +425,17 @@ select#id_categories {
     width: 100%;
 }
 
+.panel-image {
+    width: 100%;
+    overflow: hidden;
+}
+
 .panel-image img {
     position: relative;
     width: 100%;
     max-width: 100%;
+    min-width: 100%;
+    margin: 0 auto;
     /*height: 80px;*/
     /* for IE 6 */
 }
@@ -429,4 +444,18 @@ select#id_categories {
 .panel-white .panel-body h3 {
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+
+@media (max-width: 767px) {
+    .panel-body.table-responsive {
+        padding-bottom: 86px;
+    }
+}
+
+@media (max-width: 400px) {
+    .btn-group.dropdown>a.btn.btn-sm.btn-default.btn-raised,
+    .btn-group.dropdown>button.btn.btn-sm.btn-info.btn-raised.dropdown-toggle {
+        width: 100%;
+    }
 }

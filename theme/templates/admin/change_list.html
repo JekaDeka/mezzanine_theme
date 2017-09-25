@@ -82,6 +82,9 @@
   </ol>
 {% endblock %}
 
+{% block page_heading %}
+{% endblock %}
+
 <!-- CONTENT -->
 {% block content %}
 <div class="row">
@@ -130,6 +133,7 @@
 
 							{% if action_form and actions_on_top and cl.full_result_count and cl.result_count %}
 								{# {% admin_actions %} #}
+								{% if has_add_permission %}
 								<div class="actions" style="margin-top: -10px; margin-right: -7px; float: right;">
 								    <div class="" title="Действие:" >
 								    	<div class="" style="display:none;">
@@ -140,7 +144,7 @@
 											<span class="material-input"></span>
 										</div>
 <!-- 								      <span class="input-group-btn"> -->
-								      
+								  
 								    <button type="submit" class="btn" title="Выполнить выбранное действие" name="index" value="1" style="color: rgb(97, 97, 97)!important; margin: 0!important; font-size: inherit;">
 								    <i class="fa fa-minus"></i> <span>Удалить элементы</span>
 								    <div class="ripple-container"></div></button>
@@ -149,6 +153,7 @@
 								<input class="select-across" name="select_across" type="hidden" value="1">
 								  
 								</div>
+								{% endif %}
 							{% endif %}
 								
 								{% result_list cl %}

@@ -1,0 +1,28 @@
+{% extends "order/order_list.html" %}
+{% load mezzanine_tags keyword_tags i18n disqus_tags theme_tags blog_tags %}
+
+{% block meta_title %}  Заявка отправлена {% endblock %}
+
+
+{% block meta_description %}{% metablock %}
+ Заявка отправлена
+{% endmetablock %}{% endblock %}
+
+{% block title %}
+Заявка отправлена
+{% endblock %}
+
+{% block breadcrumbs_title %}
+	<h2>Заявка отправлена</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li><a href="{% url 'order_list' %}">Стол заказов</a></li>
+{% endblock %}
+
+{% block main %}
+<div class="sixteen columns">
+	<div class="notification closeable success"><p>Ваша заявка успешно отправлена.</p></div>
+	<a href="{% url 'order_list' %}" class="button color">К столку заказов</a>
+</div>
+{% endblock %}

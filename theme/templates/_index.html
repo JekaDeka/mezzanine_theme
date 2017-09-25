@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles imagefit %} 
+{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles imagefit blog_tags %} 
 
 {% block meta_title %}{% trans "Home" %} {% endblock %} 
 
@@ -93,265 +93,133 @@
 {% endif %}
 {% endblock %}
 
-{% block featured %}
+
+
+{% block extra_content %}
 <div class="container">
+    <div class="twelve columns">
+    	<div class="widget">
+        <h3 class="headline">Лучшие магазины</h3><span class="line"></span><div class="clearfix"></div>
+    	{% for shop in user_shops %}
+    		<p>go</p>
+    	{% endfor %}
+    	</div>
 
-{% for category in featured %}
-    <div class="four columns custom_column">
-        <a href="{{ category.get_absolute_url }}" class="img-caption" >
-            <figure class="blue-effect">
-
-                {% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
-                        {% if category.featured_image %}
-                            <img alt="" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 380 380 %}"/>
-                        {% else %}
-                            {% with "23456"|make_list|random as rnd %}
-                            {% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
-                                <img src="{{ STATIC_URL }}{% thumbnail img_path 380 380 %}" alt="" class="width-100">
-                            {% endwith %}
-                            {% endwith %}
-                        {% endif %}
-                    {% else %}
-                        <img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 380 380 %}" alt="" class="width-100">
-                    {% endif %}
-                <figcaption>
-                    <h3>{{ category.title }}</h3>
-                    <span>{{ category.parent.title }}</span>
-                </figcaption>
-            </figure>
-        </a>
     </div>
-{% endfor %}
+    <div class="four columns">
+        {% blog_recent_posts 4 as recent_posts %}
+		{% if recent_posts %}
+		<div class="widget margin-top-30">
+			<h3 class="headline">Блог</h3><span class="line"></span><div class="clearfix"></div>
+			<ul class="widget-tabs">
+			{% for recent_post in recent_posts %}
+				<li>			
+			    {% spaceless %}
+			    {% if settings.BLOG_USE_FEATURED_IMAGE %}
+			    <div class="widget-thumb">
+						<a href="{{ recent_post.get_absolute_url }}">
+						{% if recent_post.featured_image %}
+							<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 74 74 %}"/>
+						{% endif %}
+						</a>
+				</div>  
+				{% endif %}
+				<div class="widget-text">
+				    <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
+				    <span>{{ recent_post.publish_date|date }} </span>
+			    </div>
+				<div class="clearfix"></div>
+			    {% endspaceless %}
+				</li>
+			{% endfor %}
+			</ul>	
+		</div>
+		{% endif %}
+
+	{% blog_categories as categories %}
+		{% if categories %}
+		<div class="widget margin-top-10">
+			<h3 class="headline">{% trans "Categories" %}</h3><span class="line"></span><div class="clearfix"></div>
+			<nav class="categories">
+				<ul>
+				{% for category in categories %}
+					<li><a href="{% url 'blog_post_list_category' category.slug %}">{{ category }}</a> ({{ category.post_count }})</li>
+				{% endfor %}
+				</ul>
+			</nav>
+		</div>
+		{% endif %}	
+
+        {% keywords_for blog.blogpost as tags %}
+		{% if tags %}
+			<div class="widget margin-top-10">
+				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>	
+				<nav class="tags">
+				{% for tag in tags %}
+				    <a href="{% url "blog_post_list_tag" tag.slug %}" class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
+				{% endfor %}
+				</nav>
+			</div>
+		{% endif %}
+    </div>
 </div>
-<div class="clearfix"></div>
-{% endblock %}
 
-{% block new_arrivals %}
-{% if new_arrivals %}
-<div class="container hide-on-mobile">
 
-    <!-- Headline -->
+<div class="container">
     <div class="sixteen columns">
-        <h3 class="headline">Новые поступления</h3>
-        <span class="line margin-bottom-0"></span>
-    </div>
-
-    <!-- Carousel -->
-    <div id="new-arrivals" class="showbiz-container sixteen columns" >
-
-        <!-- Navigation -->
-        <div class="showbiz-navigation">
-            <div id="showbiz_left_1" class="sb-navigation-left"><i class="fa fa-angle-left"></i></div>
-            <div id="showbiz_right_1" class="sb-navigation-right"><i class="fa fa-angle-right"></i></div>
-        </div>
-        <div class="clearfix"></div>
-
-        <!-- Products -->
-        <div class="showbiz" data-left="#showbiz_left_1" data-right="#showbiz_right_1" data-play="#showbiz_play_1" >
-            <div class="overflowholder">
-                <ul>
-                    {% for product in new_arrivals %}
-                    <li>
-                        <figure class="product">
-                {% if product.on_custom_sale %}
-                    <div class="product-discount">СКИДКА</div>
-                {% endif %}
-                {% if product.pre_order %}
-                    <div class="product-discount blue">Под заказ</div>
-                {% endif %}
-                <div class="mediaholder">
-                <a href="{{ product.get_absolute_url }}">
-                    {% if product.image %}
-                    <img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}">
-                    <div class="cover">
-                        <img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}">
-                    </div>
-                    {% else %}
-                    <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
-                    <div class="cover">
-                        <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 380 %}">
-                    </div>
-                    {% endif %}
-                </a>
-                <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
-                </div>
-                <a href="{{ product.get_absolute_url }}">
-                    <section>
-                        <h5>{{ product.title|title }}</h5>
-                        <span class="product-category">
-                        {% if product.material %}
-                            {{ product.material|truncatechars:22 }}
-                        {% else %}
-                            <br>
-                        {% endif %}
-                        </span>
-                        {% if product.on_custom_sale %}
-                            <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
-                        {% else %}
-                        <span class="product-price">{{ product.price|rub_currency }}</span>
-                        {% endif %}
-                    </section>
-                </a>
-            </figure>
-                    </li>
-                        
-                    {% endfor %}
-                </ul>
-                <div class="clearfix"></div>
-
-            </div>
+        <div class="widget">
+            <h2 class="headline">Лучшие новые товары</h2>
+            <span class="line"></span>
             <div class="clearfix"></div>
         </div>
-    </div>
-
-</div>
-{% endif %}
-{% endblock %}
-
-{% block parallax_banner %}
-<!--<div class="parallax-banner fullwidth-element"  data-background="#000" data-opacity="0.45" data-height="200">
-    <img src="{% static 'images/parallax.jpg' %}" alt="" />
-    <div class="parallax-overlay"></div>
-    <div class="parallax-title">###<span>HANDMAKER.TOP</span></div>
-</div>-->
-{% endblock %}
-
-{% block product_list %}
-{% if most_popular or user_shops or sale_product %}
-<div class="container margin-bottom-25">
-
-    <!-- Best Sellers -->
-    <div class="one-third column">
-        <!-- Headline -->
-        <h3 class="headline">Самые популярные</h3>
-        <span class="line margin-bottom-0"></span>
-        <div class="clearfix"></div>
-
-
-        <ul class="product-list">
-            {% for product in most_popular %}
-            <li><a href="{{product.get_absolute_url}}">
-                {% if product.image %}
-                <img src="{{ MEDIA_URL }}{% thumbnail product.image 80 80 %}" alt="" />
-                {% else %}
-                <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image-80.jpg' 80 80 %}">
-                {% endif %}
-                <div class="product-list-desc">{{product.title|title}} <i> {{ product.price|rub_currency }}</i></div>
-            </a></li>
-            {% endfor %}
-            <li><div class="clearfix"></div></li>
-
-        </ul>
-
-    </div>
-
-    <!-- Top Rated -->
-    <div class="one-third column">
-        <!-- Headline -->
-        <h3 class="headline">Лучшие магазины</h3>
-        <span class="line margin-bottom-0"></span>
-        <div class="clearfix"></div>
-
-
-        <ul class="product-list top-rated">
-        {% for shop in user_shops %}
-            <li><a href="{% url "shop_view" shop.slug %}">
-                {% if shop.image %}
-                <img src="{{ MEDIA_URL }}{% thumbnail shop.image 80 80 %}" alt="" />
-                {% else %}
-                <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image-80.jpg' 80 80 %}">
-                {% endif %}
-                <div class="product-list-desc with-rating">{{ shop.shopname }} <!--<i> {{ product.price|rub_currency }} </i>-->
-                    <div class="rating five-stars">
-                        <div class="star-rating"></div>
-                        <div class="star-bg"></div>
-                    </div>
-                </div>
-            </a></li>
-        {% endfor %}
-            <li><div class="clearfix"></div></li>
-
-        </ul>
-
-    </div>
-    <!-- Weekly Sales -->
-    <div class="one-third column">
-        <!-- Headline -->
-        <h3 class="headline">Распродажа</h3>
-        <span class="line margin-bottom-0"></span>
-        <div class="clearfix"></div>
-
-
-        <ul class="product-list discount">
-        {% for product in sale_product %}
-            <li><a href="{{product.get_absolute_url}}">
-                {% if product.image %}
-                <img src="{{ MEDIA_URL }}{% thumbnail product.image 80 80 %}" alt="" />
-                {% else %}
-                <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image-80.jpg' 80 80 %}">
-                {% endif %}
-                <div class="product-list-desc">{{product.title|title}} <i>
-                {% if product.on_custom_sale %}
-                {{ product.unit_price|rub_currency }}
-                {% endif %}
-                <b>{{ product.price|rub_currency }}</b></i></div>
-            </a></li>
-        {% endfor %}
-
-            <li><div class="clearfix"></div></li>
-        </ul>
+        <div class="twelve columns products">
+            {% for product in featured_products %}
+			<div class="four shop columns custom_column">
+				<figure class="product">
+					<div class="badges">
+					{% if product.pre_order %}
+						<div class="product-example">Для примера</div>
+					{# {% else %} #}
+						<!--<div class="product-ready">Готовый вариант</div>-->
+					{% endif %}
+					{% if product.on_custom_sale %}
+						<div class="product-discnt">СКИДКА</div>
+					{% endif %}
+					</div>
+					{% get_product_images product as images %}
+					<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
+					<a href="{{ product.get_absolute_url }}">
+						{% if images %}
+						<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+							{% if images.count != 1 %}
+							<div class="cover">
+									<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+							</div>
+							{% endif %}
+						{% else %}
+						<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+						{% endif %}
+					</a>
+					<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+					</div>
+					<a href="{{ product.get_absolute_url }}">
+						<section>
+							<h5>{{ product.title|title|truncatechars:34 }}</h5>
+							<a href="{% url 'shop_view' product.user|get_shop_slug %}" class="shopname">{{ product.user|get_shop_name }}</a>
+							<!--<span class="product-category">
+							</span>-->
+							{% if product.on_custom_sale %}
+								<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+							{% else %}
+							<span class="product-price">{{ product.price|rub_currency }}</span>
+							{% endif %}
+						</section>
+					</a>
+				</figure>
+			</div>
+			{% endfor %}
+		<div class="clearfix"></div>
+        </div>
     </div>
 </div>
-<div class="clearfix"></div>
-{% endif %}
-{% endblock %}
-
-{% block lastest_articles %}
-{% if recent_posts %}
-<div class="container" >
-    <!-- Headline -->
-    <div class="sixteen columns" >
-        <h3 class="headline">Последние записи</h3>
-        <span class="line margin-bottom-30"></span>
-    </div>
-
-    {% for blog_post in recent_posts %}
-    <div class="four columns">
-        <article class="from-the-blog">
-            {% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %}
-            {% block blog_post_list_post_featured_image %}
-            <figure class="from-the-blog-image">
-                <a href="{{ blog_post.get_absolute_url }}">
-                    <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="" />
-                </a>
-                <div class="hover-icon"></div>
-            </figure>
-            {% endblock %}
-            {% endif %}
-            <section class="from-the-blog-content">
-                {% block blog_post_list_post_title %}
-                    <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|title }}</h5></a>
-                {% endblock %}
-                {% block blog_post_list_post_metainfo %}
-                    {% with blog_post.user as author %}
-                    <i>{% trans "Posted by" %}: <a href="{% url "blog_post_list_author" author %}">{{ author.get_full_name|default:author.username }}</a>,  
-                    {% blocktrans with sometime=blog_post.publish_date|date %}{{ sometime }}{% endblocktrans %}
-                    </i>
-                    {% endwith %}
-                {% endblock %}
-                {% block blog_post_list_post_content %}
-                {% if blog_post.preview_content %}
-                    {{ blog_post.preview_content|safe|truncatewords_html:45 }}
-                {% else %}
-                    {{ blog_post.description_from_content|safe|truncatewords_html:45 }}
-                {% endif %}
-                {% endblock %}
-                <a href="{{ blog_post.get_absolute_url }}" class="button gray">{% trans "read more" %}</a>
-            </section>
-        </article>
-    </div>
-        
-    {% endfor %}
-</div>
-{% endif %}
 {% endblock %}

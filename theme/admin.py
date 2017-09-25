@@ -4,6 +4,9 @@ from django.db import models
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
+from django.conf.urls import url
+from django.utils.html import format_html
+from django.core.urlresolvers import reverse
 from mezzanine.forms.admin import FormAdmin
 from mezzanine.blog.models import BlogPost
 from cartridge.shop.models import Category, Product, ProductImage, ProductVariation
@@ -11,7 +14,7 @@ from cartridge.shop.admin import ProductAdmin, ProductImageAdmin, ProductVariati
 from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.core.admin import TabularDynamicInlineAdmin
 from mezzanine.pages.admin import PageAdmin
-from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory
+from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory, OrderItemRequest
 from theme.forms import SelectForm, OrderItemAdminForm
 
 
@@ -167,7 +170,7 @@ class MyProductAdmin(ProductAdmin):
             #                 var.save()
 
 
-class ItemInline(admin.StackedInline):
+class SliderItemInline(admin.StackedInline):
     model = SliderItem
     # fieldsets = (
     #     (None, {'fields': (('image', 'alt', 'sort'),
@@ -177,7 +180,7 @@ class ItemInline(admin.StackedInline):
 
 class SliderAdmin(admin.ModelAdmin):
     inlines = [
-        ItemInline,
+        SliderItemInline,
     ]
     list_display = ('title', )
     search_fields = ['title', ]
@@ -189,8 +192,14 @@ class SliderAdmin(admin.ModelAdmin):
 
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created', 'price', 'ended', )
+    list_display = ('title', 'created', 'price', 'ended', 'get_performer')
     form = OrderItemAdminForm
+
+    def get_performer(self, obj):
+        if obj.performer:
+            return obj.performer.get_full_name()
+        return obj.performer
+    get_performer.short_description = 'Исполнитель'
 
     def save_model(self, request, obj, form, change):
         if getattr(obj, 'author', None) is None:
@@ -215,6 +224,53 @@ class OrderItemAdmin(admin.ModelAdmin):
     #     return field
 
 
+@admin.register(OrderItemRequest)
+class OrderItemRequestAdmin(admin.ModelAdmin):
+    model = OrderItemRequest
+    list_display = ('order', 'get_performers',)
+    list_display_links = None
+
+    def get_queryset(self, request):
+        # qs = super(OrderItemRequestAdmin, self).get_queryset(request)
+        qs = OrderItem.objects.filter(performer=None).filter(
+            author=request.user).distinct()
+        return qs
+
+    def order(self, obj):
+        return obj.title
+
+    def buttons(self, order):
+        return format_html(
+            '<div class="btn-group dropdown">'
+            '<a href="{}" class="btn btn-sm btn-default btn-raised" target="_blank">{}<div class="ripple-container"></div></a>'
+            '<button class="btn btn-sm btn-info btn-raised dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></button>'
+            '<ul class="dropdown-menu" role="menu">'
+            '<li><a href="{}">Одобрить</a></li>'
+            '<li><a href="{}" target="_blank">Посмотреть профиль</a></li>'
+            '<li class="divider"></li>'
+            '<li><a href="{}">Отказать</a></li>'
+            '</ul>'
+            '</div><br>',
+            reverse('profile_view', args=[]),
+            order.performer.get_full_name(),
+            reverse('order_request_assign', args=[
+                    order.order.id, order.performer.id]),
+            reverse('profile_view', args=[]),
+            reverse('order_request_delete', args=[
+                    order.order.id, order.performer.id]),
+        )
+
+    def get_performers(self, obj):
+        orderRequests = OrderItemRequest.objects.filter(order=obj)
+        html = '<div class="parent">'
+        html += "".join(self.buttons(order) for order in orderRequests)
+        html += '</div>'
+        return html
+
+    get_performers.short_description = 'Исполнители'
+    get_performers.allow_tags = True
+
+
 admin.site.unregister(BlogPost)
 admin.site.unregister(Product)
 admin.site.register(BlogPost, MyBlogPostAdmin)
@@ -223,6 +279,7 @@ admin.site.register(Product, MyProductAdmin)
 admin.site.register(Slider, SliderAdmin)
 admin.site.register(OrderItem, OrderItemAdmin)
 admin.site.register(OrderItemCategory)
+# admin.site.register(OrderItemRequest, OrderItemRequestAdmin)
 
 # form_fieldsets = deepcopy(FormAdmin.fieldsets)
 # form_fieldsets[0][1]["fields"] += ("featured_image",)

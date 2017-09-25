@@ -169,6 +169,9 @@ class UserShop(models.Model):
     def get_products_count(self):
         return Product.objects.filter(user=self.user).count()
 
+    def get_last_product(self):
+        return Product.objects.filter(user=self.user).last()
+
     def get_active_orders(self):
         return 0
 
@@ -191,7 +194,7 @@ class SliderItem(models.Model):
                                upload_to=upload_to(
                                    "theme.SliderItem.featured_image", "slider"),
                                format="Image", max_length=255, null=True, blank=True)
-    short_description = RichTextField(blank=True)
+    short_description = RichTextField(verbose_name=_("Описание"), blank=True)
     href = models.CharField(verbose_name=_("Ссылка"), max_length=2000, blank=True,
                             help_text="Ссылка куда будет ввести данный слайд. Например /blog/")
 
@@ -206,8 +209,9 @@ class SliderItem(models.Model):
 
 
 class OrderItem(models.Model):
+
     title = models.CharField(_("Название"), max_length=500, null=False)
-    active = models.BooleanField(_("Активен"), default=True, editable=False)
+    active = models.BooleanField(_("Открыт"), default=True, editable=False)
     created = models.DateField(
         _("Дата добавления"), editable=False, default=date.today)
     ended = models.DateField(
@@ -240,7 +244,10 @@ class OrderItem(models.Model):
                                format="Image", max_length=255, null=True, blank=True,
                                help_text="Загрузите фотографии эскизов или примеров, которые помогут мастерам точнее понять Ваш заказ.")
     author = models.ForeignKey(
-        "auth.User", on_delete=models.CASCADE, default=None, editable=False, null=True)
+        "auth.User", on_delete=models.CASCADE, default=None, editable=False, null=True, related_name="author")
+
+    performer = models.ForeignKey(
+        'auth.User', on_delete=models.SET_NULL, editable=False, null=True)
 
     class Meta:
         verbose_name = _("Заказ")
@@ -258,6 +265,21 @@ class OrderItem(models.Model):
     @property
     def lifespan(self):
         return '%s - present' % self.ended.strftime('%m/%d/%Y')
+
+
+class OrderItemRequest(models.Model):
+    """Each order item can have many users that requested to complete this order.
+    Such that each author can choose specific user to compelte his order."""
+    class Meta:
+        verbose_name = _("Отклики")
+        verbose_name_plural = _("Отклики на заявки")
+        ordering = ("order",)
+        unique_together = ('order', 'performer',)
+
+    order = models.ForeignKey(
+        OrderItem, on_delete=models.CASCADE, related_name="order", verbose_name=("Заказы"))
+    performer = models.ForeignKey(
+        'auth.User', on_delete=models.CASCADE, verbose_name=("Исполнители"))
 
 
 class OrderItemCategory(Slugged):

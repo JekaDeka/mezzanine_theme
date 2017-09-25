@@ -6,9 +6,12 @@ from django.shortcuts import render
 from django.contrib.auth import get_user_model
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template import RequestContext
+from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
-from django.http import HttpResponse
+from django.template.loader import get_template
+from django.core.urlresolvers import reverse
+from django.core.mail import EmailMessage
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
@@ -18,15 +21,14 @@ from django.middleware.csrf import get_token
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product
-from theme.models import OrderItem, OrderItemCategory
+from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm, ShopForm
-from theme.models import UserShop
+from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm
 from theme.utils import grouped
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from mezzanine.utils.urls import login_redirect, next_url
@@ -137,31 +139,23 @@ def promote_user(request, template="accounts/account_signup.html",
 
 
 def true_index(request):
-    main_category = Page.objects.filter(slug='catalog')
-    featured = None  # Category.objects.filter(parent=main_category)[:4]
-
+    # main_category = Page.objects.filter(slug='catalog')
+    # featured_products = Category.objects.filter(parent=main_category)
     # enddate = datetime.datetime.today()
     # startdate = enddate - datetime.timedelta(days=60)
     # new_arrivals = Product.objects.filter(
     # created__range=[startdate,
     # enddate]).filter(status=2).order_by('-created')[:7]
 
-    new_arrivals = Product.objects.filter(status=2).order_by('-created')[:7]
+    new_arrivals = Product.objects.order_by('-created')[:8]
 
-    recent_posts = BlogPost.objects.order_by('-created')[:4]
+    # recent_posts = BlogPost.objects.order_by('-created')[:4]
 
-    most_popular = new_arrivals[:3]
     user_shops = UserShop.objects.all()[:3]
-    sale_product = new_arrivals[3:6]
-
-    new_arrivals = None
-    context = {'featured': featured,
-               'new_arrivals': new_arrivals,
-               'recent_posts': recent_posts,
-               'most_popular': most_popular,
-               'user_shops': user_shops,
-               'sale_product': sale_product
-               }
+    context = {
+        'featured_products': new_arrivals,
+        'user_shops': user_shops,
+    }
     return render(request, '_index.html', context)
 
 
@@ -294,7 +288,7 @@ def order_list(request, tag=None, year=None, month=None, username=None,
                extra_context=None):
 
     templates = []
-    orders = OrderItem.objects.all()
+    orders = OrderItem.objects.filter(performer=None)
     if category is not None:
         pass
     author = request.user
@@ -317,16 +311,73 @@ def order_detail(request, pk, template="order/order_detail.html",
                  extra_context=None):
     templates = []
     order = get_object_or_404(OrderItem, pk=pk)
-    context = {"order": order}
+    form = MessageForm
+    if request.method == 'POST':
+        form = MessageForm(data=request.POST)
+        if form.is_valid():
+            message = request.POST.get('message', '')
+            template = get_template('order/order_request_approved.txt')
+            context = Context({
+                'order': order,
+                'performer': request.user,
+                'message': message,
+            })
+            content = template.render(context)
+
+            email = EmailMessage(
+                "Для вашего заказа нашелся исполнитель",
+                content,
+                settings.EMAIL_HOST_USER,
+                [order.author.email],
+                headers={'Reply-To': request.user.email}
+            )
+            email.send(fail_silently=True)
+            order_request_add(request, pk)
+            return render(request, 'order/order_request_approved.html', {})
+
+    context = {"order": order, "form": form}
 
     context.update(extra_context or {})
     templates.append(template)
     return TemplateResponse(request, templates, context)
 
 
-# class SignUpView(CreateView):
-#     template_name = 'accounts/account_shop_create.html'
-#     form_class = ShopForm
+@login_required
+def order_request_add(request, order_pk):
+    try:
+        order = OrderItem.objects.get(pk=order_pk, performer=None)
+        orderRequest = OrderItemRequest(order=order, performer=request.user)
+        orderRequest.save()
+    except Exception as e:
+        pass
+    return render(request, 'order/order_request_approved.html', {})
+
+
+@login_required
+def order_request_assign(request, order_pk, performer_pk, extra_context=None):
+    if request.user.has_perm('theme.change_orderitemrequest'):
+        try:
+            order = OrderItem.objects.get(pk=order_pk)
+            performer = User.objects.get(pk=performer_pk)
+            order.performer = performer
+            order.save()
+        except Exception as e:
+            raise
+
+    return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
+
+
+@login_required
+def order_request_delete(request, order_pk, performer_pk, extra_context=None):
+    if request.user.has_perm('theme.change_orderitemrequest'):
+        try:
+            order = OrderItemRequest.objects.get(
+                order=order_pk, performer=performer_pk)
+            order.delete()
+        except Exception as e:
+            raise
+
+    return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
 
 
 def validate_shopname(request):

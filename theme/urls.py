@@ -5,8 +5,17 @@ from imagefit import urls
 
 # prefix in main HelloDjango project
 urlpatterns = [
-    url("^ordertable/(?P<pk>\w+)/",
+    url(r"^ordertable/(?P<pk>[0-9]+)/$",
         views.order_detail, name="order_detail"),
+    url(r'^ordertable/add/(?P<order_pk>[0-9]+)/$',
+        views.order_request_add, name="order_request_add"),
+
+    url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/assign/$',
+        views.order_request_assign, name="order_request_assign"),
+    url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/delete/$',
+        views.order_request_delete, name="order_request_delete"),
+
+
     url(r'^profile_view/$',
         views.profile_view, name='profile_view'),
 

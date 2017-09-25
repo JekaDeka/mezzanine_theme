@@ -15,6 +15,7 @@ from django.contrib import admin
 from django.contrib.auth import authenticate, get_user_model
 from django.forms.utils import flatatt, to_current_timezone
 from django.utils.datastructures import MultiValueDict
+from django.core.mail import send_mail
 
 
 from mezzanine.conf import settings
@@ -61,6 +62,13 @@ class СustomBlogForm(forms.ModelForm):
 
 class ContactForm(forms.Form):
     contact_email = forms.EmailField(required=True)
+
+
+class MessageForm(forms.Form):
+    message = forms.CharField(
+        required=True,
+        widget=forms.Textarea
+    )
 
 
 class ShopForm(forms.ModelForm):
@@ -234,3 +242,43 @@ class OrderItemAdminForm(forms.ModelForm):
         super(OrderItemAdminForm, self).__init__(*args, **kwargs)
         self.fields['ended'].widget.format = '%d/%m/%Y'
         self.fields['ended'].input_formats = ['%d/%m/%Y']
+
+
+class OrderItemRequestActionForm(forms.Form):
+    comment = forms.CharField(
+        required=False,
+        widget=forms.Textarea,
+    )
+    send_email = forms.BooleanField(
+        required=False,
+    )
+
+    @property
+    def email_subject_template(self):
+        return 'email/base.txt'
+
+    @property
+    def email_body_template(self):
+        raise NotImplementedError()
+
+    def form_action(self, order, user):
+        raise NotImplementedError()
+
+    def save(self, order, user):
+        try:
+            order, action = self.form_action(order, user)
+        except errors.Error as e:
+            error_message = str(e)
+            self.add_error(None, error_message)
+            raise
+        if self.cleaned_data.get('send_email', False):
+            send_email(
+                to=[user.email],
+                subject_template=self.email_subject_template,
+                body_template=self.email_body_template,
+                context={
+                    "order": order,
+                    "action": action,
+                }
+            )
+        return order, action
