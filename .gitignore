@@ -1,7 +1,6 @@
 *.pyc
 *.pyo
 *.db
-*.txt
 *.bat
 .DS_Store
 .coverage
