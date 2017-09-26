@@ -33,9 +33,10 @@
 			<h3 class="headline">Виды работ </h3><span class="line"></span><div class="clearfix"></div>
 			<nav class="categories">
 				<ul>
+				<li><a href="{% url 'order_list' %}" {% url 'order_list' as the_url %}{% if the_url == request.get_full_path %}class="active"{% endif %}>Любой</a></li>
 				{% for category in order_categories %}
 					{% url 'order_list_category' category.slug as the_url %}
-					<li><a href="{% url 'order_list_category' category.slug %}" {% if the_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
+					<li><a href="{% url 'order_list_category' category.slug %}"{% if the_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
 				{% endfor %}
 				</ul>
 			</nav>
@@ -44,47 +45,37 @@
 	{% endblock %}
 </div>
 <div class="twelve columns">
-<div class="extra-padding">
-{% for order in orders.object_list %}
-<article class="post">
-<div class="order-container">                
-    <div class="order-thumb">
-    	{% if order.featured_image %}
-    	<a href="{{ order.get_absolute_url }}">
-			<img  src="{{ MEDIA_URL }}{% thumbnail order.featured_image 300 300 %}" alt="" />
-		</a>
-		{% else %}
-			<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 300 %}">
-		{% endif %}
-		<div class="order-info meta">
-			{% with order.author as author %}
-			<span><i class="fa fa-user"></i>Заказчик: <a href="{% url "profile" author %}">{{ author.get_full_name }}</a></span>
-			{% endwith %}
-			<br>
-			<span><i class="fa fa-calendar-plus-o" aria-hidden="true"></i>Добавлено: {{ order.created }}</span>
-			<br>
-			<span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
-			<br>
-			<span><i class="fa fa-rub" aria-hidden="true"></i> Бюджет: {{ order.price|rub_currency }} </span>
+	{% for order in orders.object_list %}
+	<div class="order-container margin-bottom-15">
+		<div class="three alpha columns margin-top-10">
+			{% if order.featured_image %}
+		    	<a href="{{ order.get_absolute_url }}">
+					<img  src="{{ MEDIA_URL }}{% thumbnail order.featured_image 300 300 %}" alt="no-image" style="margin: auto;" />
+				</a>
+			{% else %}
+				<a href="{{ order.get_absolute_url }}">
+					<img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 0 0 %}" alt="no-image" style="margin: auto;">
+				</a>
+			{% endif %}
 		</div>
-		
-    </div>
-    <div class="order-content">
-			<h2>
-				<a href="{{ order.get_absolute_url }}">{{ order.title|title }}</a>
-			</h2>
-        <div class="order-desc">
-    	{{ order.description|safe|truncatewords:80 }}
-    	</div>
-    	<a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>
-    </div>
-    
+		<div class="nine omega columns">
+		    <h2><a href="{{ order.get_absolute_url }}">{{ order.title|title }}</a></h2>
+		    <div class="meta">
+		        <span><i class="fa fa-calendar-plus-o" aria-hidden="true"></i>Добавлено: {{ order.created }}</span>
+		        <br>
+		        <span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
+		        <br>
+		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price|rub_currency }}</span>
+		    </div>
+		    <p>{{ order.description|safe|truncatewords:80 }}</p>
+		        <a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="margin-top-15"><span class="line"></span><div class="clearfix"></div></div>
+	{% endfor %}
+	
 </div>
-</article>
-{% endfor %}
-</div>
-</div>
-
 </div>
 <div class="container">
 {% pagination_for orders %}

@@ -310,14 +310,19 @@ def order_list(request, tag=None, year=None, month=None, username=None,
 def order_detail(request, pk, template="order/order_detail.html",
                  extra_context=None):
     templates = []
-    order = get_object_or_404(OrderItem, pk=pk)
+    try:
+        order = OrderItem.objects.get(pk=pk)
+    except Exception as e:
+        return redirect('order_list')
+
     form = MessageForm
     if request.method == 'POST':
         form = MessageForm(data=request.POST)
         if form.is_valid():
             message = request.POST.get('message', '')
-            template = get_template('order/order_request_approved.txt')
+            template = get_template('order/order_email_request_approved.html')
             context = Context({
+                'request': request,
                 'order': order,
                 'performer': request.user,
                 'message': message,
@@ -365,8 +370,9 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
         except Exception as e:
             pass
         else:
-            template = get_template('order/order_request_assign.txt')
+            template = get_template('order/order_email_request_assign.html')
             context = Context({
+                'request': request,
                 'order': order,
                 'performer': performer,
             })

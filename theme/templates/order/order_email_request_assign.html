@@ -1,8 +1,7 @@
-{% extends "order/base.txt" %}
+{% extends "order/email_base.html" %}
 {% load static mezzanine_tags accounts_tags %}
 {% block main %}
-{% with domain="handmaker.top" %}
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
         <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;">
             <b>Здравствуйте, {{ performer.first_name }}!</b>
@@ -10,9 +9,8 @@
     </tr>
     <tr>
         <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-            {{ order.author|username_or:"get_full_name" }} одобрил вашу заявку для исполнения заказа - <a href="{{ domain }}{{ order.get_absolute_url }}">{{ order }}</a>
+            {{ order.author|username_or:"get_full_name" }} одобрил вашу заявку для исполнения заказа - <a href="http://{{ request.get_host }}{{ order.get_absolute_url }}">{{ order }}</a>
         </td>
     </tr>
 </table>
-{% endwith %}
 {% endblock main %}

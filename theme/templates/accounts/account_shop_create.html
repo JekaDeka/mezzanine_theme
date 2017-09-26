@@ -1,5 +1,12 @@
 {% extends "base.html" %} 
 {% load i18n mezzanine_tags pages_tags %} 
+{% block meta_title %}
+{% if shop %}
+	{{ shop.shopname }}
+{% else %}
+	Создание магазина
+{% endif %}
+{% endblock %}
 {% block extra_js %} 
 {{ block.super }}
 <script>
@@ -179,7 +186,7 @@ $(document).ready(function() {
 		</label>
 	</div>
 	<div class="container create_shop">
-		<div class="nine columns">
+		<div class="nine columns alpha">
 			<div>
 				{{ form.shopname.label }}: {{ form.shopname }}
 				<div class="error">
@@ -228,13 +235,12 @@ $(document).ready(function() {
 				{{ form.rules }}	
 			</div>
 		</div>
-		<div class="seven columns">
+		<div class="seven columns omega">
 			<h3 class="headline">Доставка</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
 
-			<p>Отметьте возможные варианты доставки ваших товаров.
-Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу.</p>
+			<p>Отметьте возможные варианты доставки ваших товаров. Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу.</p>
 			<div class="express">
 				<div class="express_text">
 					<label class="control control--checkbox">
@@ -351,8 +357,8 @@ $(document).ready(function() {
 				
 			</div>
 		</div>
-
-		<div class="sixteen columns">
+		<div class="clearfix"></div>
+		<div class="sixteen columns alpha">
 			<input type="submit" style="float: right;" value="{% if shop %} Сохранить изменения {% else %} Создать магазин {% endif %}" />
 		</div>
 	</div>

@@ -21,15 +21,14 @@
 <li>{{ order.title|title }}</li>
 {% endblock %}
 
-
 {% block main %}
 {% if order.featured_image %}
 	<div class="six columns">
 		<div class="slider-padding">
-			<div id="product-slider-vertical" class="royalSlider rsDefault">
-				<a href="{{ MEDIA_URL }}{% thumbnail order.featured_image 0 0 %}" class="mfp-image" title="{{ order.title|title }}">
-					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail order.featured_image 400 400 %}"
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail order.featured_image 100 100 %}" alt="{{ order.featured_image.description }}" />
+			<div id="product-slider" class="royalSlider rsDefault">
+				<a href="{{ MEDIA_URL }}{% thumbnail order.featured_image 0 0 True 80 %}" class="mfp-gallery" title="{{ order.title|title }}">
+					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail order.featured_image 410 410 True 80 %}"
+					data-rsTmb="{{ MEDIA_URL }}{% thumbnail order.featured_image 96 96 True 80 %}" alt="{{ order.featured_image.description }}" />
 				</a>
 			 </div>
 			 <div class="clearfix"></div>
@@ -56,7 +55,7 @@
 					<tr>
 						<th><i class="fa fa-user"></i> Заказчик</th>
 						<td>
-							<a href="{% url 'shop_view' order.author|get_shop_slug %}">{{ order.author.get_full_name }}</a>
+							<a href="{% url "profile" order.author %}">{{ order.author.get_full_name }}</a>
 						</td>
 					</tr>
 					<tr>
@@ -149,3 +148,4 @@
 		</div>
 	</div>
 {% endblock %}
+

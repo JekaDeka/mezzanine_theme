@@ -2,6 +2,9 @@
 {% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %}
 
 {% block meta_title %}{{ shop.shopname }}{% endblock %}
+{% block meta_description %}{% metablock %}
+{{ shop.bio|safe }}
+{% endmetablock %}{% endblock %}
 
 {% block breadcrumbs %}
 {% endblock %}

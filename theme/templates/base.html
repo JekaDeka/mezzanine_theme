@@ -43,45 +43,6 @@
 <div id="wrapper">
 
 {% block top_bar %}
-{% if request.user.is_authenticated %}
-<!--<div class="container">
-	<div class="eight columns">
-		<ul class="top-bar-menu">
-			<li>
-				<i class="fa fa-envelope"></i> <a href="mailto:info@handmaker.top">info@handmaker.top</a>
-			</li>
-			<li>
-				<i class="fa fa-pencil-square-o" aria-hidden="true"></i>
-				<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Написать в блог</a>
-			</li>
-			<li>
-				<i class="fa fa-plus-square" aria-hidden="true"></i>
-				<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Создать заказ</a>
-			</li>
-		</ul>
-	</div>
-	<div class="eight columns">
-		<ul class="top-bar-menu" style="float: right;">
-			<li>
-				<i class="fa fa-shopping-cart" aria-hidden="true"></i>
-				<a href="mailto:info@handmaker.top">Страница магазина</a>
-			</li>
-			<li>
-				<i class="fa fa-list" aria-hidden="true"></i>
-				<a href="{% if request.user.is_authenticated %}/admin/blog/blogpost/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Мои товары</a>
-			</li>
-			<li>
-				<i class="fa fa-cog" aria-hidden="true"></i>
-				<a href="{% if request.user.is_authenticated %}/admin/shop/product/add/{% else %}
-				{% url "login" %}?next={% url 'promote_user' %}{% endif %}">Настройки</a>
-			</li>
-		</ul>
-	</div>
-</div>-->
-{% endif %}
 <div id="top-bar">
 	<div class="container">
 		<div class="sixteen columns">
@@ -229,26 +190,14 @@
 		</div>
 		{% endif %}
 	</div>
-	<!-- Container / End -->
-
 </div>
-<!-- Footer / End -->
-
-<!-- Footer Bottom / Start -->
 <div id="footer-bottom">
-
-	<!-- Container -->
 	<div class="container">
-
-		<!--<div class="eight columns"><!~~<a href="{# {% url 'true_index' %} #}">handmaker.top</a>~~></div>-->
-		<div class="sixteen columns" style="text-align: right">© Theme by <a href="http://themeforest.net/user/purethemes/portfolio?ref=purethemes">Purethemes.net</a>. All Rights Reserved.</div>
+		<div class="eight columns">
+			<!--<a href="{# {% url 'true_index' %} #}">handmaker.top</a></div>-->
 		</div>
-
 	</div>
-	<!-- Container / End -->
-
 </div>
-<!-- Footer Bottom / End -->
 {% endblock %}
 <!-- Back To Top Button -->
 <div id="backtotop"><a href="#"></a></div>

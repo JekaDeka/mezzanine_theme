@@ -1,7 +1,6 @@
-{% extends "order/base.txt" %}
+{% extends "order/email_base.html" %}
 {% load static mezzanine_tags accounts_tags %}
 {% block main %}
-{% with domain="handmaker.top" %}
     <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr>
         <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;">
@@ -10,7 +9,7 @@
     </tr>
     <tr>
         <td style="padding: 20px 0 30px 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-            Вы опубликовали на сайте <a href="handmaker.top/">handmaker.top</a> заказ - <a href="{{ domain }}{{ order.get_absolute_url }}">{{ order }}</a>, для которого нашелся исполнитель: <a href="{{ domain }}{% url 'profile_view' %}">{{ performer|username_or:"get_full_name" }}</a>
+            Вы опубликовали на сайте <a href="http://{{ request.get_host }}">handmaker.top</a> заказ - <a href="http://{{ request.get_host }}{{ order.get_absolute_url }}">{{ order }}</a>, для которого нашелся исполнитель: <a href="http://{{ request.get_host }}{% url 'profile_view' %}">{{ performer|username_or:"get_full_name" }}</a>
         </td>
     </tr>
     {% if message %}
@@ -27,9 +26,8 @@
     {% endif %}
     <tr>
         <td style="padding: 25px 0 0 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
-            Вы можете одобрить его заявку в <a href="{{ domain }}{% url 'admin:theme_orderitemrequest_changelist' %}">панели управления</a>
+            Вы можете одобрить его заявку в <a href="http://{{ request.get_host }}{% url 'admin:theme_orderitemrequest_changelist' %}">панели управления</a>
         </td>
     </tr>
 </table>
-{% endwith %}
 {% endblock main %}
