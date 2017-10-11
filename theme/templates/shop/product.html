@@ -109,7 +109,7 @@
 		{% endif %}
 		<div class="widget margin-top-10">
 			<h3 class="headline">Информация о магазине</h3><span class="line"></span><div class="clearfix"></div>
-			<a href="{% url 'shop_view' product.user.shop.slug %}">
+			<a href="{{ product.user.shop.get_absolute_url }}">
 				<img src="{{ MEDIA_URL }}{% thumbnail product.user.shop.image 80 80 %}" class="pull-left margin-right-5">
 				<h2>{{ product.user.shop.shopname }}</h2>
 			</a>
@@ -221,7 +221,7 @@
 					<a href="{{ product.get_absolute_url }}">
 						<section>
 							<h5>{{ product.title|title|truncatechars:34 }}</h5>
-							<a href="{% url 'shop_view' product.user.shop.slug %}" class="shopname">{{ product.user.shop.shopname }}</a>
+							<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
 							<!--<span class="product-category">
 							</span>-->
 							{% if product.on_custom_sale %}

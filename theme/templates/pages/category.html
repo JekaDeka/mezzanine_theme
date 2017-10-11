@@ -170,7 +170,7 @@
 				<a href="{{ product.get_absolute_url }}">
 					<section>
 						<h5>{{ product.title|title|truncatechars:34 }}</h5>
-						<a href="{% url 'shop_view' product.user.shop.slug %}" class="shopname">{{ product.user.shop.shopname }}</a>
+						<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
 						<!--<span class="product-category">
 						</span>-->
 						{% if product.on_custom_sale %}

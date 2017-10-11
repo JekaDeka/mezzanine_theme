@@ -11,7 +11,7 @@
 {% block main %} 
 <!--<div class="eight columns">
 	{% if shop %}
-		<a href="{% url "shop_view" shop.slug %}">Посмотреть магазин на сайте <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
+		<a href="{{ shop.get_absolute_url }}">Посмотреть магазин на сайте <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
 		<a href="{% url "shop_edit" %}">Редактировать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
 	{% else %}
 		<a href="{% url "shop_create" %}">Создать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
@@ -110,7 +110,7 @@
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a href="{% url 'shop_view' shop.slug %}" class="icon-box">
+		<a href="{{ shop.get_absolute_url }}" class="icon-box">
 				<span><i class="fa fa-shopping-bag" aria-hidden="true"></i></span>
 			<h3>Посмотреть магазин на сайте</h3>
 		</a>	

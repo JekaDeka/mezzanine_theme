@@ -120,7 +120,7 @@
                 <ul class="dropdown-menu" role="menu">
                     <li><a href="{% url 'shop_toggle_vacation' %}">Уйти на каникулы</a></li>
                     <li class="divider"></li>
-                    <li><a href="{% url 'shop_view' request.user.shop.slug %}">Посмотреть магазин на сайте</a></li>
+                    <li><a href="{{ request.user.shop.get_absolute_url }}">Посмотреть магазин на сайте</a></li>
                 </ul>
             </div>
             <div class="panel-heading">
