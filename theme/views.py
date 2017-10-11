@@ -198,15 +198,50 @@ def profile_view(request, template_name='admin/index.html',
 
 
 def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_context=None):
-    # lookup = {"slug__iexact": slug}
-    # shop = get_object_or_404(UserShop, slug=slug)
-    # user = get_object_or_404(User, usershop=shop)
-    shop = UserShop.objects.get(slug=slug)
-    user = User.objects.get(usershop=shop)
-    context = {'shop': shop, 'user': user}
+    try:
+        shop = UserShop.objects.get(slug=slug)
+    except Exception as e:
+        return HttpResponseRedirect(reverse('true_index'))
+
+    form = MessageForm
+    if request.method == 'POST':
+        form = MessageForm(data=request.POST)
+        if form.is_valid():
+            message = request.POST.get('message', '')
+            template = get_template('email/message_send.html')
+            context = Context({
+                'request': request,
+                'shop': shop,
+                'message': message,
+            })
+            content = template.render(context)
+
+            email = EmailMessage(
+                "Вашему магазину задали вопрос handmaker.top",
+                content,
+                settings.EMAIL_HOST_USER,
+                [shop.user.email],
+                headers={'Reply-To': request.user.email}
+            )
+            email.content_subtype = 'html'
+            email.send(fail_silently=True)
+            return HttpResponseRedirect(reverse('shop_view', args=[shop.slug]))
+
+    context = {'shop': shop, "form": form}
     if extra_context is not None:
         context.update(extra_context)
     return TemplateResponse(request, template_name, context)
+
+
+@login_required
+def shop_toggle_vacation(request):
+    shop = request.user.shop
+    if shop.on_vacation:
+        shop.on_vacation = False
+    else:
+        shop.on_vacation = True
+    shop.save()
+    return HttpResponseRedirect(reverse('admin:index'))
 
 
 @login_required
@@ -289,8 +324,6 @@ def order_list(request, tag=None, year=None, month=None, username=None,
 
     templates = []
     orders = OrderItem.objects.filter(performer=None)
-    if category is not None:
-        pass
     author = request.user
     order_categories = OrderItemCategory.objects.all()
     if category is not None:
@@ -298,7 +331,7 @@ def order_list(request, tag=None, year=None, month=None, username=None,
         orders = orders.filter(categories=category)
 
     orders = paginate(orders, request.GET.get("page", 1),
-                      settings.BLOG_POST_PER_PAGE,
+                      15,
                       settings.MAX_PAGING_LINKS)
     context = {"orders": orders, "year": year, "month": month,
                "tag": tag, "category": category, "author": author, "order_categories": order_categories}

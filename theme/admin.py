@@ -14,7 +14,7 @@ from cartridge.shop.admin import ProductAdmin, ProductImageAdmin, ProductVariati
 from mezzanine.blog.admin import BlogPostAdmin
 from mezzanine.core.admin import TabularDynamicInlineAdmin
 from mezzanine.pages.admin import PageAdmin
-from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory, OrderItemRequest
+from theme.models import Slider, SliderItem, OrderItem, OrderItemCategory, OrderItemRequest, OrderItemImage
 from theme.forms import SelectForm, OrderItemAdminForm
 
 
@@ -191,9 +191,15 @@ class SliderAdmin(admin.ModelAdmin):
     # )
 
 
+class OrderItemImageInline(admin.TabularInline):
+    model = OrderItemImage
+    extra = 2
+
+
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ('title', 'created', 'price', 'ended', 'get_performer')
     form = OrderItemAdminForm
+    inlines = [OrderItemImageInline, ]
 
     def get_performer(self, obj):
         if obj.performer:
@@ -232,9 +238,10 @@ class OrderItemRequestAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         # qs = super(OrderItemRequestAdmin, self).get_queryset(request)
-        qs = OrderItem.objects.filter(performer=None).filter(
-            author=request.user).distinct()
-        return qs
+        qs = OrderItem.objects.filter(performer=None).distinct()
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(author=request.user)
 
     def order(self, obj):
         return obj.title

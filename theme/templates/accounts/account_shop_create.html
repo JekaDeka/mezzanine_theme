@@ -1,5 +1,5 @@
 {% extends "base.html" %} 
-{% load i18n mezzanine_tags pages_tags %} 
+{% load i18n mezzanine_tags pages_tags staticfiles %} 
 {% block meta_title %}
 {% if shop %}
 	{{ shop.shopname }}
@@ -17,14 +17,12 @@ function error_display(data, field) {
         if (!$(error).text().length) {
             $(error).append(data.error_message);
         }
-        // $(":submit").attr("disabled", true);
     } else {
         field.removeClass('error');
         var error = field.next(".error");
         if ($(error).text().length) {
             $(error).empty();
         }
-        // $(":submit").removeAttr("disabled");
     }
 }
 
@@ -68,28 +66,11 @@ function ajax_sumbit(url, field) {
     });
 }
 
-// function display_image(file, ext, classname, size) {
-// 	if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
-// 		var reader = new FileReader();
-// 		reader.onload = function(e) {
-// 			var img = new Image()
-// 			img.src = reader.result;
-// 			localStorage.theImage = reader.result;
-// 			// $(classname).html(img);
-// 			$(classname).css('background-image', 'url(' + img.src + ')');
-// 		}
-// 		reader.readAsDataURL(file); //attempts to read the file in question.
-// 	}
-// }
 $(document).ready(function() {
-    // var img = new Image();
-    // img.src = localStorage.theImage;
-
     $("body").on("change", "#file-5", function() {
         var fileInput = $(this)[0];
         var file = fileInput.files[0];
         var ext = file.name.split('.').pop().toLowerCase();
-        // display_image(file, ext, '.logo-image');
         if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
             var reader = new FileReader();
             reader.onload = function(e) {
@@ -97,7 +78,6 @@ $(document).ready(function() {
                 img.src = reader.result;
                 localStorage.theImage = reader.result;
                 $('.logo-image').html(img);
-                // $(classname).css('background-image', 'url(' + img.src + ')');
             }
             reader.readAsDataURL(file); //attempts to read the file in question.
         }
@@ -134,13 +114,22 @@ $(document).ready(function() {
         empty_error($(this));
     });
 
+    $(".express > .express_text input").on("change", function() {
+        var div_price = $(this).parent().parent().next(".express_price");
+        var input_price = $(div_price).find('input');
+        var active = $(this).is(':checked');
+        if (active) {
+            $(input_price).attr('readonly', null);
+        } else {
+            $(input_price).attr('readonly', 'readonly');
+            $(input_price).val(null);
+        }
+    });
 });
 </script>
-
-
-
-
-
+<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
 {% endblock %} 
 {% block breadcrumb_element %}
 {% if shop %}	
@@ -206,6 +195,17 @@ $(document).ready(function() {
 				<div class="error">
 					{% if form.country.errors %}
 						{% for error in form.country.errors %}
+							{{ error }} 
+						{% endfor %}
+					{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ form.region.label }}:
+				{{ form.region }}
+				<div class="error">
+					{% if form.region.errors %}
+						{% for error in form.region.errors %}
 							{{ error }} 
 						{% endfor %}
 					{% endif %}
@@ -327,7 +327,7 @@ $(document).ready(function() {
 			<h3 class="headline">Оплата</h3>
 			<span class="line"></span>
 			<div class="clearfix"></div>
-			<p>Выберите, какими способами покупатель сможет оплатить заказ. Если у вас есть счета «Яндекс.Деньги» или PayPal — отметьте эти варианты. Так покупатель сможет выбрать удобный ему метод оплаты.</p>
+			<p>Выберите, какими способами покупатель сможет оплатить заказ.</p>
 			<div>
 				<label class="control control--checkbox">
 				{{ form.payment_personal }}

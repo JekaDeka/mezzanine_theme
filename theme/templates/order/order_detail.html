@@ -22,14 +22,16 @@
 {% endblock %}
 
 {% block main %}
-{% if order.featured_image %}
+{% if order.images.first %}
 	<div class="six columns">
 		<div class="slider-padding">
 			<div id="product-slider" class="royalSlider rsDefault">
-				<a href="{{ MEDIA_URL }}{% thumbnail order.featured_image 0 0 True 80 %}" class="mfp-gallery" title="{{ order.title|title }}">
-					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail order.featured_image 410 410 True 80 %}"
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail order.featured_image 96 96 True 80 %}" alt="{{ order.featured_image.description }}" />
+				{% for image in order.images.all %}
+				<a href="{{ MEDIA_URL }}{% thumbnail image 0 0 True 80 %}" class="mfp-gallery" title="{{ order.title|title }}">
+					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image 410 410 True 80 %}"
+					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image 96 96 True 80 %}" alt="{{ image.description }}" />
 				</a>
+				{% endfor %}
 			 </div>
 			 <div class="clearfix"></div>
 		</div>
@@ -56,6 +58,12 @@
 						<th><i class="fa fa-user"></i> Заказчик</th>
 						<td>
 							<a href="{% url "profile" order.author %}">{{ order.author.get_full_name }}</a>
+						</td>
+					</tr>
+					<tr>
+						<th><i class="fa fa-map-marker" aria-hidden="true"></i> Регион</th>
+						<td>
+							{% if order.lock_in_region %} {{ order.author.shop.region }} {% else %} Любой {% endif %}
 						</td>
 					</tr>
 					<tr>
@@ -128,11 +136,13 @@
 					</tr>
 					{% endif %}
 					
+					{% if order.description %}
 					<tr>
 						<td colspan="2">
 							{{order.description|safe }}
 						</td>
 					</tr>
+					{% endif %}
 				</table>
 				<a class="popup-with-zoom-anim button color" href="#small-dialog">Откликнуться</a>
 				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
@@ -140,7 +150,7 @@
 				    <form action="" method="POST">
 				    {% csrf_token %}
 				    {{ form.as_p }}
-				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить заявку</button>
+				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить сообщение</button>
 				  </form>
 				</div>
 				<div class="clearfix"></div>

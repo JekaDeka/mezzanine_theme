@@ -429,6 +429,7 @@ ul.top-bar-menu li:hover i {
     width: 200px
 }
 
+.text-center,
 .order-info {
     text-align: center
 }
@@ -709,6 +710,10 @@ textarea,
 .create_shop input[type="text"] {
     resize: none;
     width: 100%;
+}
+.create_shop select {
+    padding: 10px 12px;
+    width: 100%; 
 }
 
 input[type="number"] {

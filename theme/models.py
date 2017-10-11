@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from django.db.models.signals import m2m_changed, post_save
 from django.contrib.auth.models import User, Group
 from mezzanine.core.fields import FileField, RichTextField
+from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
 from mezzanine.core.models import Displayable, Ownable, RichText, Slugged, SitePermission
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.models import upload_to
@@ -13,6 +14,11 @@ from cartridge.shop.models import Priced, Product
 from django.utils.timezone import now
 from django.core.urlresolvers import reverse
 from slugify import slugify, Slugify, UniqueSlugify
+from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
+
+# from django_countries.fields import CountryField
+
+
 from datetime import date
 
 
@@ -56,6 +62,44 @@ def ensure_profile_exists(sender, **kwargs):
 #             instance.save()
 
 
+class Country(models.Model):
+
+    class Meta:
+        ordering = ("name",)
+
+    name = models.CharField(max_length=255, verbose_name=("Страна"))
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.name)
+
+
+class Region(models.Model):
+
+    class Meta:
+        ordering = ("name",)
+
+    name = models.CharField(
+        max_length=255, verbose_name=("Регион"))
+    country = models.ForeignKey(Country)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.name)
+
+
+class City(models.Model):
+
+    class Meta:
+        ordering = ("name",)
+
+    name = models.CharField(
+        max_length=255, verbose_name=("Регион"))
+    country = models.ForeignKey(Country)
+    region = models.ForeignKey(Region)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return str(self.name)
+
+
 class UserProfile(models.Model):
     """docstring for UserPro"""
     user = models.OneToOneField("auth.User")
@@ -75,7 +119,7 @@ class UserProfile(models.Model):
 
 class UserShop(models.Model):
     """docstring for UserShop"""
-    user = models.OneToOneField("auth.User")
+    user = models.OneToOneField("auth.User", related_name="shop")
     image = models.ImageField(
         upload_to="tmp_images/", verbose_name=_("Логотип магазина"), blank=False, default="")
 
@@ -86,15 +130,32 @@ class UserShop(models.Model):
                                 verbose_name=("Название магазина"))
     slug = models.URLField(editable=False, default='')
     bio = RichTextField(default="", verbose_name=("Описание"),
-                        help_text="Расскажите миру о Вашем творчестве, опишите свой продукт. Ваш бренд и то, что вы создаете своим трудом, являются единственными в своем роде - скажите, почему! Расскажите о себе, чем вы были воодушевлены, когда начали заниматься своим делом, что повлияло на ваш выбор, как развивается ваше творчество сейчас. Какие техники, материалы вы используете для своих изделий, каких принципов придерживаетесь при создании своего бренда. Ваш рассказ должен быть интересным, лаконичным, информативным и убедительным. Можете упомянуть любимую цитату или вдохновляющую идею. Не стоит злоупотреблять смайликами и прочими символами.")
+                        help_text="Расскажите миру о Вашем творчестве, опишите свой продукт. \
+                        Ваш бренд и то, что вы создаете своим трудом, являются единственными в своем роде - скажите, почему! \
+                        Расскажите о себе, чем вы были воодушевлены, когда начали заниматься своим делом, что повлияло на ваш выбор, как развивается ваше творчество сейчас. \
+                        Какие техники, материалы вы используете для своих изделий, каких принципов придерживаетесь при создании своего бренда. \
+                        Ваш рассказ должен быть интересным, лаконичным, информативным и убедительным. Можете упомянуть любимую цитату или вдохновляющую идею. \
+                        Не стоит злоупотреблять смайликами и прочими символами.")
 
     phone = models.CharField(max_length=255, blank=True,
                              verbose_name=("Телефон"))
 
-    country = models.CharField(max_length=255, blank=False,
-                               verbose_name=("Страна"), default="")
-    city = models.CharField(max_length=255, blank=False,
-                            verbose_name=("Город"), default="")
+    country = models.ForeignKey(Country, verbose_name=("Страна"))
+    region = ChainedForeignKey(
+        Region,
+        chained_field="country",
+        chained_model_field="country",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Регион"))
+    # city = models.CharField(City)
+    city = ChainedForeignKey(
+        City,
+        chained_field="region",
+        chained_model_field="region",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Город"))
 
     express_point = models.BooleanField(
         default=False, verbose_name=("Получение в вашем пункте выдачи"))
@@ -141,26 +202,32 @@ class UserShop(models.Model):
     rules = RichTextField(default="",
                           verbose_name=(
                               "Дополнительная информация об оплате"),
-                          help_text="Обозначьте условия возврата товаров. В течение какого времени после получения товара покупатель может обратиться? Если вы не принимаете возвраты или обмены, чётко укажите на это, чтобы избежать споров в случае желания покупателя отказаться от покупки.")
+                          help_text="Обозначьте условия возврата товаров. В течение какого времени после получения товара покупатель может обратиться? \
+                          Если вы не принимаете возвраты или обмены, чётко укажите на это, чтобы избежать споров в случае желания покупателя отказаться от покупки.")
 
-    def get_express_fields(self):
-        fields = []
-        for f in self._meta.fields:
-            fname = f.name
-            try:
-                value = getattr(self, fname)
-            except AttributeError:
-                value = None
+    on_vacation = models.BooleanField(
+        default=False, verbose_name=("На каникулах"), editable=False)
 
-            if fname.startswith('express') and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
-                fields.append(
-                    {
-                        'label': f.verbose_name,
-                        'name': f.name,
-                        'value': value,
-                    }
-                )
-        return fields
+    comments = CommentsField()
+
+    # def get_fields(self, starts_with):
+    #     fields = []
+    #     for f in self._meta.fields:
+    #         fname = f.name
+    #         try:
+    #             value = getattr(self, fname)
+    #         except AttributeError:
+    #             value = None
+
+    #         if fname.startswith(starts_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
+    #             fields.append(
+    #                 {
+    #                     'label': f.verbose_name,
+    #                     'name': f.name,
+    #                     'value': value,
+    #                 }
+    #             )
+    #     return fields
 
     def save(self, request=False, *args, **kwargs):
         self.slug = slugify(self.shopname, to_lower=True)
@@ -174,6 +241,11 @@ class UserShop(models.Model):
 
     def get_active_orders(self):
         return 0
+
+    def get_absolute_url(self):
+        url_name = "shop_view"
+        kwargs = {"slug": self.slug}
+        return reverse(url_name, kwargs=kwargs)
 
 
 class Slider(models.Model):
@@ -222,7 +294,7 @@ class OrderItem(models.Model):
     ended = models.DateField(
         _("Крайний срок"), null=True, editable=True, blank=True, help_text="Оставьте пустым, если срок неограничен.")
     price = models.DecimalField(
-        _("Бюджет"), max_digits=8, decimal_places=2, default=0, blank=True,
+        _("Бюджет"), max_digits=8, decimal_places=2, default=0, blank=True, null=True,
         help_text="Если Вы не представляете, сколько подобная работа могла бы стоить, оставьте поле незаполненным.")
     count = models.DecimalField(
         _("Количество"), max_digits=8, decimal_places=0, default=1)
@@ -235,6 +307,8 @@ class OrderItem(models.Model):
     material_suggest = models.CharField(
         _("Пожелания к материалам"), max_length=500, blank=True, default="",
         help_text="Пример: шерсть")
+    lock_in_region = models.BooleanField(
+        default=False, verbose_name=("Только мой регион"), help_text="Мастера из других регионов не получат уведомление о Вашем заказе")
     description = RichTextField(
         default="", verbose_name=("Подробное описание"),
         help_text="Как можно более подробно опишите желаемое изделие.")
@@ -243,11 +317,8 @@ class OrderItem(models.Model):
                                    verbose_name=_("Виды работ"),
                                    blank=False, null=False, related_name="orderitems")
 
-    featured_image = FileField(verbose_name=_("Изображение"),
-                               upload_to=upload_to(
-                                   "theme.OrderItem.image", "orders"),
-                               format="Image", max_length=255, null=True, blank=True,
-                               help_text="Загрузите фотографии эскизов или примеров, которые помогут мастерам точнее понять Ваш заказ.")
+    # featured_image = models.ForeignKey(
+    #     "OrderItemImage", related_name="orderimages")
     author = models.ForeignKey(
         "auth.User", on_delete=models.CASCADE, default=None, editable=False, null=True, related_name="author")
 
@@ -265,6 +336,30 @@ class OrderItem(models.Model):
     @property
     def lifespan(self):
         return '%s - present' % self.ended.strftime('%m/%d/%Y')
+
+
+class OrderItemImage(models.Model):
+    file = FileField(verbose_name=_("Изображение"),
+                     upload_to=upload_to(
+        "theme.OrderItem.image", "orders"),
+        format="Image", max_length=255, null=True, blank=True,
+        help_text="Загрузите фотографии эскизов или примеров, которые помогут мастерам точнее понять Ваш заказ.")
+    description = models.CharField(
+        _("Описание"), blank=True, max_length=100)
+
+    orderitem = models.ForeignKey(OrderItem, related_name='images')
+
+    class Meta:
+        verbose_name = _("Изображение")
+        verbose_name_plural = _("Изображения")
+
+    def __str__(self):
+        value = self.description
+        if not value:
+            value = self.file.name
+        if not value:
+            value = ""
+        return value
 
 
 class OrderItemRequest(models.Model):

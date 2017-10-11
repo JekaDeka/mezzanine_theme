@@ -1,0 +1,4 @@
+{% load i18n mezzanine_tags accounts_tags theme_tags comment_tags %}
+<h3 class="headline">Отзывы <span class="comments-amount">({{ shop.comments_count }})</span></h3><span class="line"></span><div class="clearfix"></div>
+    
+{% comments_for shop %}

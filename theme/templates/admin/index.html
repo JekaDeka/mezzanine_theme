@@ -10,7 +10,6 @@
 </div>
 {% endblock %}
 {% block content %}
-{% get_shop request.user as shop %}
 {% get_user_blog_posts request.user as posts %}
 <div class="container-fluid">
     <div class="row">
@@ -22,12 +21,12 @@
                 </div>
             </div>
         </div>
-        {% if shop %}
+        {% if request.user.shop %}
         <div class="col-sm-4 col-xs-6">
             <div class="info-tile info-tile-alt tile-indigo">
                 <div class="info">
                     <div class="tile-heading"><span>Товаров</span></div>
-                    <div class="tile-body"><span>{{ shop.get_products_count }}</span></div>
+                    <div class="tile-body"><span>{{ request.user.shop.get_products_count }}</span></div>
                 </div>
             </div>
         </div>
@@ -35,7 +34,7 @@
             <div class="info-tile info-tile-alt tile-danger">
                 <div class="info">
                     <div class="tile-heading"><span>Продаж</span></div>
-                    <div class="tile-body "><span>{{ shop.get_active_orders }}</span></div>
+                    <div class="tile-body "><span>{{ request.user.shop.get_active_orders }}</span></div>
                 </div>
             </div>
         </div>
@@ -111,7 +110,7 @@
             </div>
         </div>
     </div>
-    {% if shop %}
+    {% if request.user.shop %}
         <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
         <div class="panel panel-white">
             <div class="panel-controls dropdown">
@@ -119,21 +118,23 @@
                     <div class="ripple-container"></div>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="{{ model.admin_url }}">Уйти на каникулы</a></li>
+                    <li><a href="{% url 'shop_toggle_vacation' %}">Уйти на каникулы</a></li>
                     <li class="divider"></li>
-                    <li><a href="{% url 'shop_view' shop.slug %}">Посмотреть магазин на сайте</a></li>
+                    <li><a href="{% url 'shop_view' request.user.shop.slug %}">Посмотреть магазин на сайте</a></li>
                 </ul>
             </div>
             <div class="panel-heading">
                 <h2>Мой магазин</h2>
             </div>
             <div class="panel-image">
-                <img src="{{MEDIA_URL}}{% thumbnail shop.background 1300 150 %}" alt="Обложка">
+                <img src="{{MEDIA_URL}}{% thumbnail request.user.shop.background 1300 150 %}" alt="Обложка">
             </div>
             <div class="panel-body">
-                <h3>{{shop.shopname}}</h3>
-                <p class="text-danger">Магазин в данное время закрыт и не примиает заказы</p>
-                <p>{{ shop.country }}, {{ shop.city }}</p>
+                <h3>{{request.user.shop.shopname}}</h3>
+                {% if request.user.shop.on_vacation %}
+                    <p class="text-danger">Магазин в данное время на каникулах и не примиает заказы</p>
+                {% endif %}
+                <p>{{ request.user.shop.country }}, {{ request.user.shop.city }}</p>
                 <ul class="demo-btns">
                 <li>
                     <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shop_product_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>
@@ -149,10 +150,10 @@
                 </li>
             </ul>
                 <div class="pull-left">
-                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего товаров</small>{{ shop.get_products_count }}</h4>
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего товаров</small>{{ request.user.shop.get_products_count }}</h4>
                 </div>
                 <div class="pull-right text-right">
-                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Активных заказов</small>{{ shop.get_active_orders }}</h4>
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Активных заказов</small>{{ request.user.shop.get_active_orders }}</h4>
                 </div>
             </div>
         </div>

@@ -93,32 +93,32 @@
             soloArrowRightHOffset: 0,
             soloArrowRightVOffset: 0
         });
-        $('#new-arrivals').showbizpro({
-            dragAndScroll: "off",
-            visibleElementsArray: [4, 4, 3, 1],
-            carousel: "off",
-            entrySizeOffset: 0,
-            allEntryAtOnce: "off",
-            rewindFromEnd: "off",
-            autoPlay: "off",
-            delay: 2000,
-            speed: 400,
-            easing: 'Back.easeOut'
-        });
-        $('#happy-clients').showbizpro({
-            dragAndScroll: "off",
-            visibleElementsArray: [1, 1, 1, 1],
-            carousel: "off",
-            entrySizeOffset: 0,
-            allEntryAtOnce: "off"
-        });
-        $('#our-clients').showbizpro({
-            dragAndScroll: "off",
-            visibleElementsArray: [5, 4, 3, 1],
-            carousel: "off",
-            entrySizeOffset: 0,
-            allEntryAtOnce: "off"
-        });
+        // $('#new-arrivals').showbizpro({
+        //     dragAndScroll: "off",
+        //     visibleElementsArray: [4, 4, 3, 1],
+        //     carousel: "off",
+        //     entrySizeOffset: 0,
+        //     allEntryAtOnce: "off",
+        //     rewindFromEnd: "off",
+        //     autoPlay: "off",
+        //     delay: 2000,
+        //     speed: 400,
+        //     easing: 'Back.easeOut'
+        // });
+        // $('#happy-clients').showbizpro({
+        //     dragAndScroll: "off",
+        //     visibleElementsArray: [1, 1, 1, 1],
+        //     carousel: "off",
+        //     entrySizeOffset: 0,
+        //     allEntryAtOnce: "off"
+        // });
+        // $('#our-clients').showbizpro({
+        //     dragAndScroll: "off",
+        //     visibleElementsArray: [5, 4, 3, 1],
+        //     carousel: "off",
+        //     entrySizeOffset: 0,
+        //     allEntryAtOnce: "off"
+        // });
         $(".parallax-banner").pureparallax({
             overlayBackgroundColor: '#000',
             overlayOpacity: '0.45',
@@ -243,47 +243,47 @@
                 nav.show();
             }
         }
-        $('#product-slider-vertical').royalSlider({
-            autoScaleSlider: true,
-            autoScaleSliderWidth: 560,
-            autoHeight: true,
-            loop: false,
-            slidesSpacing: 0,
-            imageScaleMode: 'none',
-            imageAlignCenter: false,
-            navigateByClick: false,
-            numImagesToPreload: 2,
-            arrowsNav: true,
-            arrowsNavAutoHide: false,
-            arrowsNavHideOnTouch: true,
-            keyboardNavEnabled: true,
-            fadeinLoadedSlide: true,
-            controlNavigation: 'thumbnails',
-            thumbs: {
-                orientation: 'vertical',
-                firstMargin: false,
-                appendSpan: true,
-                autoCenter: false,
-                spacing: 10,
-                paddingTop: 10,
-            }
-        });
-        $('#basic-slider').royalSlider({
-            autoScaleSlider: true,
-            autoScaleSliderHeight: "auto",
-            autoHeight: true,
-            loop: false,
-            slidesSpacing: 0,
-            imageScaleMode: 'none',
-            imageAlignCenter: false,
-            navigateByClick: false,
-            numImagesToPreload: 2,
-            arrowsNav: true,
-            arrowsNavAutoHide: false,
-            arrowsNavHideOnTouch: true,
-            keyboardNavEnabled: true,
-            fadeinLoadedSlide: true,
-        });
+        // $('#product-slider-vertical').royalSlider({
+        //     autoScaleSlider: true,
+        //     autoScaleSliderWidth: 560,
+        //     autoHeight: true,
+        //     loop: false,
+        //     slidesSpacing: 0,
+        //     imageScaleMode: 'none',
+        //     imageAlignCenter: false,
+        //     navigateByClick: false,
+        //     numImagesToPreload: 2,
+        //     arrowsNav: true,
+        //     arrowsNavAutoHide: false,
+        //     arrowsNavHideOnTouch: true,
+        //     keyboardNavEnabled: true,
+        //     fadeinLoadedSlide: true,
+        //     controlNavigation: 'thumbnails',
+        //     thumbs: {
+        //         orientation: 'vertical',
+        //         firstMargin: false,
+        //         appendSpan: true,
+        //         autoCenter: false,
+        //         spacing: 10,
+        //         paddingTop: 10,
+        //     }
+        // });
+        // $('#basic-slider').royalSlider({
+        //     autoScaleSlider: true,
+        //     autoScaleSliderHeight: "auto",
+        //     autoHeight: true,
+        //     loop: false,
+        //     slidesSpacing: 0,
+        //     imageScaleMode: 'none',
+        //     imageAlignCenter: false,
+        //     navigateByClick: false,
+        //     numImagesToPreload: 2,
+        //     arrowsNav: true,
+        //     arrowsNavAutoHide: false,
+        //     arrowsNavHideOnTouch: true,
+        //     keyboardNavEnabled: true,
+        //     fadeinLoadedSlide: true,
+        // });
         var thisrowfield;
         $('.qtyplus').click(function(e) {
             e.preventDefault();

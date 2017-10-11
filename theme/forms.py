@@ -29,7 +29,8 @@ from cartridge.shop.models import Cart, CartItem, Order, DiscountCode, Category
 from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
-from theme.models import UserShop, UserProfile, OrderItem
+from theme.models import UserShop, UserProfile, OrderItem, Region, City
+# from django_countries.widgets import CountrySelectWidget
 
 
 setattr(Field, 'is_checkbox', lambda self: isinstance(
@@ -79,7 +80,7 @@ class ShopForm(forms.ModelForm):
     class Meta:
         model = UserShop
         fields = ("background", "image", "shopname", "phone",
-                  "country", "city", "bio", "rules",
+                  "country", "region", "city", "bio", "rules",
                   "express_point", "express_point_price",
                   "express_city", "express_city_price",
                   "express_country", "express_country_price",
@@ -89,17 +90,15 @@ class ShopForm(forms.ModelForm):
                   "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other")
         widgets = {
             'shopname': forms.TextInput(attrs={'class': 'form-control'}),
-            'country': forms.TextInput(attrs={'class': 'form-control'}),
-            'city': forms.TextInput(attrs={'class': 'form-control'}),
             'background': forms.FileInput(attrs={'id': 'file-1', 'class': 'inputfile inputfile-1'}),
             'image': forms.FileInput(attrs={'id': 'file-5', 'class': 'inputfile inputfile-4'}),
             'phone': forms.TextInput(attrs={'class': 'mask', 'placeholder': '+7 (999) 999-9999'}),
-            'express_point_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-            'express_city_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-            'express_country_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-            'express_world_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-            'express_mail_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-            'express_personal_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
+            'express_point_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
+            'express_city_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
+            'express_country_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
+            'express_world_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
+            'express_mail_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
+            'express_personal_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
             'express_other': forms.Textarea(attrs={'placeholder': 'Дополнительная информация о доставке', 'rows': '5'}),
             'payment_other': forms.Textarea(attrs={'placeholder': 'Дополнительная информация об оплате', 'rows': '5'}),
             'bio': forms.Textarea(attrs={'placeholder': 'Описание магазина'}),

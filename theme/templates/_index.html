@@ -7,27 +7,26 @@
 {% endblock %}
 
 {% block first_time_user %}
-{% if request.user.is_authenticated %}
 	<div class="container fullwidth-element userpanel">
     <div class="two-third columns alpha omega margin-bottom-10">
-    {% if shop %}
+    {% if request.user.shop %}
     	<figure>
-            <img src="{% static 'images/edit_shop.jpg'|resize:"860x400,C" %}">
+            <img src="{% static 'images/edit_shop.jpg'|resize:"820x400,C" %}">
             <figcaption>
                 <h3>Управление магазином</h3>
                 <ul>
                     <li>
-                        <a class="button color">Добавить новый товар</a>
+                        <a href="{% url 'admin:shop_product_add' %}" class="button color">Добавить новый товар</a>
                     </li>
                     <li>
-                        <a href="{% url 'shop_edit' %}"class="button color">Настройки</a>
+                        <a href="{% url 'shop_edit' %}" class="button color">Настройки</a>
                     </li>
                 </ul>
             </figcaption>
         </figure>
-    {% else %}
+	{% else %}
    		<figure>
-            <img src="{% static 'images/open_shop.jpg'|resize:"860x400,C" %}">
+            <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}">
             <a href="{% url 'shop_create' %}">
 			    <figcaption>
 			        <time>Начните продавать уже сейчас</time>
@@ -35,14 +34,13 @@
 			    </figcaption>
 			</a>
         </figure>
-
     {% endif %}
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
             <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}">
             <figcaption>
-            <a href="">
+            <a href="{% url 'admin:theme_orderitem_add' %}">
                 <span>Хочешь индивидуальности?</span>
                 <h3>Сделай личный заказ у мастера</h3>
             </figcaption>
@@ -52,7 +50,7 @@
     <div class="one-third columns omega margin-bottom-10">
         <figure>
             <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}">
-            <a href="">
+            <a href="{% url 'admin:blog_blogpost_add' %}">
             <figcaption>
                 <span>Открой в себе автора</span>
                 <h3>Сделай запись в Блог</h3>
@@ -61,8 +59,6 @@
         </figure>
     </div>
 </div>
-{% endif %}
-
 {% endblock first_time_user %}
 
 {% block slider %}
@@ -95,13 +91,46 @@
 
 
 
-{% block extra_content__ %}
+{% block extra_content %}
 <div class="container">
     <div class="twelve columns">
     	<div class="widget">
         <h3 class="headline">Лучшие магазины</h3><span class="line"></span><div class="clearfix"></div>
     	{% for shop in user_shops %}
-    		<p>go</p>
+    		<div class="six columns alpha margin-bottom-20">
+    		<div class="shop-stacked-images">
+    			{% with request.user.product_set.all|slice:"4" as product %}
+    			<div class="main pull-left">
+    				<a href="{{ product.0.get_absolute_url }}">
+    					<img src="{{ MEDIA_URL }}{% thumbnail product.0.image 300 160 %}" alt="{{ product.0.title }}"/>
+    				</a>
+    			</div>
+    			<div class="small pull-left">
+    				<a href="{{ product.1.get_absolute_url }}">
+    					<img src="{{ MEDIA_URL }}{% thumbnail product.1.image 120 50 %}" alt="{{ product.1.title }}"/>
+    				</a>
+    			</div>
+    			<div class="small pull-left">
+    				<a href="{{ product.2.get_absolute_url }}">
+    					<img src="{{ MEDIA_URL }}{% thumbnail product.2.image 120 50 %}" alt="{{ product.2.title }}"/>
+    				</a>
+    			</div>
+    			<div class="small pull-left">
+    				<a href="{{ product.3.get_absolute_url }}">
+    					<img src="{{ MEDIA_URL }}{% thumbnail product.3.image 120 50 %}" alt="{{ product.3.title }}"/>
+    				</a>
+    			</div>
+    			{% endwith %}
+    		</div>
+    		<div class="clearfix"></div>
+    		<div class="shop-info">
+    			<a href="{% url 'shop_view' request.user.shop.slug %}">
+	    			<img src="{{ MEDIA_URL }}{% thumbnail request.user.shop.image 100 100 %}" alt="{{request.user.shop.shopname}}" class="shop-image pull-left" />
+	    		</a>
+	    		<a href="{% url 'shop_view' request.user.shop.slug %}"><h2>{{request.user.shop.shopname}}</h2></a>
+	    			<span>{{request.user.shop.country}}, {{request.user.shop.city}} </span>
+    		</div>
+    		</div>
     	{% endfor %}
     	</div>
 
@@ -166,15 +195,14 @@
 
 
 <div class="container">
-    <div class="sixteen columns">
         <div class="widget">
             <h2 class="headline">Лучшие новые товары</h2>
             <span class="line"></span>
             <div class="clearfix"></div>
         </div>
-        <div class="twelve columns products">
+        <div class="sixteen columns products">
             {% for product in featured_products %}
-			<div class="four shop columns custom_column">
+			<div class="three shop columns custom_column">
 				<figure class="product">
 					<div class="badges">
 					{% if product.pre_order %}
@@ -205,7 +233,7 @@
 					<a href="{{ product.get_absolute_url }}">
 						<section>
 							<h5>{{ product.title|title|truncatechars:34 }}</h5>
-							<a href="{% url 'shop_view' product.user|get_shop_slug %}" class="shopname">{{ product.user|get_shop_name }}</a>
+							<a href="{% url 'shop_view' product.user.shop.slug %}" class="shopname">{{ product.user.shop.shopname }}</a>
 							<!--<span class="product-category">
 							</span>-->
 							{% if product.on_custom_sale %}
@@ -220,6 +248,5 @@
 			{% endfor %}
 		<div class="clearfix"></div>
         </div>
-    </div>
 </div>
 {% endblock %}

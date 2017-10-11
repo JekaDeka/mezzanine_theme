@@ -7,9 +7,12 @@ from imagefit import urls
 urlpatterns = [
     url(r"^ordertable/(?P<pk>[0-9]+)/$",
         views.order_detail, name="order_detail"),
+    url("^ordertable/(?P<category>\w+)/$",
+        views.order_list, name='order_list_category'),
+
+
     url(r'^ordertable/add/(?P<order_pk>[0-9]+)/$',
         views.order_request_add, name="order_request_add"),
-
     url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/assign/$',
         views.order_request_assign, name="order_request_assign"),
     url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/delete/$',
@@ -24,6 +27,9 @@ urlpatterns = [
     url(r'^edit/$',
         views.shop_create, name="shop_edit"),
 
+    url(r'^vacation/$',
+        views.shop_toggle_vacation, name="shop_toggle_vacation"),
+
     url(r'^ajax/validate_shopname/$',
         views.validate_shopname, name='validate_shopname'),
     url(r'^ajax/get_categories/$',
@@ -37,5 +43,5 @@ urlpatterns = [
         views.profile_settings, name="profile_settings"),
     url(r'^$', views.true_index, name="true_index"),
     url(r'^imagefit/', include('imagefit.urls')),
-
+    url(r'^chaining/', include('smart_selects.urls')),
 ]

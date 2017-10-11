@@ -125,21 +125,23 @@
 
 {% block main_containter %}
 	<div class="container">
-		{% block sidebar %}
+		{% block leftsidebar %}
 		{% endblock %}
 
 		{% block main %}
 		{% endblock %}
-	</div>
-	<div class="container">
-		{% block product_info %}
-		{% endblock %}
-	</div>
-	<div class="container">
-		{% block related_products %}
-		{% endblock %}
-	</div>
 
+		{% block rightsidebar %}
+		{% endblock %}
+	</div>
+	<!--<div class="container">-->
+		{# {% block product_info %} #}
+		{# {% endblock %} #}
+	<!--</div>-->
+	<!--<div class="container">-->
+		{# {% block related_products %} #}
+		{# {% endblock %} #}
+	<!--</div>-->
 {% endblock %}
 
 {% block extra_content %}

@@ -810,45 +810,66 @@ def not_none(value):
     return value
 
 
+@register.assignment_tag
+def get_fields(shop, starts_with):
+    fields = []
+    for f in shop._meta.fields:
+        fname = f.name
+        try:
+            value = getattr(shop, fname)
+        except AttributeError:
+            value = None
+
+        if fname.startswith(starts_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
+            fields.append(
+                {
+                    'label': f.verbose_name,
+                    'name': f.name,
+                    'value': value,
+                }
+            )
+    return fields
+
+
 @register.filter
 def grouped(l):
     for i in range(0, len(l), 2):
         yield l[i:i + 2]
 
 
-@register.filter
-def get_shop_slug(user):
-    if not user:
-        return "/"
-    shop = get_object_or_404(UserShop, user=user)
-    return shop.slug
+# @register.filter
+# def get_shop_slug(user):
+#     if not user:
+#         return "/"
+#     shop = get_object_or_404(UserShop, user=user)
+#     return shop.slug
 
 
-@register.filter
-def get_shop_name(user):
-    if not user:
-        return "/"
-    shop = get_object_or_404(UserShop, user=user)
-    return shop.shopname
+# @register.filter
+# def get_shop_name(user):
+#     if not user:
+#         return "/"
+#     shop = get_object_or_404(UserShop, user=user)
+#     return shop.shopname
 
 
-@register.assignment_tag
-def get_shop(user):
-    try:
-        shop = UserShop.objects.get(user=user)
-    except Exception as e:
-        return None
-    return shop
+# @register.assignment_tag
+# def get_shop(user):
+#     try:
+#         shop = UserShop.objects.get(user=user)
+#     except Exception as e:
+#         return None
+#     return shop
 
 
-@register.assignment_tag
-def get_shop_products(user):
-    try:
-        # products = get_list_or_404(Product, user=user)
-        products = Product.objects.filter(user=user)
-    except Exception as e:
-        return None
-    return products
+# @register.assignment_tag
+# def get_shop_products(user):
+#     try:
+#         # products = get_list_or_404(Product, user=user)
+#         products = Product.objects.filter(user=user)
+#     except Exception as e:
+#         return None
+#     return products
 
 
 @register.assignment_tag
@@ -856,8 +877,7 @@ def get_user_blog_posts(user):
     try:
         posts = BlogPost.objects.filter(user=user)
     except Exception as e:
-        return Npne
-    # posts = get_list_or_404(BlogPost, user=user)
+        return None
     return posts
 
 
@@ -882,6 +902,7 @@ def get_device_width(context):
 
 @register.assignment_tag
 def get_product_images(product):
+    # reducing image count to 2 because of slider which contain only two
     return ProductImage.objects.filter(product=product)[:2]
 
 

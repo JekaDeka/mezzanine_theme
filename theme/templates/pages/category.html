@@ -83,7 +83,7 @@
 {{ block.super }}
 {% endblock %}
 
-{% block sidebar %}
+{% block leftsidebar %}
 <div class="four columns">
 	<div class="widget margin-top-0">
 		<h3 class="headline"> {% trans "Categories" %} </h3>
@@ -170,7 +170,7 @@
 				<a href="{{ product.get_absolute_url }}">
 					<section>
 						<h5>{{ product.title|title|truncatechars:34 }}</h5>
-						<a href="{% url 'shop_view' product.user|get_shop_slug %}" class="shopname">{{ product.user|get_shop_name }}</a>
+						<a href="{% url 'shop_view' product.user.shop.slug %}" class="shopname">{{ product.user.shop.shopname }}</a>
 						<!--<span class="product-category">
 						</span>-->
 						{% if product.on_custom_sale %}

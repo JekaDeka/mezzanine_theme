@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n mezzanine_tags blog_tags pages_tags keyword_tags disqus_tags theme_tags %}
 
-{% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
+{% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}Стол заказов{% endif %}{% endblock %}
 
 {% block meta_keywords %}{% metablock %}
 {% keywords_for page as keywords %}
@@ -14,9 +14,14 @@
 {% block meta_description %}{% metablock %}
 {{ page.description }}
 {% endmetablock %}{% endblock %}
-
+{% block breadcrumbs_title %}
+	<h2>Стол заказов</h2>
+{% endblock breadcrumbs_title %}
 
 {% block breadcrumb_element %}
+{% if category %}
+	<li><a href="{% url 'order_list' %}">Стол заказов</a></li>
+{% endif %}
 {% for category in order_categories %}
 	{% url 'order_list_category' category.slug as the_url %}
 	{% if the_url in request.get_full_path %}
@@ -43,14 +48,24 @@
 		</div>
 		{% endif %}	
 	{% endblock %}
+	<div class="widget margin-top-10">
+			<h3 class="headline">Регион</h3><span class="line"></span><div class="clearfix"></div>
+			<nav class="categories">
+				<ul>
+					<li>Любой</li>
+					<li>Только мой</li>
+				</ul>
+			</nav>
+		</div>
+
 </div>
 <div class="twelve columns">
 	{% for order in orders.object_list %}
 	<div class="order-container margin-bottom-15">
 		<div class="three alpha columns margin-top-10">
-			{% if order.featured_image %}
+			{% if order.images.first %}
 		    	<a href="{{ order.get_absolute_url }}">
-					<img  src="{{ MEDIA_URL }}{% thumbnail order.featured_image 300 300 %}" alt="no-image" style="margin: auto;" />
+					<img  src="{{ MEDIA_URL }}{% thumbnail order.images.first 300 300 %}" alt="no-image" style="margin: auto;" />
 				</a>
 			{% else %}
 				<a href="{{ order.get_absolute_url }}">
@@ -66,6 +81,8 @@
 		        <span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
 		        <br>
 		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price|rub_currency }}</span>
+		        <br>
+		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author.shop.region }} {% else %} Любой {% endif %}</span>
 		    </div>
 		    <p>{{ order.description|safe|truncatewords:80 }}</p>
 		        <a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>
@@ -74,11 +91,7 @@
 	<div class="clearfix"></div>
 	<div class="margin-top-15"><span class="line"></span><div class="clearfix"></div></div>
 	{% endfor %}
-	
+	{% pagination_for orders %}
 </div>
-</div>
-<div class="container">
-{% pagination_for orders %}
 {% endblock %}
-</div>
 
