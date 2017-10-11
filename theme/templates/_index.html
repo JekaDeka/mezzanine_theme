@@ -96,7 +96,8 @@
     <div class="twelve columns">
     	<div class="widget">
         <h3 class="headline">Лучшие магазины</h3><span class="line"></span><div class="clearfix"></div>
-    	{% for shop in user_shops %}
+    	{% if user_shops %}
+    		{% for shop in user_shops %}
     		<div class="six columns alpha margin-bottom-20">
     		<div class="shop-stacked-images">
     			{% with request.user.product_set.all|slice:"4" as product %}
@@ -132,8 +133,8 @@
     		</div>
     		</div>
     	{% endfor %}
+    	{% endif %}
     	</div>
-
     </div>
     <div class="four columns">
         {% blog_recent_posts 4 as recent_posts %}
