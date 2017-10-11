@@ -125,10 +125,10 @@
     		</div>
     		<div class="clearfix"></div>
     		<div class="shop-info">
-    			<a href="{% url 'shop_view' request.user.shop.slug %}">
+    			<a href="{{ request.user.shop.get_absolute_url }}">
 	    			<img src="{{ MEDIA_URL }}{% thumbnail request.user.shop.image 100 100 %}" alt="{{request.user.shop.shopname}}" class="shop-image pull-left" />
 	    		</a>
-	    		<a href="{% url 'shop_view' request.user.shop.slug %}"><h2>{{request.user.shop.shopname}}</h2></a>
+	    		<a href="{{ request.user.shop.get_absolute_url }}"><h2>{{request.user.shop.shopname}}</h2></a>
 	    			<span>{{request.user.shop.country}}, {{request.user.shop.city}} </span>
     		</div>
     		</div>
@@ -234,7 +234,7 @@
 					<a href="{{ product.get_absolute_url }}">
 						<section>
 							<h5>{{ product.title|title|truncatechars:34 }}</h5>
-							<a href="{% url 'shop_view' product.user.shop.slug %}" class="shopname">{{ product.user.shop.shopname }}</a>
+							<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
 							<!--<span class="product-category">
 							</span>-->
 							{% if product.on_custom_sale %}
