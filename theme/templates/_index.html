@@ -100,7 +100,7 @@
     		{% for shop in user_shops %}
     		<div class="six columns alpha margin-bottom-20">
     		<div class="shop-stacked-images">
-    			{% with request.user.product_set.all|slice:"4" as product %}
+    			{% with shop.user.product_set.all|slice:"4" as product %}
     			<div class="main pull-left">
     				<a href="{{ product.0.get_absolute_url }}">
     					<img src="{{ MEDIA_URL }}{% thumbnail product.0.image 300 160 %}" alt="{{ product.0.title }}"/>
@@ -125,11 +125,11 @@
     		</div>
     		<div class="clearfix"></div>
     		<div class="shop-info">
-    			<a href="{{ request.user.shop.get_absolute_url }}">
-	    			<img src="{{ MEDIA_URL }}{% thumbnail request.user.shop.image 100 100 %}" alt="{{request.user.shop.shopname}}" class="shop-image pull-left" />
+    			<a href="{{ shop.get_absolute_url }}">
+	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 100 100 %}" alt="{{shop.shopname}}" class="shop-image pull-left" />
 	    		</a>
-	    		<a href="{{ request.user.shop.get_absolute_url }}"><h2>{{request.user.shop.shopname}}</h2></a>
-	    			<span>{{request.user.shop.country}}, {{request.user.shop.city}} </span>
+	    		<a href="{{ shop.get_absolute_url }}"><h2>{{shop.shopname}}</h2></a>
+	    			<span>{{shop.country}}, {{shop.city}} </span>
     		</div>
     		</div>
     	{% endfor %}

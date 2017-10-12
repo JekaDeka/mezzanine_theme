@@ -17,6 +17,7 @@ from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
 from django.middleware.csrf import get_token
+from django.db.models import Count
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
@@ -147,11 +148,13 @@ def true_index(request):
     # created__range=[startdate,
     # enddate]).filter(status=2).order_by('-created')[:7]
 
-    new_arrivals = Product.objects.order_by('-created')[:8]
+    new_arrivals = Product.objects.order_by('-created')[:10]
 
     # recent_posts = BlogPost.objects.order_by('-created')[:4]
+    tmp = User.objects.distinct().annotate(
+        product_num=Count('product')).filter(product_num__gt=4)
 
-    user_shops = UserShop.objects.all()[:3]
+    user_shops = UserShop.objects.filter(user=tmp)
     context = {
         'featured_products': new_arrivals,
         'user_shops': user_shops,
