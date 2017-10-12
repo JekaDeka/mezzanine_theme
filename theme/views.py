@@ -154,7 +154,7 @@ def true_index(request):
     tmp = User.objects.distinct().annotate(
         product_num=Count('product')).filter(product_num__gt=0)
 
-    user_shops = UserShop.objects.filter(user_in=tmp)
+    user_shops = UserShop.objects.filter(user__in=tmp)
     context = {
         'featured_products': new_arrivals,
         'user_shops': user_shops,
