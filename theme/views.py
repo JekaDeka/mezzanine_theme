@@ -126,14 +126,14 @@ def promote_user(request, template="accounts/account_signup.html",
                  extra_context=None):
     # user = request.user
     # if user.is_authenticated():
-    #     if not user.is_staff:
-    #         user.is_staff = True
-    #         group = Group.objects.get(name='custom')
-    #         siteperms = SitePermission.objects.create(user=user)
-    #         siteperms.sites.add(settings.SITE_ID)
-    #         user.groups.add(group)
-    #         user.save()
-    #         user.userprofile.save()
+        # if not user.is_staff:
+        #     user.is_staff = True
+        #     group = Group.objects.get(name='custom')
+        #     siteperms = SitePermission.objects.create(user=user)
+        #     siteperms.sites.add(settings.SITE_ID)
+        #     user.groups.add(group)
+        #     user.save()
+        #     user.userprofile.save()
 
     return redirect('/')
 
@@ -265,13 +265,11 @@ def shop_create(request, template="accounts/account_shop_create.html"):
                 shop.background = request.FILES['background']
             shop.save()
 
-            if not shop.user.is_staff:
+            if not shop.user.groups.filter(name='custom').exists():
                 shop.user.is_staff = True
                 group = Group.objects.get(name='custom')
-                siteperms = SitePermission.objects.create(user=shop.user)
-                siteperms.sites.add(settings.SITE_ID)
                 shop.user.groups.add(group)
-                shop.user.save()  # save staff status and permissions
+                shop.user.save()
 
             return redirect('shop_view', slug=shop.slug)
 
