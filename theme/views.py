@@ -152,7 +152,7 @@ def true_index(request):
 
     # recent_posts = BlogPost.objects.order_by('-created')[:4]
     tmp = User.objects.distinct().annotate(
-        product_num=Count('product')).filter(product_num__gt=0)
+        product_num=Count('product')).filter(product_num__gt=3)
 
     user_shops = UserShop.objects.filter(user__in=tmp)
     context = {

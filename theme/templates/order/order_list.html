@@ -23,8 +23,8 @@
 	<li><a href="{% url 'order_list' %}">Стол заказов</a></li>
 {% endif %}
 {% for category in order_categories %}
-	{% url 'order_list_category' category.slug as the_url %}
-	{% if the_url in request.get_full_path %}
+	{% url 'order_list_category' category.slug as category_url %}
+	{% if category_url in request.get_full_path %}
 		<li> {{ category }} </li>
 	{% endif %} 
 {% endfor %}
@@ -41,7 +41,7 @@
 				<li><a href="{% url 'order_list' %}" {% url 'order_list' as the_url %}{% if the_url == request.get_full_path %}class="active"{% endif %}>Любой</a></li>
 				{% for category in order_categories %}
 					{% url 'order_list_category' category.slug as the_url %}
-					<li><a href="{% url 'order_list_category' category.slug %}"{% if the_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
+					<li><a href="{{ the_url }}"{% if the_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
 				{% endfor %}
 				</ul>
 			</nav>
