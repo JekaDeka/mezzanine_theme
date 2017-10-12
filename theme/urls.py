@@ -7,7 +7,7 @@ from imagefit import urls
 urlpatterns = [
     url(r"^ordertable/(?P<pk>[0-9]+)/$",
         views.order_detail, name="order_detail"),
-    url("^ordertable/(?P<category>\w+)/$",
+    url("^ordertable/(?P<category>[\w\-]+)/$",
         views.order_list, name='order_list_category'),
 
 
