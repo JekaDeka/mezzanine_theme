@@ -66,7 +66,6 @@ $(function() {
 });
 </script>
 {% endblock extra_js %} 
-{% block messages %}{% endblock messages %}
 {% block breadcrumbs_title %}
 <h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
 <li>{{ request.user.email }}</li>
@@ -76,13 +75,13 @@ $(function() {
 <div class="eleven columns margin-bottom-25">
 	<h3 class="headline">Блог</h3><span class="line"></span><div class="clearfix"></div>
 	<div class="four columns margin-bottom-5">
-		<a {% if profile %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+		<a {% if profile %} href="{% url 'admin:blog_blogpost_changelist' %}" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-list"></i></span>
 			<h3>Мои статьи</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if profile %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+		<a {% if profile %} href="{% url 'admin:blog_blogpost_add' %}" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-pencil"></i></span>
 			<h3>Написать в блог</h3>
 		</a>	
@@ -91,21 +90,21 @@ $(function() {
 
 	<h3 class="headline">Стол заказов</h3><span class="line"></span>
 	<div class="four columns margin-bottom-5">
-		<a {% if profile %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+		<a {% if profile %} href="{% url 'admin:theme_orderitem_changelist' %}" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-list"></i></span>
-			<h3>Мои заказы</h3>
+			<h3>Мои заявки</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if profile %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+		<a {% if profile %} href="{% url 'admin:theme_orderitem_add' %}" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-plus"></i></span>
-			<h3>Создать новый заказ</h3>
+			<h3>Добавить заявку</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if profile %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+		<a {% if profile %} href="{% url 'admin:theme_orderitemrequest_changelist' %}" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-envelope-open" aria-hidden="true"></i></span>
-			<h3>Заявки</h3>
+			<h3>Отклики</h3>
 		</a>	
 	</div>
 	<div class="clearfix"></div>
@@ -118,13 +117,13 @@ $(function() {
 		</div>
 	{% else %}
 		<div class="four columns margin-bottom-5">
-		<a {% if shop %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+		<a {% if shop %} href="{% url 'admin:shop_product_changelist' %}" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class=""><i class="fa fa-list"></i></span>
 			<h3>Мои товары</h3>
 		</a>	
 		</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if shop %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+		<a {% if shop %} href="{% url 'admin:shop_product_add' %}" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
 				<span class=""><i class="fa fa-plus"></i></span>
 			<h3>Добавить новый товар</h3>
 		</a>	
