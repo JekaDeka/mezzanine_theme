@@ -2,8 +2,8 @@
 <header id="topnav" class="navbar navbar-fixed-top navbar-bleachedcedar" role="banner">
     <div class="logo-area">
         <div class="navbar-brand navbar-brand-inverse">
-            <img class="show-on-collapse img-logo-white" alt="handmaker" src="{% static 'images/logo/bird.png' %}">
-            <img class="img-white" alt="handmaker" src="{% static 'images/logo/bird_text.png' %}">
+            <a href="{% url 'true_index' %}"><img class="show-on-collapse img-logo-white" alt="handmaker" src="{% static 'images/logo/bird.png' %}"></a>
+            <a href="{% url 'true_index' %}"><img class="img-white" alt="handmaker" src="{% static 'images/logo/bird_text.png' %}"></a>
         </div>
         <span id="trigger-sidebar" class="toolbar-trigger toolbar-icon-bg stay-on-search">
 			<a data-toggle="tooltips" data-placement="right" title="Toggle Sidebar">

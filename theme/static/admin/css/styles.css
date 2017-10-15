@@ -24410,7 +24410,7 @@ ul.demo-btns {
 }
 ul.demo-btns > li {
   display: inline-block;
-  margin-bottom: 10px;
+  margin-bottom: 2px;
 }
 .demo-switcher-fab {
   position: fixed!important;

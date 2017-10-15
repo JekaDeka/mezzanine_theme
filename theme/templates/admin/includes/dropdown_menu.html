@@ -6,7 +6,9 @@
 				<div class="widget-body">
 					<div class="userinfo ">
 						<div class="avatar pull-left">
-							<img src="{% static 'admin/img/3.jpg' %}" class="img-responsive img-circle">
+							{% if request.user.profile.image %}
+								<img src="{{ MEDIA_URL }}{{ request.user.profile.image }}" class="img-responsive img-circle">
+							{% endif %}
 						</div>
 						<div class="info">
 							<span class="username">{{ request.user|username_or:"get_full_name" }}</span>
