@@ -149,7 +149,7 @@
 	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 100 100 %}" alt="{{shop.shopname}}" class="shop-image pull-left" />
 	    		</a>
 	    		<a href="{{ shop.get_absolute_url }}"><h2>{{shop.shopname}}</h2></a>
-	    			<span>{{shop.country}}, {{shop.city}} </span>
+	    			<span>{{shop.user.profile.country}}, {{shop.user.profile.city}} </span>
     		</div>
     		</div>
     	{% endfor %}
