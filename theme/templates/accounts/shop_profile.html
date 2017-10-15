@@ -42,7 +42,7 @@
 </div>
 <div class="five columns">
     {% get_fields shop starts_with="express" as express_fields %} 
-    {% if express_fields %}
+    {% if express_fields|any_is_true %}
     <h3 class="headline">Доставка</h3><span class="line"></span>
     <div class="clearfix"></div>
     <div class="list-2">

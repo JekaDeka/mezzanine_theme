@@ -126,11 +126,15 @@
 			<!-- Tabs Navigation -->
 			<ul class="tabs-nav">
 				<li class="active"><a href="#tab2">Характеристики</a></li>
+
 				{% get_fields product.user.shop starts_with="express" as express_fields %}
-    			{% if express_fields %}
+    			{% if express_fields|any_is_true %}
 					<li><a href="#tab4">Доставка</a></li>
 				{% endif %}
-				<li><a href="#tab5">Правила магазина</a></li>
+				{% if product.user.shop.rules %}
+					<li><a href="#tab5">Правила магазина</a></li>
+				{% endif %}
+				
 				<!--<li><a href="#tab3">Комментарии <span class="tab-reviews"></span></a></li>-->
 			</ul>
 
@@ -161,20 +165,15 @@
 				</div>
 				{% if express_fields %}
 				<div class="tab-content list-1" id="tab4">
-					<ul>
-			            {% for fields in express_fields|grouped %}
-			            <li>
-			                {% for field in fields %} 
-			                    {% if field.value == True %}
-			                        <span> {{ field.label }}</span> 
-			                    {% else %}
-			                        <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> 
-			                    {% endif %} 
-			                {% endfor %}
-			            </li>
+			        <ul>
+			            {% for fields in express_fields|grouped %} 
+			                {% if fields.0.value %}
+			                <li> {{ fields.0.label }}: <span style="white-space: nowrap;">{{ fields.1.value|rub_currency }}</span> </li>
+			                {% endif %} 
 			            {% endfor %}
 			        </ul>
-				</div>
+			        <p>{{ product.user.shop.express_other }}</p>
+			    </div>
 				{% endif %}
 				<div class="tab-content" id="tab5">
 				<p>{{ product.user.shop.rules|safe }}</p>
