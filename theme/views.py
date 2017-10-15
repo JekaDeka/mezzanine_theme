@@ -8,7 +8,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
-from django.template.loader import get_template
+from django.template.loader import get_template, render_to_string
 from django.core.urlresolvers import reverse
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
@@ -22,19 +22,20 @@ from django.db.models import Count
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product
-from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop
+from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop, UserProfile
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm
+from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm, UserProfileForm
 from theme.utils import grouped
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from mezzanine.utils.urls import login_redirect, next_url
 from mezzanine.accounts.forms import LoginForm, PasswordResetForm
 from django.contrib.auth.models import Group
+from django.views import generic
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.detail import BaseDetailView
 from django.contrib.auth.decorators import login_required
@@ -123,25 +124,26 @@ def blog_post_feed(request, format, **kwargs):
         raise Http404()
 
 
-def promote_user(request, template="accounts/account_signup.html",
-                 extra_context=None):
-    # user = request.user
-    # if user.is_authenticated():
-        # if not user.is_staff:
-        #     user.is_staff = True
-        #     group = Group.objects.get(name='custom')
-        #     siteperms = SitePermission.objects.create(user=user)
-        #     siteperms.sites.add(settings.SITE_ID)
-        #     user.groups.add(group)
-        #     user.save()
-        #     user.userprofile.save()
+# def promote_user(request, template="accounts/account_signup.html",
+#                  extra_context=None):
+#     # user = request.user
+#     # if user.is_authenticated():
+#         # if not user.is_staff:
+#         #     user.is_staff = True
+#         #     group = Group.objects.get(name='custom')
+#         #     siteperms = SitePermission.objects.create(user=user)
+#         #     siteperms.sites.add(settings.SITE_ID)
+#         #     user.groups.add(group)
+#         #     user.save()
+#         #     user.userprofile.save()
 
-    return redirect('/')
+#     return redirect('/')
 
 
 def true_index(request):
-    # main_category = Page.objects.filter(slug='catalog')
-    # featured_products = Category.objects.filter(parent=main_category)
+    main_category = Page.objects.get(slug='catalog')
+    # categories = main_category.children.all()
+    categories = Category.objects.filter(parent=main_category)[:10]
     # enddate = datetime.datetime.today()
     # startdate = enddate - datetime.timedelta(days=60)
     # new_arrivals = Product.objects.filter(
@@ -158,6 +160,7 @@ def true_index(request):
     context = {
         'featured_products': new_arrivals,
         'user_shops': user_shops,
+        'categories': categories,
     }
     return render(request, '_index.html', context)
 
@@ -251,13 +254,11 @@ def shop_toggle_vacation(request):
 def shop_create(request, template="accounts/account_shop_create.html"):
     try:
         shop = UserShop.objects.get(user=request.user)
-        form = ShopForm(request.POST or None, instance=shop)
     except:
         shop = None
-        form = ShopForm(request.POST or None, request.FILES or None)
 
     if request.method == 'POST':
-        # form = ShopForm(request.POST, request.FILES, instance=shop)
+        form = ShopForm(request.POST, request.FILES, instance=shop)
         if form.is_valid():
             shop = form.save(commit=False)
             shop.user = request.user
@@ -273,11 +274,9 @@ def shop_create(request, template="accounts/account_shop_create.html"):
                 group = Group.objects.get(name='custom')
                 shop.user.groups.add(group)
                 shop.user.save()
-
             return redirect('shop_view', slug=shop.slug)
-
-        return redirect('shop_create')
-
+    else:
+        form = ShopForm(instance=shop)
     templates = []
     context = {"form": form, "shop": shop}
     templates.append(template)
@@ -294,27 +293,47 @@ def profile_settings(request, template="accounts/account_profile_settings.html",
     try:
         shop = UserShop.objects.get(user=user)
     except:
-        return redirect('shop_create')
+        shop = None
+    try:
+        profile = user.profile
+    except:
+        profile = None
 
-    # if request.method == "POST":
-    #     form = SmallProfileForm(request.POST, instance=user)
-    #     if form.is_valid():
-    #         profile = form.save(commit=False)
-    #         profile.user = auth_user
-    #         profile.save()
+    if request.method == 'POST':
+        form = UserProfileForm(request.POST, request.FILES, instance=profile)
+        if form.is_valid():
+            profile = form.save(commit=False)
+            profile.user = user
+            first_time = False
+            if request.FILES.get('image', False):
+                profile.image = request.FILES['image']
 
-    #         if not auth_user.is_staff:
-    #             auth_user.is_staff = True
-    #             group = Group.objects.get(name='custom')
-    #             siteperms = SitePermission.objects.create(user=auth_user)
-    #             siteperms.sites.add(settings.SITE_ID)
-    #             auth_user.groups.add(group)
-    #             auth_user.save()  # save staff status and permissions
+            if not profile.user.groups.filter(name='blog_only').exists():
+                profile.user.is_staff = True
+                group = Group.objects.get(name='blog_only')
+                profile.user.groups.add(group)
+                profile.user.save()
+                first_time = True
 
-    #     return TemplateResponse(request, template, {"form": form, "title":
-    #                                                 _("Update Profile")})
+            profile.save()
+            html = render_to_string(
+                'accounts/includes/card_profile.html', {'profile': profile, 'MEDIA_URL': settings.MEDIA_URL})
+            response_data = {}
+            response_data['first_time'] = first_time
+            response_data['result'] = 'success'
+            response_data['response'] = html
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
+        else:
+            response_data = {}
+            response_data['errors'] = form.errors
+            response_data['result'] = 'error'
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
 
-    context = {"shop": shop, "user": user, "title": _("Мой профиль")}
+    else:
+        form = UserProfileForm(instance=profile)
+
+    context = {"shop": shop, "user": user,
+               "profile": profile, "form": form, "title": "Личный кабинет"}
     context.update(extra_context or {})
     return TemplateResponse(request, template, context)
 
@@ -441,7 +460,7 @@ def order_request_delete(request, order_pk, performer_pk, extra_context=None):
 def validate_shopname(request):
     shopname = request.GET.get('shopname', None)
     data = {
-        'is_taken': UserShop.objects.filter(shopname__iexact=shopname).exists()
+        'is_taken': UserShop.objects.filter(shopname__iexact=shopname).exclude(user=request.user).exists()
     }
     if data['is_taken']:
         data['error_message'] = 'Магазин с таким именем уже существует.'
@@ -498,3 +517,29 @@ def get_categories(request):
     # return HttpResponse(json.dumps(tree, ensure_ascii=False, indent=4),
     # content_type="application/json")
     return JsonResponse(tree, safe=False,  json_dumps_params={'ensure_ascii': False, 'indent': 4})
+
+
+# class UserList(generic.ListView):
+#     model = UserProfile
+#     template_name = 'accounts/account_profile_settings.html'
+
+
+# class UserEdit(generic.UpdateView):
+#     model = UserProfile
+#     fields = '__all__'
+
+#     def get_context_data(self, **context):
+#         if 'edit' in self.request.GET:
+#             context['edit'] = True
+#         return super(UserEdit, self).get_context_data(**context)
+
+#     def get_template_names(self):
+#         if self.request.is_ajax():
+#             return 'accounts/includes/form.html'
+#         return 'accounts/account_profile_settings.html'
+
+#     def get_object(self, queryset=None):
+#         return self.request.user.profile
+
+#     def get_success_url(self):
+#         return reverse('profile_settings')

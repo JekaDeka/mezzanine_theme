@@ -3,11 +3,12 @@
 
 {% block meta_title %}{% trans "Home" %} {% endblock %} 
 
+
 {% block breadcrumbs %}
 {% endblock %}
 
 {% block first_time_user %}
-	<div class="container fullwidth-element userpanel">
+<div class="container fullwidth-element userpanel">
     <div class="two-third columns alpha omega margin-bottom-10">
     {% if request.user.shop %}
     	<figure>
@@ -19,7 +20,7 @@
                         <a href="{% url 'admin:shop_product_add' %}" class="button color">Добавить новый товар</a>
                     </li>
                     <li>
-                        <a href="{% url 'shop_edit' %}" class="button color">Настройки</a>
+                        <a href="{% url 'shop_edit' %}" class="button color">Настройки магазина</a>
                     </li>
                 </ul>
             </figcaption>
@@ -64,7 +65,7 @@
 {% block slider %}
 {% get_slideshow as images %}
 {% if images %}
-<div class="container fullwidth-element home-slider">
+<div class="container fullwidth-element home-slider margin-bottom-10">
 	<div class="tp-banner-container">
 		<div class="tp-banner">
 			<ul>
@@ -85,11 +86,30 @@
 			</ul>
 		</div>
 	</div>
+	<div class="clearfix"></div>
 </div>
 {% endif %}
 {% endblock %}
 
-
+{% block main_containter %}
+{% if categories %}
+<div class="container fullwidth-element userpanel">
+{% for category in categories %}
+    <div class="main-page-category columns">
+        <a href="{{ category.get_absolute_url }}" class="img-caption">
+            <figure>
+                <img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" alt="{{ category.slug }}">
+                <figcaption>
+                    <h3>{{ category.title }}</h3>
+                    <span>Подробнее</span>
+                </figcaption>
+            </figure>
+        </a>
+    </div>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}
 
 {% block extra_content %}
 <div class="container">
@@ -196,28 +216,30 @@
 
 
 <div class="container">
-        <div class="widget">
-            <h2 class="headline">Лучшие новые товары</h2>
-            <span class="line"></span>
-            <div class="clearfix"></div>
-        </div>
-        <div class="sixteen columns products">
-            {% for product in featured_products %}
-			<div class="three shop columns custom_column">
-				<figure class="product">
-					<div class="badges">
-					{% if product.pre_order %}
-						<div class="product-example">Для примера</div>
-					{# {% else %} #}
-						<!--<div class="product-ready">Готовый вариант</div>-->
-					{% endif %}
-					{% if product.on_custom_sale %}
-						<div class="product-discnt">СКИДКА</div>
-					{% endif %}
-					</div>
-					{% get_product_images product as images %}
-					<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
-					<a href="{{ product.get_absolute_url }}">
+	<div class="sixteen columns">
+	    <div class="widget">
+	        <h2 class="headline">Лучшие новые товары</h2>
+	        <span class="line"></span>
+	        <div class="clearfix"></div>
+	    </div>
+	</div>
+    <div class="sixteen columns products margin-bottom-20">
+        {% for product in featured_products %}
+        <div class="three shop columns custom_column">
+            <figure class="product">
+                <div class="badges">
+                    {% if product.pre_order %}
+                    	<div class="product-example">Для примера</div>
+                    {# {% else %} #}
+                    <!--<div class="product-ready">Готовый вариант</div>-->
+                    {% endif %} 
+                    {% if product.on_custom_sale %}
+                    	<div class="product-discnt">СКИДКА</div>
+                    {% endif %}
+                </div>
+                {% get_product_images product as images %}
+                <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
+                    <a href="{{ product.get_absolute_url }}">
 						{% if images %}
 						<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
 							{% if images.count != 1 %}
@@ -226,28 +248,26 @@
 							</div>
 							{% endif %}
 						{% else %}
-						<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+							<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
 						{% endif %}
 					</a>
-					<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
-					</div>
-					<a href="{{ product.get_absolute_url }}">
-						<section>
-							<h5>{{ product.title|title|truncatechars:34 }}</h5>
-							<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
-							<!--<span class="product-category">
+                    <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+                </div>
+                <a href="{{ product.get_absolute_url }}">
+                    <section>
+                        <h5>{{ product.title|title|truncatechars:34 }}</h5>
+                        <a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
+                        <!--<span class="product-category">
 							</span>-->
-							{% if product.on_custom_sale %}
-								<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
-							{% else %}
-							<span class="product-price">{{ product.price|rub_currency }}</span>
-							{% endif %}
-						</section>
-					</a>
-				</figure>
-			</div>
-			{% endfor %}
-		<div class="clearfix"></div>
+                        {% if product.on_custom_sale %}
+                        <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span> {% else %}
+                        <span class="product-price">{{ product.price|rub_currency }}</span> {% endif %}
+                    </section>
+                </a>
+            </figure>
         </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+    </div>
 </div>
 {% endblock %}

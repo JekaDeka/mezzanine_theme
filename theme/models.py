@@ -33,22 +33,23 @@ Priced.add_to_class("on_custom_sale", on_custom_sale)
 
 # class UserProfile(models.Model):
 #     user = models.OneToOneField("auth.User")
-#     firstname = models.CharField(max_length=255, blank=False,
-#                                  verbose_name=("Имя"))
-#     lastname = models.CharField(max_length=255, blank=False,
-#                                 verbose_name=("Фамилия"))
+# firstname = models.CharField(max_length=255, blank=False,
+#                              verbose_name=("Имя"))
+# lastname = models.CharField(max_length=255, blank=False,
+#                             verbose_name=("Фамилия"))
 
 
 @receiver(post_save, sender=User)
 def ensure_profile_exists(sender, **kwargs):
     if kwargs.get('created', False):
         user = kwargs.get('instance')
-        user.is_staff = True
-        group = Group.objects.get(name='blog_only')
+        # user.is_staff = True
+        # group = Group.objects.get(name='blog_only')
         siteperms = SitePermission.objects.create(user=user)
         siteperms.sites.add(settings.SITE_ID)
-        user.groups.add(group)
+        # user.groups.add(group)
         user.save()  # save staff status and permissions
+
 # def user_postsave_handler(sender, instance, **kwargs):
 #     if not instance.is_staff:
 #         try:
@@ -102,19 +103,43 @@ class City(models.Model):
 
 class UserProfile(models.Model):
     """docstring for UserPro"""
-    user = models.OneToOneField("auth.User")
+    user = models.OneToOneField("auth.User", related_name="profile")
+    first_name = models.CharField(max_length=255, blank=False,
+                                  verbose_name=("Имя"))
+    last_name = models.CharField(max_length=255, blank=False,
+                                 verbose_name=("Фамилия"))
     image = models.ImageField(
-        upload_to="profile_images/", verbose_name=_("Ваше изображение"), blank=False, default="")
+        upload_to="tmp_images/", verbose_name=_("Ваше изображение"), blank=False, default="")
 
     phone = models.CharField(max_length=255, blank=True,
                              verbose_name=("Телефон"))
-    country = models.CharField(max_length=255, blank=False,
-                               verbose_name=("Страна"), default="")
-    city = models.CharField(max_length=255, blank=False,
-                            verbose_name=("Город"), default="")
 
-    bio = RichTextField(default="", verbose_name=("Описание"),
-                        help_text="Расскажите о себе.")
+    country = models.ForeignKey(Country, verbose_name=("Страна"))
+    region = ChainedForeignKey(
+        Region,
+        chained_field="country",
+        chained_model_field="country",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Регион"))
+    city = ChainedForeignKey(
+        City,
+        chained_field="region",
+        chained_model_field="region",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Город"))
+
+    bio = RichTextField(default="", verbose_name=("О себе"), blank=True)
+
+    def get_full_name(self):
+        full_name = '%s %s' % (self.first_name, self.last_name)
+        return full_name.strip()
+
+    def get_absolute_url(self):
+        url_name = "profile"
+        kwargs = {"username": self.user.username}
+        return reverse(url_name, kwargs=kwargs)
 
 
 class UserShop(models.Model):
@@ -129,7 +154,7 @@ class UserShop(models.Model):
     shopname = models.CharField(max_length=255, blank=False, unique=True,
                                 verbose_name=("Название магазина"))
     slug = models.URLField(editable=False, default='')
-    bio = RichTextField(default="", verbose_name=("Описание"),
+    bio = RichTextField(default="", verbose_name=("Описание"), blank=True,
                         help_text="Расскажите миру о Вашем творчестве, опишите свой продукт. \
                         Ваш бренд и то, что вы создаете своим трудом, являются единственными в своем роде - скажите, почему! \
                         Расскажите о себе, чем вы были воодушевлены, когда начали заниматься своим делом, что повлияло на ваш выбор, как развивается ваше творчество сейчас. \
@@ -137,25 +162,24 @@ class UserShop(models.Model):
                         Ваш рассказ должен быть интересным, лаконичным, информативным и убедительным. Можете упомянуть любимую цитату или вдохновляющую идею. \
                         Не стоит злоупотреблять смайликами и прочими символами.")
 
-    phone = models.CharField(max_length=255, blank=True,
-                             verbose_name=("Телефон"))
+    # phone = models.CharField(max_length=255, blank=True,
+    #                          verbose_name=("Телефон"))
 
-    country = models.ForeignKey(Country, verbose_name=("Страна"))
-    region = ChainedForeignKey(
-        Region,
-        chained_field="country",
-        chained_model_field="country",
-        show_all=False,
-        auto_choose=True,
-        sort=True, verbose_name=("Регион"))
-    # city = models.CharField(City)
-    city = ChainedForeignKey(
-        City,
-        chained_field="region",
-        chained_model_field="region",
-        show_all=False,
-        auto_choose=True,
-        sort=True, verbose_name=("Город"))
+    # country = models.ForeignKey(Country, verbose_name=("Страна"))
+    # region = ChainedForeignKey(
+    #     Region,
+    #     chained_field="country",
+    #     chained_model_field="country",
+    #     show_all=False,
+    #     auto_choose=True,
+    #     sort=True, verbose_name=("Регион"))
+    # city = ChainedForeignKey(
+    #     City,
+    #     chained_field="region",
+    #     chained_model_field="region",
+    #     show_all=False,
+    #     auto_choose=True,
+    #     sort=True, verbose_name=("Город"))
 
     express_point = models.BooleanField(
         default=False, verbose_name=("Получение в вашем пункте выдачи"))
@@ -182,7 +206,7 @@ class UserShop(models.Model):
     express_personal_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
                                                  help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
 
-    express_other = RichTextField(default="",
+    express_other = RichTextField(default="", blank=True,
                                   verbose_name=(
                                       "Дополнительная информация о доставке"),
                                   help_text="Адреса, по которым покупатель сможет забрать товар самостоятельно. Любые другие нюансы и условия по доставке.")
@@ -192,14 +216,14 @@ class UserShop(models.Model):
     payment_bank_transfer = models.BooleanField(
         default=False, verbose_name=("Банковский перевод"))
     payment_card_transfer = models.BooleanField(
-        default=False, verbose_name=("Банковской картой"))
+        default=False, verbose_name=("Банковская карта"))
 
-    payment_other = RichTextField(default="",
+    payment_other = RichTextField(default="", blank=True,
                                   verbose_name=(
                                       "Дополнительная информация об оплате"),
                                   help_text="Опишите любые другие условия и важные моменты по оплате — покупателю будет проще принять решение о покупке в вашем магазине.")
 
-    rules = RichTextField(default="",
+    rules = RichTextField(default="", blank=True,
                           verbose_name=(
                               "Дополнительная информация об оплате"),
                           help_text="Обозначьте условия возврата товаров. В течение какого времени после получения товара покупатель может обратиться? \
@@ -212,12 +236,12 @@ class UserShop(models.Model):
 
     # def get_fields(self, starts_with):
     #     fields = []
-    #     for f in self._meta.fields:
-    #         fname = f.name
-    #         try:
-    #             value = getattr(self, fname)
-    #         except AttributeError:
-    #             value = None
+    # for f in self._meta.fields:
+    #     fname = f.name
+    #     try:
+    #         value = getattr(self, fname)
+    #     except AttributeError:
+    #         value = None
 
     #         if fname.startswith(starts_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
     #             fields.append(
@@ -264,8 +288,8 @@ class SliderItem(models.Model):
 
     featured_image = FileField(verbose_name=_("Изображение"),
                                upload_to=upload_to(
-                                   "theme.SliderItem.featured_image", "slider"),
-                               format="Image", max_length=255, null=True, blank=True)
+        "theme.SliderItem.featured_image", "slider"),
+        format="Image", max_length=255, null=True, blank=True)
     short_description = RichTextField(verbose_name=_("Описание"), blank=True)
     href = models.CharField(verbose_name=_("Ссылка"), max_length=2000, blank=True,
                             help_text="Ссылка куда будет ввести данный слайд. Например /blog/")

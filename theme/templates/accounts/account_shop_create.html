@@ -100,20 +100,11 @@ $(document).ready(function() {
         }
     });
 
-    $(".mask").mask('+0 (000) 000-0000');
+    // $(".mask").mask('+0 (000) 000-0000');
 
-    $("#id_shopname").focusout(function() {
+    $("#id_shopname").on("change", function() {
         ajax_sumbit('{% url "validate_shopname" %}', $(this));
     });
-
-    $("#id_country").on('input', function() {
-        empty_error($(this));
-    });
-
-    $("#id_city").on('input', function() {
-        empty_error($(this));
-    });
-
     $(".express > .express_text input").on("change", function() {
         var div_price = $(this).parent().parent().next(".express_price");
         var input_price = $(div_price).find('input');
@@ -124,12 +115,12 @@ $(document).ready(function() {
             $(input_price).attr('readonly', 'readonly');
             $(input_price).val(null);
         }
-    });
+    }).change();
 });
 </script>
-<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
+<!--<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
 <script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
-<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>-->
 {% endblock %} 
 {% block breadcrumb_element %}
 {% if shop %}	
@@ -174,7 +165,7 @@ $(document).ready(function() {
 			{% endif %}
 		</label>
 	</div>
-	<div class="container create_shop">
+	<div class="container input-full-width">
 		<div class="nine columns alpha">
 			<div>
 				{{ form.shopname.label }}: {{ form.shopname }}
@@ -186,42 +177,42 @@ $(document).ready(function() {
 					{% endif %}
 				</div>
 			</div>
-			<div>
-				{{ form.phone.label }}: {{ form.phone }}
-			</div>
-			<div>
-				{{ form.country.label }}:
-				{{ form.country }}
+			<!--<div>-->
+				{# {{ form.phone.label }}: {{ form.phone }} #}
+			<!--</div>-->
+			<!--<div>
+				{# {{ form.country.label }}: #}
+				{# {{ form.country }} #}
 				<div class="error">
-					{% if form.country.errors %}
-						{% for error in form.country.errors %}
-							{{ error }} 
-						{% endfor %}
-					{% endif %}
+					{# {% if form.country.errors %} #}
+						{# {% for error in form.country.errors %} #}
+							{# {{ error }}  #}
+						{# {% endfor %} #}
+					{# {% endif %} #}
+				</div>
+			</div>-->
+<!--			<div>
+				{# {{ form.region.label }}: #}
+				{# {{ form.region }} #}
+				<div class="error">
+					{# {% if form.region.errors %} #}
+						{# {% for error in form.region.errors %} #}
+							{# {{ error }}  #}
+						{# {% endfor %} #}
+					{# {% endif %} #}
 				</div>
 			</div>
-			<div>
-				{{ form.region.label }}:
-				{{ form.region }}
-				<div class="error">
-					{% if form.region.errors %}
-						{% for error in form.region.errors %}
-							{{ error }} 
-						{% endfor %}
-					{% endif %}
+			<div>-->
+				{# {{ form.city.label }}: #}
+				{# {{ form.city }} #}
+<!--				<div class="error">
+					{# {% if form.city.errors %} #}
+						{# {% for error in form.city.errors %} #}
+							{# {{ error }}  #}
+						{# {% endfor %} #}
+					{# {% endif %} #}
 				</div>
-			</div>
-			<div>
-				{{ form.city.label }}:
-				{{ form.city }}
-				<div class="error">
-					{% if form.city.errors %}
-						{% for error in form.city.errors %}
-							{{ error }} 
-						{% endfor %}
-					{% endif %}
-				</div>
-			</div>
+			</div>-->
 			<div>
 				{{ form.bio.label }}: {{ form.bio }}
 				<p> {{ form.bio.help_text }} </p>
@@ -240,7 +231,7 @@ $(document).ready(function() {
 			<span class="line"></span>
 			<div class="clearfix"></div>
 
-			<p>Отметьте возможные варианты доставки ваших товаров. Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу.</p>
+			<p>Отметьте возможные варианты доставки ваших товаров. Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу, 0 - доставка бесплата.</p>
 			<div class="express">
 				<div class="express_text">
 					<label class="control control--checkbox">

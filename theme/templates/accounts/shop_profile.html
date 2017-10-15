@@ -20,8 +20,8 @@
 {% if shop.on_vacation %}
 <div class="sixteen columns">
     <div class="notification error text-center">
-    <p>Магазин на каникулах</p>
-</div>
+        <p>Магазин на каникулах</p>
+    </div>
 </div>
 <div class="clearfix"></div>
 {% endif %}
@@ -30,75 +30,67 @@
     <h2 class="headline" style="margin-top:-37px; font-size: 35px!important;">{{ shop.shopname }}</h2>
     <span class="line"></span>
     <div class="clearfix"></div>
-    <div>{{ shop.bio|safe }}</div>
+    {% if shop.bio %}
+        <p>{{ shop.bio|safe }}</p>
+    {% endif %}
     {% if shop.rules %}
-        <h3 class="headline margin-top-25">Правила магазина</h3>
+        <h3 class="headline margin-top-0">Правила магазина</h3>
         <span class="line"></span>
         <div class="clearfix"></div>
-        <div>{{ shop.rules|safe }}</div>
+        <p>{{ shop.rules|safe }}</p>
     {% endif %}
-    
 </div>
 <div class="five columns">
-    {% get_fields shop starts_with="express" as express_fields %}
+    {% get_fields shop starts_with="express" as express_fields %} 
     {% if express_fields %}
-    <h3 class="headline">Доставка</h3><span class="line"></span><div class="clearfix"></div>
+    <h3 class="headline">Доставка</h3><span class="line"></span>
+    <div class="clearfix"></div>
     <div class="list-2">
         <ul>
-            {% for fields in express_fields|grouped %}
-            <li>
-                {% for field in fields %} 
-                    {% if field.value == True %}
-                        <span> {{ field.label }}</span> 
-                    {% else %}
-                        <span style="white-space: nowrap">{{ field.value|rub_currency }} </span> 
-                    {% endif %} 
-                {% endfor %}
-            </li>
+            {% for fields in express_fields|grouped %} 
+                {% if fields.0.value %}
+                <li> {{ fields.0.label }}: <span style="white-space: nowrap;">{{ fields.1.value|rub_currency }}</span> </li>
+                {% endif %} 
             {% endfor %}
         </ul>
-        <div>{{ shop.express_other }}</div>
+        <p>{{ shop.express_other }}</p>
     </div>
     <div class="clearfix"></div>
-    {% endif %}
+    {% endif %} 
+
     {% get_fields shop starts_with="payment" as payment_fields %}
-    {% if payment_fields %}
+    {% if payment_fields|any_is_true %}
     <h3 class="headline">Оплата</h3>
     <span class="line"></span>
     <div class="clearfix"></div>
     <div class="list-2">
         <ul>
-            {% for field in payment_fields %}
-            {% if field.value == True %}
-                <li>{{ field.label }}</li>
-            {% endif %}
+            {% for field in payment_fields %} 
+                {% if field.value == True %}<li>{{ field.label }}</li>{% endif %} 
             {% endfor %}
         </ul>
-    <p>{{ shop.payment_other }}</p>
+        <p>{{ shop.payment_other }}</p>
     </div>
-    {% endif %}
     <div class="clearfix"></div>
-</div>
-<div class="five columns" style="float: right">
-    <h3 class="headline">Контакты</h3>
+    {% endif %}
+    <h3 class="headline">Владелец</h3>
     <span class="line" style="margin-bottom:0px;"></span>
     <div class="clearfix"></div>
-    <span> {{ shop.user.get_full_name }}, </span>
-    <span class="phone"> {{ shop.phone }} </span>
-    <p>{{ shop.country }} {{ shop.region }}</p>
+    <a href="{% url "profile" shop.user %}"><span> {{ shop.user.profile.get_full_name }}</span></a>
+    <p>{{ shop.user.profile.country }}, {{ shop.user.profile.city }}</p>
     <div class="clearfix"></div>
-    <div style="margin: 5px 0 0 0;"></div>
+
     <a class="popup-with-zoom-anim button color" href="#small-dialog">Задать вопрос</a>
-        <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-            <h2 class="margin-bottom-10">Задайте вопрос магазину</h2>
-            <form action="" method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
+    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+        <h2 class="margin-bottom-10">Задайте вопрос магазину</h2>
+        <form action="" method="POST">
+            {% csrf_token %} {{ form.as_p }}
             <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить вопрос</button>
-            </form>
-        </div>
+        </form>
+    </div>
 </div>
 <div class="clearfix"></div>
+
 <div class="sixteen columns margin-top-25">
 	{# {% include "accounts/includes/shop_widget.html" %} #}
 </div>

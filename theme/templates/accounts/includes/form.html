@@ -1,0 +1,44 @@
+{% load mezzanine_tags staticfiles %}
+<form method="POST" action="{% url 'profile_settings' %}" enctype="multipart/form-data" id="user-profile-form" style="display: none;">
+    <div class="card-profile">
+        {% csrf_token %}
+        <div class="image">
+            {{ form.image }}
+            <label for="file-2">
+                <img class="logo-image" src="{% if profile.image %}{{ MEDIA_URL }}{% thumbnail profile.image 420 300 %}
+                    {% else %}{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}{% endif %}">
+            </label>
+        </div>
+        <div class="form-content">
+            <div class="half-inline">
+                {{ form.first_name }}<!-- -->{{ form.last_name }}
+            </div>
+            <table>
+                <tr>
+                    <td><strong>{{ form.country.label }} </strong></td>
+                    <td>{{ form.country }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ form.region.label }} </strong></td>
+                    <td>{{ form.region }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ form.city.label }} </strong></td>
+                    <td>{{ form.city }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ form.phone.label }} </strong></td>
+                    <td>{{ form.phone }}</td>
+                </tr>
+                <tr>
+                    <td><strong>{{ form.bio.label }} </strong></td>
+                    <td>{{ form.bio }}</td>
+                </tr>
+                <tr>
+                    <td><button type="submit">Сохранить</button></td>
+                    <td><a href="javascript:void(0)" id="form-trigger">Отмена</a></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</form>

@@ -21,12 +21,11 @@
                 </div>
             </div>
         </div>
-        {% if request.user.shop %}
         <div class="col-sm-4 col-xs-6">
             <div class="info-tile info-tile-alt tile-indigo">
                 <div class="info">
                     <div class="tile-heading"><span>Товаров</span></div>
-                    <div class="tile-body"><span>{{ request.user.shop.get_products_count }}</span></div>
+                    <div class="tile-body"><span>{% if shop %}{{ request.user.shop.get_products_count }}{% else %}0{% endif %}</span></div>
                 </div>
             </div>
         </div>
@@ -34,11 +33,10 @@
             <div class="info-tile info-tile-alt tile-danger">
                 <div class="info">
                     <div class="tile-heading"><span>Продаж</span></div>
-                    <div class="tile-body "><span>{{ request.user.shop.get_active_orders }}</span></div>
+                    <div class="tile-body "><span>{% if shop %}{{ request.user.shop.get_active_orders }}{% else %}0{% endif %}</span></div>
                 </div>
             </div>
         </div>
-        {% endif %}
     </div>
     <div class="row">
     <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
@@ -98,10 +96,10 @@
             <div class="panel-body">
                 <ul class="demo-btns">
                     <li>
-                        <a class="btn btn-sm btn-success btn-raised btn-label" href="#">Изменить профиль</a>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'profile_settings' %}">Настройки профиля</a>
                     </li>
                     <li>
-                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="#">Изменить пароль</a>
+                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:password_change' %}">Изменить пароль</a>
                     </li>
                 </ul>
                 <div class="pull-left">
@@ -134,7 +132,7 @@
                 {% if request.user.shop.on_vacation %}
                     <p class="text-danger">Магазин в данное время на каникулах и не примиает заказы</p>
                 {% endif %}
-                <p>{{ request.user.shop.country }}, {{ request.user.shop.city }}</p>
+                <p>{{ request.user.profile.country }}, {{ request.user.profile.city }}</p>
                 <ul class="demo-btns">
                 <li>
                     <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shop_product_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>

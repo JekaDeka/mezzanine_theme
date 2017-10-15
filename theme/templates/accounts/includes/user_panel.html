@@ -1,16 +1,27 @@
 {% load i18n mezzanine_tags accounts_tags %}
-<div class="pull-right">
+<div id="additional-menu">
+    <ul>
+    	{% if not request.user.is_authenticated %}
+		<li><a href="{% url "signup" %}?next=/init/">Создать магазин</a></li>
+		<li><a href="{% url "login" %}">Войти</a></li>
+	{% else %}
+			<li><a href="{% url "profile_settings" %}">{{ request.user.email }}</a></li>
+			<li><a href="{% url 'logout' %}?next={{ request.path }}">{% trans "Log out" %}</a></li>
+		{% endif %}
+    </ul>
+</div>
+<!--<div class="pull-right">
 	{% if not request.user.is_authenticated %}
 		<a class="button dark" href="{% url "signup" %}?next=/init/">Создать магазин</a>
 		<a class="button dark" href="{% url "login" %}">Войти</a>
 	{% else %}
 		{% if not request.user.usershop %}
-			<!--<a class="button dark" href="{% url "shop_create" %}">Создать магазин</a>-->
+			<!~~<a class="button dark" href="{% url "shop_create" %}">Создать магазин</a>~~>
 		{% else %}
-			<!--<a class="button dark" href="{% url "profile_settings" %}">Панель управления</a>-->
+			<!~~<a class="button dark" href="{% url "profile_settings" %}">Панель управления</a>~~>
 		{% endif %}
-			<a class="button dark" href="{% url "profile_settings" %}">Панель управления</a>
+			<a class="button dark" href="{% url "profile_settings" %}">{{ request.user.email }}</a>
 			<a class="button dark" href="{% url 'logout' %}?next={{ request.path }}">{% trans "Log out" %}</a>
 		{% endif %}
-</div>
+</div>-->
 

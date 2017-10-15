@@ -22,9 +22,9 @@ urlpatterns = [
     url(r'^profile_view/$',
         views.profile_view, name='profile_view'),
 
-    url(r'^create/$',
+    url(r'^shop/create/$',
         views.shop_create, name="shop_create"),
-    url(r'^edit/$',
+    url(r'^shop/edit/$',
         views.shop_create, name="shop_edit"),
 
     url(r'^vacation/$',
@@ -38,9 +38,10 @@ urlpatterns = [
 
     url('^shop/(?P<slug>[\w\-]+)/$',
         views.shop_view, name='shop_view'),
-    url(r'^promote/$', views.promote_user, name="promote_user"),
+
     url(r'^settings/$',
         views.profile_settings, name="profile_settings"),
+
     url(r'^$', views.true_index, name="true_index"),
     url(r'^imagefit/', include('imagefit.urls')),
     url(r'^chaining/', include('smart_selects.urls')),

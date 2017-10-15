@@ -1,6 +1,12 @@
 (function($) {
     "use strict";
     $(document).ready(function() {
+        $("#open-switcher").click(function() {
+            $("#style-switcher").toggleClass('show');
+            $("#settings").toggle();
+            $(this).toggleClass('toggle');
+            $(this).find('i').toggleClass('left');
+        });
         // $('.top-bar-dropdown').click(function(event) {
         //     $('.top-bar-dropdown').not(this).removeClass('active');
         //     if ($(event.target).parent().parent().attr('class') == 'options') {
@@ -119,14 +125,14 @@
         //     entrySizeOffset: 0,
         //     allEntryAtOnce: "off"
         // });
-        $(".parallax-banner").pureparallax({
-            overlayBackgroundColor: '#000',
-            overlayOpacity: '0.45',
-            timeout: 200
-        });
-        $(".parallax-titlebar").pureparallax({
-            timeout: 100
-        });
+        // $(".parallax-banner").pureparallax({
+        //     overlayBackgroundColor: '#000',
+        //     overlayOpacity: '0.45',
+        //     timeout: 200
+        // });
+        // $(".parallax-titlebar").pureparallax({
+        //     timeout: 100
+        // });
 
         function addLevelClass($parent, level) {
             $parent.addClass('parent-' + level);
@@ -501,7 +507,7 @@
             });
         });
         PureGrid.init();
-        var pixelRatio = !!window.devicePixelRatio ? window.devicePixelRatio : 1;
+        // var pixelRatio = !!window.devicePixelRatio ? window.devicePixelRatio : 1;
         // $(window).on("load", function() {
         //     if (pixelRatio > 1) {
         //         $('#logo img').each(function() {

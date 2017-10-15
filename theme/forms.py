@@ -73,14 +73,35 @@ class MessageForm(forms.Form):
     )
 
 
+class UserProfileForm(forms.ModelForm):
+
+    class Media:
+        js = ('javascript/mymarkup.js',)
+
+    class Meta:
+        model = UserProfile
+        exclude = ('user',)
+        # fields = ("phone",)
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': '', 'placeholder': 'Имя', }),
+            'last_name': forms.TextInput(attrs={'class': '', 'placeholder': 'Фамилия', }),
+            'phone': forms.TextInput(attrs={'class': 'mask', 'placeholder': '+7 (999) 999-9999'}),
+            'image': forms.FileInput(attrs={'id': 'file-2', 'class': 'inputfile inputfile-2'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(UserProfileForm, self).__init__(*args, **kwargs)
+
+
 class ShopForm(forms.ModelForm):
     error_css_class = 'class-error'
     required_css_class = 'class-required'
 
     class Meta:
         model = UserShop
-        fields = ("background", "image", "shopname", "phone",
-                  "country", "region", "city", "bio", "rules",
+        fields = ("background", "image", "shopname",  # "phone",
+                  # "country", "region", "city",
+                  "bio", "rules",
                   "express_point", "express_point_price",
                   "express_city", "express_city_price",
                   "express_country", "express_country_price",
@@ -92,7 +113,7 @@ class ShopForm(forms.ModelForm):
             'shopname': forms.TextInput(attrs={'class': 'form-control'}),
             'background': forms.FileInput(attrs={'id': 'file-1', 'class': 'inputfile inputfile-1'}),
             'image': forms.FileInput(attrs={'id': 'file-5', 'class': 'inputfile inputfile-4'}),
-            'phone': forms.TextInput(attrs={'class': 'mask', 'placeholder': '+7 (999) 999-9999'}),
+            # 'phone': forms.TextInput(attrs={'class': 'mask', 'placeholder': '+7 (999) 999-9999'}),
             'express_point_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
             'express_city_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
             'express_country_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
@@ -159,7 +180,7 @@ class ThemeProfileForm(ProfileForm):
 
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email")
+        fields = ("email",)
 
 
 class DataGroupSelect(forms.widgets.SelectMultiple):

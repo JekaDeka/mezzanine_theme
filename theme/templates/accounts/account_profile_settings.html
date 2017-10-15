@@ -1,133 +1,178 @@
-{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags %} 
+{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles %} {% block meta_title %}{{ title }}{% endblock %} {% block extra_js %} {{ block.super }}
+<script type="text/javascript">
+$(function() {
+    $(".mask").mask('+0 (000) 000 0000');
+    $("body").on("change", "#file-2", function() {
+        var fileInput = $(this)[0];
+        var file = fileInput.files[0];
+        var ext = file.name.split('.').pop().toLowerCase();
+        // display_image(file, ext, '.inputfile-1 + label');
+        if (!($.inArray(ext, ["gif", "png", "jpg", "jpeg"]) == -1)) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image()
+                img.src = reader.result;
+                localStorage.theImage = reader.result;
+                $('.logo-image').attr('src', img.src);
+            }
+            reader.readAsDataURL(file); //attempts to read the file in question.
+        }
+    });
+});
+</script>
+<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
+<script>
+$(function() {
+    $(document).on('click', '#form-trigger', function() {
+        $('#user-info').toggle();
+        $("#user-profile-form").toggle();
+    });
+    $("#user-profile-form").on('submit', function(evt) {
+        var form = evt.target;
+        var $form = $(form);
+        evt.preventDefault();
+        var fd = new FormData();
+        var file_data = $('#file-2')[0].files[0];
+        fd.append("image", file_data);
+        var other_data = $form.serializeArray();
+        $.each(other_data, function(key, input) {
+            fd.append(input.name, input.value);
+        });
 
-{% block meta_title %}{{ title }}{% endblock %} 
+        $.ajax({
+            url: form.action,
+            type: form.method,
+            data: fd,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+            	if (data['first_time']) {
+            		location.reload();
+            	}
+            	if (data['result'] == 'success') {
+                    $("#user-profile-form").toggle();
+                	$("#user-info").replaceWith(data['response']);
+                }
+                if (data['result'] == 'error') {
+                	console.log(data['errors']);
+                	//TO_DO
+                	//append errors to form
+                }
+            },
+        });
+    });
+});
+</script>
+{% endblock extra_js %} 
+{% block messages %}{% endblock messages %}
 {% block breadcrumbs_title %}
-<h2>Панель быстрого доступа</h2> 
-{% endblock breadcrumbs_title %} 
-{% block breadcrumb_element %}
-	<li>{{ request.user.email }}</li>
-{% endblock breadcrumb_element %}
+<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
+<li>{{ request.user.email }}</li>
+{% endblock breadcrumb_element %} 
 
-{% block main %} 
-<!--<div class="eight columns">
-	{% if shop %}
-		<a href="{{ shop.get_absolute_url }}">Посмотреть магазин на сайте <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
-		<a href="{% url "shop_edit" %}">Редактировать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
-	{% else %}
-		<a href="{% url "shop_create" %}">Создать магазин <!~~<i class="fa fa-plus-circle" aria-hidden="true"></i>~~></a>
-	{% endif %}
-</div>
-<div class="eight columns">
-	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
-	<div class="clearfix"></div>
-</div>-->
-{% if not shop %}
-<div class="sixteen columns">
-	<div class="notification warning">
-		<p>Для того, чтобы воспользоваться всеми возможностям сайта, <a href="{% url "shop_create" %}">создайте магазин</a></p>
-	</div>
-</div>
-{% endif %}
-
-<div class="nine columns">
-	<h3 class="headline">Блог</h3><span class="line margin-bottom-35"></span>
-	<div class="clearfix"></div>
-	<div class="four columns margin-bottom-5 ">
-		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-4"><i class="fa fa-list"></i></span>
+{% block main %}
+<div class="eleven columns margin-bottom-25">
+	<h3 class="headline">Блог</h3><span class="line"></span><div class="clearfix"></div>
+	<div class="four columns margin-bottom-5">
+		<a {% if profile %} href="/admin/blog/blogpost/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+				<span><i class="fa fa-list"></i></span>
 			<h3>Мои статьи</h3>
 		</a>	
 	</div>
-	
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-4"><i class="fa fa-pencil"></i></span>
+		<a {% if profile %} href="/admin/blog/blogpost/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+				<span><i class="fa fa-pencil"></i></span>
 			<h3>Написать в блог</h3>
 		</a>	
 	</div>
 	<div class="clearfix"></div>
 
-
-	<h3 class="headline">Мой магазин</h3><span class="line margin-bottom-35"></span>
-	<div class="clearfix"></div>
+	<h3 class="headline">Стол заказов</h3><span class="line"></span>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-2"><i class="fa fa-list"></i></span>
-			<h3>Мои товары</h3>
+		<a {% if profile %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+				<span><i class="fa fa-list"></i></span>
+			<h3>Мои заказы</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-2"><i class="fa fa-plus"></i></span>
+		<a {% if profile %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+				<span><i class="fa fa-plus"></i></span>
+			<h3>Создать новый заказ</h3>
+		</a>	
+	</div>
+	<div class="four columns margin-bottom-5">
+		<a {% if profile %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+				<span><i class="fa fa-envelope-open" aria-hidden="true"></i></span>
+			<h3>Заявки</h3>
+		</a>	
+	</div>
+	<div class="clearfix"></div>
+
+	<h3 class="headline">Мой магазин</h3><span class="line"></span><div class="clearfix"></div>
+	{% if not shop %}
+		<div class="four columns margin-bottom-5">
+		    <a {% if profile %}href="{% url 'shop_create' %}"{% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
+						<span><i class="fa fa-shopping-bag" aria-hidden="true"></i></span><h3>Создать магазин</h3></a>
+		</div>
+	{% else %}
+		<div class="four columns margin-bottom-5">
+		<a {% if shop %} href="/admin/shop/product/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+				<span class=""><i class="fa fa-list"></i></span>
+			<h3>Мои товары</h3>
+		</a>	
+		</div>
+	<div class="four columns margin-bottom-5">
+		<a {% if shop %} href="/admin/shop/product/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+				<span class=""><i class="fa fa-plus"></i></span>
 			<h3>Добавить новый товар</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
 		<a href="{% url 'shop_edit' %}" class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-2"><i class="fa fa-gear"></i></span>
+				<span class=""><i class="fa fa-gear"></i></span>
 			<h3>Редактировать магазин</h3>
 		</a>	
 	</div>
-	
-	<div class="clearfix"></div>
-	<h3 class="headline">Стол заказов</h3><span class="line margin-bottom-35"></span>
-	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-3"><i class="fa fa-list"></i></span>
-			<h3>Мои заказы</h3>
-		</a>	
-	</div>
-	<div class="four columns margin-bottom-5">
-		<a {% if request.user.is_staff %} href="/admin/theme/orderitem/add/" {% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
-				<span class="color-effect-3"><i class="fa fa-plus"></i></span>
-			<h3>Создать новый заказ</h3>
-		</a>	
-	</div>
+	{% endif %}
 	<div class="clearfix"></div>
 
-
-</div>
-
-<div class="six columns">
-	<h3 class="headline">Мой профиль</h3><span class="line margin-bottom-35"></span>
-{% if form and not shop %}
-	<p> {% errors_for form %} </p>
-	<form method="post" {% if form.is_multipart %} enctype="multipart/form-data" {% endif %} class="login">
-		<fieldset>
-			{% fields_for form %}
-			<div class="form-actions">
-				{% block account_form_actions %}
-				<input class="button" type="submit" value="{{ title }}"> {% endblock %}
-			</div>
-		</fieldset>
-	</form>
-</div>
-{% else %}
-	<div class="four columns margin-bottom-5">
-		<a href="/admin/" class="icon-box">
-				<span><i class="fa fa-list"></i></span>
+	<h3 class="headline">Настройки</h3><span class="line"></span><div class="clearfix"></div>
+		<div class="four columns margin-bottom-5">
+		<a {% if profile.user.is_staff %}href="{% url 'admin:index' %}"{% endif %} class="icon-box {% if not profile.user.is_staff %}disabled{% endif %}">
+				<span><i class="fa fa-wrench" aria-hidden="true"></i></span>
 			<h3>Перейти в панель управления</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a href="{{ shop.get_absolute_url }}" class="icon-box">
-				<span><i class="fa fa-shopping-bag" aria-hidden="true"></i></span>
+		<a {% if shop %}href="{{ shop.get_absolute_url }}"{% endif %} class="icon-box {% if not shop %}disabled{% endif %}">
+				<span><i class="fa fa-id-card-o" aria-hidden="true"></i></span>
 			<h3>Посмотреть магазин на сайте</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a href="{% url 'profile_view' %}" class="icon-box">
+		<a {% if profile %}href="{{ profile.get_absolute_url }}"{% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-user" aria-hidden="true"></i></span>
-			<h3>Изменить профиль</h3>
+			<h3>Посмотреть профиль на сайте</h3>
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
 		<a href="{% url 'mezzanine_password_reset' %}" class="icon-box">
 				<span><i class="fa fa-lock" aria-hidden="true"></i></span>
-			<h3>Сменить пароль</h3>
+			<h3>Изменить пароль</h3>
 		</a>	
 	</div>
 	<div class="clearfix"></div>
 </div>
-{% endif %}
+{% endblock %} 
+
+
+{% block leftsidebar %}
+<div class="five columns margin-bottom-25">
+    <h3 class="headline">Мой профиль</h3><span class="line"></span>
+    <div class="clearfix"></div>
+    {% include 'accounts/includes/form.html' %} 
+    {% include "accounts/includes/card_profile.html" %}
+</div>
 {% endblock %}

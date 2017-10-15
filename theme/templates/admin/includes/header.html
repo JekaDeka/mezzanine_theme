@@ -14,13 +14,13 @@
         </span>
     </div>
     <ul class="nav navbar-nav toolbar pull-right">
-        <!--<li class="toolbar-icon-bg">
-            <a href="{# {% url 'admin:password_change' %} #}" class="toggle-fullscreen"><span class="icon-bg">
-                <i class="material-icons">lock</i>
-            </span></a>
-        </li>-->
         <li class="toolbar-icon-bg">
-            <a href="{% url 'logout' %}?next={{ request.path }}" class="toggle-fullscreen"><span class="icon-bg">
+            <a href="{% url 'true_index' %}"><span class="icon-bg">
+                <i class="material-icons">apps</i>
+            </span></a>
+        </li>
+        <li class="toolbar-icon-bg">
+            <a href="{% url 'logout' %}?next={{ request.path }}"><span class="icon-bg">
 	        	<i class="material-icons">exit_to_app</i>
 	        </span></a>
         </li>

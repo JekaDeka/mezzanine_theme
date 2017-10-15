@@ -380,9 +380,9 @@ def rub_currency(value):
     """
     Format a value as a RUB currency
     """
-    if not value:
+    if value is None:
         return "Цена по запросу"
-    if value == 0:
+    elif value == 0:
         return "Бесплатно"
     value = moneyfmt(value, curr='', sep=' ')
     value = value + " ₽"
@@ -820,7 +820,7 @@ def get_fields(shop, starts_with):
         except AttributeError:
             value = None
 
-        if fname.startswith(starts_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
+        if fname.startswith(starts_with) and f.editable and (f.name not in ('id', 'user', 'express_other')):
             fields.append(
                 {
                     'label': f.verbose_name,
@@ -835,6 +835,13 @@ def get_fields(shop, starts_with):
 def grouped(l):
     for i in range(0, len(l), 2):
         yield l[i:i + 2]
+
+
+@register.filter
+def any_is_true(l):
+    if any(el["value"] for el in l):
+        return True
+    return False
 
 
 # @register.filter
