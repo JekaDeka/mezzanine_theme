@@ -83,7 +83,7 @@
 		        <br>
 		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price|rub_currency }}</span>
 		        <br>
-		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author.shop.region }} {% else %} Любой {% endif %}</span>
+		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author.profile.region }} {% else %} Любой {% endif %}</span>
 		    </div>
 		    <p>{{ order.description|safe|truncatewords:80 }}</p>
 		        <a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>

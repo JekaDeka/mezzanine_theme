@@ -15,6 +15,12 @@
 {{ page.description }}
 {% endmetablock %}{% endblock %}
 
+{% block breadcrumb_element %}
+{% if category %}
+	<li><a href="{% url 'blog_post_list_category' category.slug %}">{{ category }}</a></li>
+{% endif %}
+{% endblock %}
+
 {% block rightsidebar %}
 <div class="four columns">	
 	<!-- Categories -->
@@ -123,7 +129,7 @@
 				{% block blog_post_list_post_content %}
 					{% if blog_post.preview_content %}
 						{# {% editable blog_post.preview_content %} #}
-						{{ blog_post.preview_content|safe  }}
+						{{ blog_post.preview_content|safe|truncatewords_html:55 }}
 						{# {% endeditable %} #}
 					{% else %}
 						{# {% editable blog_post.content %} #}

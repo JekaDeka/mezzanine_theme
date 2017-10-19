@@ -25,14 +25,13 @@
 <div class="twelve columns">
 	<div class="extra-padding">
 		<article class="post single">
+			<section class="post-content">
 			<section class="date">
 			{% with day=blog_post.publish_date|date:"d"  month=blog_post.publish_date|date:"M"  %} 
 				<span class="day">{{day}}</span>
 				<span class="month">{{month}}</span>
 			{% endwith %}
 			</section>
-
-			<section class="post-content">
 			{% block blog_post_detail_postedby %}
 				<header class="meta">
 					<h2>{{ blog_post.title|title }}</h2>

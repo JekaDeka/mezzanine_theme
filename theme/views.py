@@ -3,6 +3,7 @@ from future.builtins import str, int
 
 from calendar import month_name
 from django.shortcuts import render
+from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
@@ -18,19 +19,20 @@ from django.contrib.auth import (login as auth_login, authenticate,
 from django.contrib.auth.decorators import login_required
 from django.middleware.csrf import get_token
 from django.db.models import Count
+from django.db import IntegrityError
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product
 from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop, UserProfile
+from theme.utils import AuthorIsRequested
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
 from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
 from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm, UserProfileForm
-from theme.utils import grouped
+from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm, OrderMessageForm, UserProfileForm
 from mezzanine.utils.email import send_verification_mail, send_approve_mail
 from mezzanine.utils.urls import login_redirect, next_url
 from mezzanine.accounts.forms import LoginForm, PasswordResetForm
@@ -39,8 +41,8 @@ from django.views import generic
 from django.views.decorators.csrf import csrf_protect
 from django.views.generic.detail import BaseDetailView
 from django.contrib.auth.decorators import login_required
-from django.contrib.messages import info, error
-from mezzanine.utils.urls import login_redirect, next_url
+# from django.contrib.messages import info, error
+# from mezzanine.utils.urls import login_redirect, next_url
 import datetime
 import json
 from PIL import Image
@@ -139,7 +141,6 @@ def blog_post_feed(request, format, **kwargs):
 
 #     return redirect('/')
 
-
 def true_index(request):
     main_category = Page.objects.get(slug='catalog')
     # categories = main_category.children.all()
@@ -150,15 +151,17 @@ def true_index(request):
     # created__range=[startdate,
     # enddate]).filter(status=2).order_by('-created')[:7]
 
-    new_arrivals = Product.objects.order_by('-created')[:10]
+    featured_products = Product.objects.filter(
+        user__shop__on_vacation=False).order_by('-created')[:10]
 
     # recent_posts = BlogPost.objects.order_by('-created')[:4]
     tmp = User.objects.distinct().annotate(
         product_num=Count('product')).filter(product_num__gt=3)
 
-    user_shops = UserShop.objects.filter(user__in=tmp)
+    user_shops = UserShop.objects.filter(
+        user__in=tmp).filter(on_vacation=False)
     context = {
-        'featured_products': new_arrivals,
+        'featured_products': featured_products,
         'user_shops': user_shops,
         'categories': categories,
     }
@@ -208,16 +211,28 @@ def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_c
         shop = UserShop.objects.get(slug=slug)
     except Exception as e:
         return HttpResponseRedirect(reverse('true_index'))
+    try:
+        profile = request.user.profile
+        data = {'first_name': profile.first_name,
+                'email': request.user.email}
+    except Exception as e:
+        profile = None
+        data = None
 
-    form = MessageForm
+    form = MessageForm(data)
     if request.method == 'POST':
         form = MessageForm(data=request.POST)
         if form.is_valid():
             message = request.POST.get('message', '')
+            first_name = request.POST.get('first_name', '')
+            email = request.POST.get('email', '')
             template = get_template('email/message_send.html')
             context = Context({
                 'request': request,
                 'shop': shop,
+                'profile': profile,
+                'first_name': first_name,
+                'email': email,
                 'message': message,
             })
             content = template.render(context)
@@ -227,10 +242,11 @@ def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_c
                 content,
                 settings.EMAIL_HOST_USER,
                 [shop.user.email],
-                headers={'Reply-To': request.user.email}
+                headers={'Reply-To': email}
             )
             email.content_subtype = 'html'
             email.send(fail_silently=True)
+            messages.success(request, "Ваше сообщение успешно отправлено")
             return HttpResponseRedirect(reverse('shop_view', args=[shop.slug]))
 
     context = {'shop': shop, "form": form}
@@ -241,13 +257,25 @@ def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_c
 
 @login_required
 def shop_toggle_vacation(request):
-    shop = request.user.shop
-    if shop.on_vacation:
-        shop.on_vacation = False
+    try:
+        shop = request.user.shop
+        if shop.on_vacation:
+            shop.on_vacation = False
+            messages.success(
+                request, "Ваш магазин успешно вернулся с каникул!")
+        else:
+            shop.on_vacation = True
+            messages.info(
+                request, 'Ваш магазин теперь на каникулах и не принимает заказы.')
+        shop.save()
+    except Exception as e:
+        shop = None
+        messages.append('go')
+
+    if request.META['HTTP_REFERER']:
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
     else:
-        shop.on_vacation = True
-    shop.save()
-    return HttpResponseRedirect(reverse('admin:index'))
+        return HttpResponseRedirect('/')
 
 
 @login_required
@@ -260,6 +288,11 @@ def shop_create(request, template="accounts/account_shop_create.html"):
     if request.method == 'POST':
         form = ShopForm(request.POST, request.FILES, instance=shop)
         if form.is_valid():
+            if shop:
+                messages.success(request, "Магазин успешно изменен.")
+            else:
+                messages.success(request, "Магазин успешно создан.")
+
             shop = form.save(commit=False)
             shop.user = request.user
             if request.FILES.get('image', False):
@@ -313,6 +346,7 @@ def profile_settings(request, template="accounts/account_profile_settings.html",
                 group = Group.objects.get(name='blog_only')
                 profile.user.groups.add(group)
                 profile.user.save()
+                messages.success(request, "Профиль успешно обновлен.")
                 first_time = True
 
             profile.save()
@@ -368,31 +402,31 @@ def order_detail(request, pk, template="order/order_detail.html",
     except Exception as e:
         return redirect('order_list')
 
-    form = MessageForm
+    form = OrderMessageForm()
     if request.method == 'POST':
-        form = MessageForm(data=request.POST)
+        form = OrderMessageForm(data=request.POST)
         if form.is_valid():
-            message = request.POST.get('message', '')
-            template = get_template('order/order_email_request_approved.html')
-            context = Context({
-                'request': request,
-                'order': order,
-                'performer': request.user,
-                'message': message,
-            })
-            content = template.render(context)
+            # message = request.POST.get('message', '')
+            # template = get_template('order/order_email_request_approved.html')
+            # context = Context({
+            #     'request': request,
+            #     'order': order,
+            #     'performer': request.user,
+            #     'message': message,
+            # })
+            # content = template.render(context)
 
-            email = EmailMessage(
-                "Для вашего заказа нашелся исполнитель handmaker.top",
-                content,
-                settings.EMAIL_HOST_USER,
-                [order.author.email],
-                headers={'Reply-To': request.user.email}
-            )
-            email.content_subtype = 'html'
-            email.send(fail_silently=True)
+            # email = EmailMessage(
+            #     "Для вашего заказа нашелся исполнитель handmaker.top",
+            #     content,
+            #     settings.EMAIL_HOST_USER,
+            #     [order.author.email],
+            #     headers={'Reply-To': request.user.email}
+            # )
+            # email.content_subtype = 'html'
+            # email.send(fail_silently=True)
             order_request_add(request, pk)
-            return render(request, 'order/order_request_approved.html', {'order': order})
+            return HttpResponseRedirect(reverse('order_detail', args=[pk]))
 
     context = {"order": order, "form": form}
 
@@ -401,15 +435,30 @@ def order_detail(request, pk, template="order/order_detail.html",
     return TemplateResponse(request, templates, context)
 
 
-@login_required
 def order_request_add(request, order_pk):
     try:
         order = OrderItem.objects.get(pk=order_pk, performer=None)
+        if request.user == order.author:
+            raise ValueError('Нельзя откликнуться на собственную заявку')
         orderRequest = OrderItemRequest(order=order, performer=request.user)
         orderRequest.save()
-    except Exception as e:
-        pass
-    return render(request, 'order/order_request_approved.html', {'order': order})
+    except Exception as error:
+        if 'UNIQUE constraint' in error.args[0]:
+            messages.error(request, 'Вы уже откликнулись на данный заказ')
+        elif 'matching query does not exist' in error.args[0]:
+            order = OrderItem.objects.get(pk=order_pk)
+            order.active = False
+            order.save()
+            messages.error(request, 'Данная заявка закрыта')
+        else:
+            messages.error(request, error.args[0])
+
+    else:
+        messages.success(
+            request, "Ваше сообщение успешно отправлено. Автор данный заявки свяжется с вами по мере своих возможностей.")
+    # return HttpResponseRedirect(reverse('order_detail', args=[order_pk]))
+    # return render(request, 'order/order_request_approved.html', {'order':
+    # order})
 
 
 @login_required
@@ -419,9 +468,11 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
             order = OrderItem.objects.get(pk=order_pk)
             performer = User.objects.get(pk=performer_pk)
             order.performer = performer
+            order.active = False
             order.save()
         except Exception as e:
-            pass
+            messages.success(
+                request, e.args[0])
         else:
             template = get_template('order/order_email_request_assign.html')
             context = Context({
@@ -440,6 +491,8 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
             )
             email.content_subtype = 'html'
             email.send(fail_silently=True)
+            messages.success(
+                request, "Исполнитель успешно назначен. Ему отправлено уведомление.")
 
     return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
 

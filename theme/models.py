@@ -8,12 +8,17 @@ from django.contrib.auth.models import User, Group
 from mezzanine.core.fields import FileField, RichTextField
 from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
 from mezzanine.core.models import Displayable, Ownable, RichText, Slugged, SitePermission
+from mezzanine.pages.models import Page
+from mezzanine.blog.models import BlogPost
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.models import upload_to
 from cartridge.shop.models import Priced, Product
 from django.utils.timezone import now
 from django.core.urlresolvers import reverse
-from slugify import slugify, Slugify, UniqueSlugify
+from django.core.validators import MinValueValidator
+from django.core.exceptions import ValidationError
+# from slugify import slugify, Slugify, UniqueSlugify
+from theme.utils import slugify_unicode
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 
 # from django_countries.fields import CountryField
@@ -106,7 +111,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField("auth.User", related_name="profile")
     first_name = models.CharField(max_length=255, blank=False,
                                   verbose_name=("Имя"))
-    last_name = models.CharField(max_length=255, blank=False,
+    last_name = models.CharField(max_length=255, blank=True, null=True,
                                  verbose_name=("Фамилия"))
     image = models.ImageField(
         upload_to="tmp_images/", verbose_name=_("Ваше изображение"), blank=False, default="")
@@ -184,27 +189,33 @@ class UserShop(models.Model):
     express_point = models.BooleanField(
         default=False, verbose_name=("Получение в вашем пункте выдачи"))
     express_point_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                              validators=[MinValueValidator(0)])
     express_city = models.BooleanField(
         default=False, verbose_name=("Курьером по г. Москва"))
     express_city_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                             validators=[MinValueValidator(0)])
     express_country = models.BooleanField(default=False, verbose_name=(
         "Курьером по стране (Российская Федерация)"))
     express_country_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                                help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                                help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                                validators=[MinValueValidator(0)])
     express_world = models.BooleanField(
         default=False, verbose_name=("Курьером по миру"))
     express_world_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                              validators=[MinValueValidator(0)])
     express_mail = models.BooleanField(
         default=False, verbose_name=("Почта России"))
     express_mail_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                             validators=[MinValueValidator(0)])
     express_personal = models.BooleanField(
         default=False, verbose_name=("Личная встреча"))
     express_personal_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                                 help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.")
+                                                 help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
+                                                 validators=[MinValueValidator(0)])
 
     express_other = RichTextField(default="", blank=True,
                                   verbose_name=(
@@ -234,16 +245,16 @@ class UserShop(models.Model):
 
     comments = CommentsField()
 
-    # def get_fields(self, starts_with):
+    # def price_fields_validate(self, end_with):
     #     fields = []
-    # for f in self._meta.fields:
-    #     fname = f.name
-    #     try:
-    #         value = getattr(self, fname)
-    #     except AttributeError:
-    #         value = None
+    #     for f in self._meta.fields:
+    #         fname = f.name
+    #         try:
+    #             value = getattr(self, fname)
+    #         except AttributeError:
+    #             value = None
 
-    #         if fname.startswith(starts_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
+    #         if fname.endswith(end_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
     #             fields.append(
     #                 {
     #                     'label': f.verbose_name,
@@ -254,7 +265,7 @@ class UserShop(models.Model):
     #     return fields
 
     def save(self, request=False, *args, **kwargs):
-        self.slug = slugify(self.shopname, to_lower=True)
+        self.slug = slugify_unicode(self.shopname)
         super(UserShop, self).save(*args, **kwargs)
 
     def get_products_count(self):
@@ -291,8 +302,9 @@ class SliderItem(models.Model):
         "theme.SliderItem.featured_image", "slider"),
         format="Image", max_length=255, null=True, blank=True)
     short_description = RichTextField(verbose_name=_("Описание"), blank=True)
-    href = models.CharField(verbose_name=_("Ссылка"), max_length=2000, blank=True,
-                            help_text="Ссылка куда будет ввести данный слайд. Например /blog/")
+    href = models.ForeignKey(BlogPost,
+                             verbose_name=_("Ссылка"),
+                             blank=True, null=True, help_text="Ссылка куда будет ввести данный слайд.")
 
     slider = models.ForeignKey(Slider, related_name="images")
 
@@ -316,12 +328,14 @@ class OrderItem(models.Model):
     created = models.DateField(
         _("Дата добавления"), editable=False, default=date.today)
     ended = models.DateField(
-        _("Крайний срок"), null=True, editable=True, blank=True, help_text="Оставьте пустым, если срок неограничен.")
+        _("Крайний срок"), null=True, editable=True, blank=True, help_text="Оставьте пустым, если срок неограничен.", validators=[MinValueValidator(date.today())])
     price = models.DecimalField(
-        _("Бюджет"), max_digits=8, decimal_places=2, default=0, blank=True, null=True,
-        help_text="Если Вы не представляете, сколько подобная работа могла бы стоить, оставьте поле незаполненным.")
+        _("Бюджет"), max_digits=8, decimal_places=0, default=0, blank=True, null=True,
+        help_text="Если Вы не представляете, сколько подобная работа могла бы стоить, оставьте поле незаполненным.", validators=[MinValueValidator(0)])
+    # count = models.PositiveIntegerField(_("Количество"),
+    # default=1, validators=[MinValueValidator(1)])
     count = models.DecimalField(
-        _("Количество"), max_digits=8, decimal_places=0, default=1)
+        _("Количество"), max_digits=8, decimal_places=0, default=1, validators=[MinValueValidator(1)])
     color_suggest = models.CharField(
         _("Пожелания к цвету"), max_length=500, blank=True, default="",
         help_text="Пример: «небесно-голубой» или «любой».")
@@ -347,7 +361,7 @@ class OrderItem(models.Model):
         "auth.User", on_delete=models.CASCADE, default=None, editable=False, null=True, related_name="author")
 
     performer = models.ForeignKey(
-        'auth.User', on_delete=models.SET_NULL, editable=False, null=True)
+        'auth.User', on_delete=models.SET_NULL, editable=False, null=True, related_name="performer")
 
     def __str__(self):              # __unicode__ on Python 2
         return str(self.title)
@@ -356,6 +370,11 @@ class OrderItem(models.Model):
         url_name = "order_detail"
         kwargs = {"pk": self.pk}
         return reverse(url_name, kwargs=kwargs)
+
+    def save(self, request=False, *args, **kwargs):
+        if self.price == 0:
+            self.price = None
+        super(OrderItem, self).save(*args, **kwargs)
 
     @property
     def lifespan(self):

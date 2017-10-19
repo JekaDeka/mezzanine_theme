@@ -45,7 +45,7 @@
 			<section class="project-section">
 				<table class="basic-table">
 					<tr>
-						<th>Статус</th>
+						<th>Статус заказа</th>
 						<td>
 							{% if order.active %}
 								Открыт
@@ -57,13 +57,13 @@
 					<tr>
 						<th><i class="fa fa-user"></i> Заказчик</th>
 						<td>
-							<a href="{% url "profile" order.author %}">{{ order.author.get_full_name }}</a>
+							<a href="{% url "profile" order.author %}">{{ order.author.profile.get_full_name }}</a>
 						</td>
 					</tr>
 					<tr>
 						<th><i class="fa fa-map-marker" aria-hidden="true"></i> Регион</th>
 						<td>
-							{% if order.lock_in_region %} {{ order.author.shop.region }} {% else %} Любой {% endif %}
+							{% if order.lock_in_region %} {{ order.author.profile.region }} {% else %} Любой {% endif %}
 						</td>
 					</tr>
 					<tr>
@@ -135,24 +135,29 @@
 						</td>
 					</tr>
 					{% endif %}
-					
-					{% if order.description %}
-					<tr>
-						<td colspan="2">
-							{{order.description|safe }}
-						</td>
-					</tr>
-					{% endif %}
 				</table>
-				<a class="popup-with-zoom-anim button color" href="#small-dialog">Откликнуться</a>
-				<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-				    <h2 class="margin-bottom-10">Отправьте дополнительное сообщение заказчику</h2>
-				    <form action="" method="POST">
-				    {% csrf_token %}
-				    {{ form.as_p }}
-				    <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить сообщение</button>
-				  </form>
-				</div>
+				{% if order.description %}
+				<p>{{ order.description|safe }}</p>
+				{% endif %}
+				{% if request.user.profile %}
+					{% if order.active %}
+					<div class="margin-top-10">
+					    <a class="popup-with-zoom-anim button color pull-right" href="#small-dialog">Откликнуться</a>
+					    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+					        <h2 class="margin-bottom-10">Отправьте дополнительное сообщение заказчику</h2>
+					        <form action="" method="POST">
+					            {% csrf_token %} {{ form.as_p }}
+					            <button class="button color" type="submit"><i class="fa fa-send black"></i>Отправить сообщение</button>
+					        </form>
+					    </div>
+					</div>
+					{% else %}
+						<a class="button color pull-right disabled" href="#small-dialog">Откликнуться</a>
+					{% endif %}
+					
+				{% else %}
+					<a class="button color pull-right" href="{% url 'login' %}?next={{ order.get_absolute_url }}">Откликнуться</a>
+				{% endif %}
 				<div class="clearfix"></div>
 			</section>
 		</div>

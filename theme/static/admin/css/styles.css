@@ -3918,14 +3918,17 @@ button.close {
 .alert-warning .alert-link {
   color: #cc8f00;
 }
+.alert-error,
 .alert-danger {
   color: #dd191d;
   background-color: #f9bdbb;
   border-color: #e84e40;
 }
+.alert-error hr,
 .alert-danger hr {
   border-top-color: #e53929;
 }
+.alert-error .alert-link,
 .alert-danger .alert-link {
   color: #af1417;
 }
@@ -7966,16 +7969,20 @@ fieldset[disabled] .navbar .btn-link:focus {
 .alert.alert-warning .alert-link {
   color: rgba(255,255,255, 0.84);
 }
+.alert.alert-error,
 .alert.alert-danger {
   background-color: #e51c23;
   color: rgba(255,255,255, 0.84);
 }
+.alert.alert-error a,
 .alert.alert-danger a,
+.alert.alert-error .alert-link,
 .alert.alert-danger .alert-link {
   color: rgba(255,255,255, 0.84);
 }
 .alert-info,
 .alert-danger,
+.alert-error,
 .alert-warning,
 .alert-success {
   color: rgba(255,255,255, 0.84);

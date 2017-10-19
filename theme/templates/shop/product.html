@@ -60,6 +60,9 @@
 	<!-- Headline -->
 		<section class="title">
 			<h2>{{ product }}</h2>
+			{% if product.pre_order %}
+				<div class="product-example">Для примера</div>
+			{% endif %}
 			{% if product.has_price %}
 				{% if product.on_custom_sale %}
 					<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
@@ -89,7 +92,7 @@
 				        {% endif %}
 				    </div>
 				</form>
-				<a href="#" class="button dark adc">{% trans "Buy" %}</a>
+				<a {% if not product.user.shop.on_vacation %}href="#"{% endif %} class="button dark {% if product.user.shop.on_vacation %}disabled{% endif %}">{% trans "Buy" %}</a>
 				<div class="clearfix"></div>
 				</section>
 			{% else %}
@@ -109,6 +112,9 @@
 		{% endif %}
 		<div class="widget margin-top-10">
 			<h3 class="headline">Информация о магазине</h3><span class="line"></span><div class="clearfix"></div>
+			{% if product.user.shop.on_vacation %}
+				<div class="product-example red">Магазин на каникулах</div>
+			{% endif %}
 			<a href="{{ product.user.shop.get_absolute_url }}">
 				<img src="{{ MEDIA_URL }}{% thumbnail product.user.shop.image 80 80 %}" class="pull-left margin-right-5">
 				<h2>{{ product.user.shop.shopname }}</h2>

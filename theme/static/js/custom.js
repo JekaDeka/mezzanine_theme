@@ -7,6 +7,15 @@
             $(this).toggleClass('toggle');
             $(this).find('i').toggleClass('left');
         });
+        var opts = {
+            auto: {
+                speed: 3500,
+                pauseOnHover: true
+            },
+            fullScreen: false,
+            swipe: false,
+        };
+        makeBSS('.bss-slides', opts);
         // $('.top-bar-dropdown').click(function(event) {
         //     $('.top-bar-dropdown').not(this).removeClass('active');
         //     if ($(event.target).parent().parent().attr('class') == 'options') {
@@ -81,24 +90,24 @@
         //         jPanelMenu.close();
         //     }
         // });
-        $('.tp-banner').revolution({
-            delay: 9000,
-            startwidth: 1290,
-            startheight: 380,
-            minHeight: 480,
-            hideThumbs: 10,
-            hideTimerBar: "on",
-            onHoverStop: "on",
-            navigationType: "none",
-            fullScreen: "on",
-            fullScreenAlignForce: "on",
-            fullWidth: "off",
-            touchenabled: "on",
-            soloArrowLeftHOffset: 0,
-            soloArrowLeftVOffset: 0,
-            soloArrowRightHOffset: 0,
-            soloArrowRightVOffset: 0
-        });
+        // $('.tp-banner').revolution({
+        //     delay: 9000,
+        //     startwidth: 1290,
+        //     startheight: 380,
+        //     minHeight: 480,
+        //     hideThumbs: 10,
+        //     hideTimerBar: "on",
+        //     onHoverStop: "on",
+        //     navigationType: "none",
+        //     fullScreen: "on",
+        //     fullScreenAlignForce: "on",
+        //     fullWidth: "off",
+        //     touchenabled: "on",
+        //     soloArrowLeftHOffset: 0,
+        //     soloArrowLeftVOffset: 0,
+        //     soloArrowRightHOffset: 0,
+        //     soloArrowRightVOffset: 0
+        // });
         // $('#new-arrivals').showbizpro({
         //     dragAndScroll: "off",
         //     visibleElementsArray: [4, 4, 3, 1],
@@ -589,55 +598,55 @@
             e.preventDefault();
             $('.woo-search-elements').toggleClass('active');
         });
-        $("#contactform .submit").click(function(e) {
-            e.preventDefault();
-            var user_name = $('input[name=name]').val();
-            var user_email = $('input[name=email]').val();
-            var user_comment = $('textarea[name=comment]').val();
-            var proceed = true;
-            if (user_name === "") {
-                $('input[name=name]').addClass('error');
-                proceed = false;
-            }
-            if (user_email === "") {
-                $('input[name=email]').addClass('error');
-                proceed = false;
-            }
-            if (user_comment === "") {
-                $('textarea[name=comment]').addClass('error');
-                proceed = false;
-            }
-            if (proceed) {
-                $('.hide').fadeIn();
-                $("#contactform .submit").fadeOut();
-                var post_data = {
-                    'userName': user_name,
-                    'userEmail': user_email,
-                    'userComment': user_comment
-                };
-                $.post('contact.php', post_data, function(response) {
-                    var output;
-                    if (response.type == 'error') {
-                        output = '<div class="error">' + response.text + '</div>';
-                        $('.hide').fadeOut();
-                        $("#contactform .submit").fadeIn();
-                    } else {
-                        output = '<div class="success">' + response.text + '</div>';
-                        $('#contact div input').val('');
-                        $('#contact textarea').val('');
-                        $('.hide').fadeOut();
-                        $("#contactform .submit").fadeIn().attr("disabled", "disabled").css({
-                            'backgroundColor': '#c0c0c0',
-                            'cursor': 'default'
-                        });
-                    }
-                    $("#result").hide().html(output).slideDown();
-                }, 'json');
-            }
-        });
-        $("#contactform input, #contactform textarea").keyup(function() {
-            $("#contactform input, #contactform textarea").removeClass('error');
-            $("#result").slideUp();
-        });
+        //     $("#contactform .submit").click(function(e) {
+        //         e.preventDefault();
+        //         var user_name = $('input[name=name]').val();
+        //         var user_email = $('input[name=email]').val();
+        //         var user_comment = $('textarea[name=comment]').val();
+        //         var proceed = true;
+        //         if (user_name === "") {
+        //             $('input[name=name]').addClass('error');
+        //             proceed = false;
+        //         }
+        //         if (user_email === "") {
+        //             $('input[name=email]').addClass('error');
+        //             proceed = false;
+        //         }
+        //         if (user_comment === "") {
+        //             $('textarea[name=comment]').addClass('error');
+        //             proceed = false;
+        //         }
+        //         if (proceed) {
+        //             $('.hide').fadeIn();
+        //             $("#contactform .submit").fadeOut();
+        //             var post_data = {
+        //                 'userName': user_name,
+        //                 'userEmail': user_email,
+        //                 'userComment': user_comment
+        //             };
+        //             $.post('contact.php', post_data, function(response) {
+        //                 var output;
+        //                 if (response.type == 'error') {
+        //                     output = '<div class="error">' + response.text + '</div>';
+        //                     $('.hide').fadeOut();
+        //                     $("#contactform .submit").fadeIn();
+        //                 } else {
+        //                     output = '<div class="success">' + response.text + '</div>';
+        //                     $('#contact div input').val('');
+        //                     $('#contact textarea').val('');
+        //                     $('.hide').fadeOut();
+        //                     $("#contactform .submit").fadeIn().attr("disabled", "disabled").css({
+        //                         'backgroundColor': '#c0c0c0',
+        //                         'cursor': 'default'
+        //                     });
+        //                 }
+        //                 $("#result").hide().html(output).slideDown();
+        //             }, 'json');
+        //         }
+        //     });
+        //     $("#contactform input, #contactform textarea").keyup(function() {
+        //         $("#contactform input, #contactform textarea").removeClass('error');
+        //         $("#result").slideUp();
+        //     });
     });
 })(this.jQuery);

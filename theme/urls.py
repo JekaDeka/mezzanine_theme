@@ -11,8 +11,8 @@ urlpatterns = [
         views.order_list, name='order_list_category'),
 
 
-    url(r'^ordertable/add/(?P<order_pk>[0-9]+)/$',
-        views.order_request_add, name="order_request_add"),
+    # url(r'^ordertable/add/(?P<order_pk>[0-9]+)/$',
+    #     views.order_request_add, name="order_request_add"),
     url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/assign/$',
         views.order_request_assign, name="order_request_assign"),
     url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/delete/$',

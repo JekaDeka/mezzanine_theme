@@ -65,7 +65,20 @@ class ContactForm(forms.Form):
     contact_email = forms.EmailField(required=True)
 
 
+class OrderMessageForm(forms.Form):
+    message = forms.CharField(
+        required=False,
+        label="Ваше сообщение",
+        widget=forms.Textarea
+    )
+
+
 class MessageForm(forms.Form):
+    first_name = forms.CharField(
+        required=True,
+        label="Ваше имя",
+    )
+    email = forms.EmailField(required=True, label="Ваша почта")
     message = forms.CharField(
         required=False,
         label="Ваше сообщение",

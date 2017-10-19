@@ -6,9 +6,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
 from django.conf.urls import url
 from django.utils.html import format_html
+from django.contrib.contenttypes.admin import GenericTabularInline
 from django.core.urlresolvers import reverse
 from mezzanine.forms.admin import FormAdmin
 from mezzanine.blog.models import BlogPost
+from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product, ProductImage, ProductVariation
 from cartridge.shop.admin import ProductAdmin, ProductImageAdmin, ProductVariationAdmin
 from mezzanine.blog.admin import BlogPostAdmin
@@ -172,10 +174,6 @@ class MyProductAdmin(ProductAdmin):
 
 class SliderItemInline(admin.StackedInline):
     model = SliderItem
-    # fieldsets = (
-    #     (None, {'fields': (('image', 'alt', 'sort'),
-    #                        ('url', 'video_url'), ('title', 'credit'), 'content', 'price')}),
-    # )
 
 
 class SliderAdmin(admin.ModelAdmin):
@@ -197,9 +195,15 @@ class OrderItemImageInline(admin.TabularInline):
 
 
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ('title', 'created', 'price', 'ended', 'get_performer')
+    view_on_site = True
+    list_display = ('title', 'created', 'price', 'ended',
+                    'get_performer', 'view_on_site')
     form = OrderItemAdminForm
     inlines = [OrderItemImageInline, ]
+
+    def view_on_site(self, obj):
+        return format_html("<a href={}>Посмотреть на сайте</a>", obj.get_absolute_url())
+    view_on_site.short_description = ""
 
     def get_performer(self, obj):
         if obj.performer:
@@ -233,15 +237,30 @@ class OrderItemAdmin(admin.ModelAdmin):
 @admin.register(OrderItemRequest)
 class OrderItemRequestAdmin(admin.ModelAdmin):
     model = OrderItemRequest
-    list_display = ('order', 'get_performers',)
+    list_display = ('order', 'get_performers', 'view_on_site')
     list_display_links = None
 
+    def view_on_site(self, obj):
+        return format_html("<a href={}>Посмотреть на сайте</a>", obj.get_absolute_url())
+    view_on_site.short_description = ""
+
     def get_queryset(self, request):
-        # qs = super(OrderItemRequestAdmin, self).get_queryset(request)
-        qs = OrderItem.objects.filter(performer=None).distinct()
-        if request.user.is_superuser:
-            return qs
-        return qs.filter(author=request.user)
+        qs = super(OrderItemRequestAdmin, self).get_queryset(request)
+        orders = OrderItem.objects.filter(
+            performer=None).filter(order__in=qs).distinct()
+        if not request.user.is_superuser:
+            orders.filter(author=request.user)
+
+        if orders:
+            return orders
+        else:
+            return OrderItem.objects.none()
+        # if OrderItemRequest.objects.filter(order__in=qs):
+        #     if request.user.is_superuser:
+        #         return qs.filter()
+        #     return qs.filter(author=request.user)
+        # else:
+        #     return OrderItem.objects.none()
 
     def order(self, obj):
         return obj.title
@@ -258,11 +277,11 @@ class OrderItemRequestAdmin(admin.ModelAdmin):
             '<li><a href="{}">Отказать</a></li>'
             '</ul>'
             '</div><br>',
-            reverse('profile_view', args=[]),
+            reverse('profile', args=[order.performer]),
             order.performer.get_full_name(),
             reverse('order_request_assign', args=[
                     order.order.id, order.performer.id]),
-            reverse('profile_view', args=[]),
+            reverse('profile', args=[order.performer]),
             reverse('order_request_delete', args=[
                     order.order.id, order.performer.id]),
         )

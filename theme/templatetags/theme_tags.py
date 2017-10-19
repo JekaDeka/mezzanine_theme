@@ -953,3 +953,8 @@ def theme_parent_list(value, autoescape=True):
         return '\n'.join(output)
 
     return mark_safe(list_formatter(value))
+
+
+# @register.filter("not_on_vacation")
+# def not_on_vacation(object_list):
+#     return object_list.filter(user__shop__on_vacation=False)

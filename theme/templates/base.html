@@ -21,8 +21,8 @@
 {% compress css %}
 <link rel="stylesheet" href="{% static "css/style.css" %}">
 <link rel="stylesheet" href="{% static "css/green.css" %}">
-<link rel="stylesheet" href="{% static "css/custom.css" %}">
 <link rel="stylesheet" href="{% static "css/mega_dropdown.css" %}">
+<link rel="stylesheet" href="{% static "css/custom.css" %}">
 <!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js' %}"></script>
 <![endif]-->
@@ -40,24 +40,6 @@
 </head>
 
 <body class="{% block body_class %}boxed{% endblock %}">
-{% if request.user.is_staff %}
-<div id="style-switcher">
-    <h2><a href="{% url 'admin:index' %}">Панель управления</a></h2>
-    <a href="{% url 'admin:index' %}" id="settings"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></a>
-    <a id="open-switcher"><i class="arrow right"></i> </a>
-    <div>
-        <ul>
-        	{% if request.user.profile %}
-        		<li><a href="{% url 'admin:blog_blogpost_changelist' %}">Мой Блог</a></li>
-            	<li><a href="{% url 'admin:theme_orderitem_changelist' %}">Мой стол заказов</a></li>
-        	{% endif %}
-            {% if request.user.shop %}
-            	<li><a href="{% url 'admin:shop_product_changelist' %}">Мои товары</a></li>
-            {% endif %}
-        </ul>
-    </div>
-</div>
-{% endif %}
 <div id="wrapper">
 {% block top_bar %}
 <div class="top-bar-menu-wrapper">
@@ -66,6 +48,24 @@
             {% block navbar_dropdown_menu %} {% page_menu "pages/menus/dropdown.html" %} {% endblock%}
         </div>
     </div>
+{% if request.user.is_staff %}
+		<div id="style-switcher">
+		    <h2><a href="{% url 'admin:index' %}">Панель управления</a></h2>
+		    <a href="{% url 'admin:index' %}" id="settings"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></a>
+		    <a id="open-switcher"><i class="arrow right"></i> </a>
+		    <div>
+		        <ul>
+		        	{% if request.user.profile %}
+		        		<li><a href="{% url 'admin:blog_blogpost_changelist' %}">Мой Блог</a></li>
+		            	<li><a href="{% url 'admin:theme_orderitem_changelist' %}">Мой стол заказов</a></li>
+		        	{% endif %}
+		            {% if request.user.shop %}
+		            	<li><a href="{% url 'admin:shop_product_changelist' %}">Мои товары</a></li>
+		            {% endif %}
+		        </ul>
+		    </div>
+		</div>
+		{% endif %}
 </div>
 {% endblock %}
 
@@ -89,8 +89,8 @@
 <div class="container">
 	{% for message in messages %}
 		<div class="sixteen columns">
-			<div class="notification success closeable margin-bottom-10 text-center">
-				<p>{{ message }}</p>
+			<div class="notification closeable {% if message.tags %}{{ message.tags }}{% endif %} margin-bottom-10 text-center">
+				<p>{{ message | safe }}</p>
 				<a class="close"></a>
 			</div>
 		</div>
@@ -102,7 +102,9 @@
     <div class="sixteen columns">
         <div class="notification notice margin-bottom-10 text-center">
             <p><span>Внимание!</span> 
-                Для того, чтобы воспользоваться всеми услугами сайта, заполните информацию в <a href="{% url 'profile_settings' %}"><span>Личном кабинете</span></a>.</p>
+            	Для того, чтобы воспользоваться всеми услугами сайта, заполните информацию в 
+            	<a href="{% url 'profile_settings' %}"><span>Личном кабинете</span></a>.
+        	</p>
         </div>
     </div>
 </div>
@@ -214,11 +216,11 @@
 </div>-->
 {% compress js %}
 <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
-<script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>
-<script src="{% static 'js/jquery.jpanelmenu.js' %}"></script>
-<script src="{% static 'js/jquery.themepunch.plugins.min.js' %}"></script>
-<script src="{% static 'js/jquery.themepunch.revolution.min.js' %}"></script>
-<script src="{% static 'js/jquery.themepunch.showbizpro.min.js' %}"></script>
+<!--<script src="{% static 'js/jquery-migrate-1.2.1.min.js' %}"></script>-->
+<!--<script src="{% static 'js/jquery.jpanelmenu.js' %}"></script>-->
+<!--<script src="{% static 'js/jquery.themepunch.plugins.min.js' %}"></script>-->
+<!--<script src="{% static 'js/jquery.themepunch.revolution.min.js' %}"></script>-->
+<!--<script src="{% static 'js/jquery.themepunch.showbizpro.min.js' %}"></script>-->
 <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
 <script src="{% static 'js/hoverIntent.js' %}"></script>
 <script src="{% static 'js/superfish.js' %}"></script>
@@ -235,6 +237,7 @@
 <script src="{% static 'js/jquery.isotope.min.js' %}"></script>
 <script src="{% static 'js/puregrid.js' %}"></script>
 <script src="{% static 'js/stacktable.js' %}"></script>
+<script src="{% static 'js/better-simple-slideshow.js' %}"></script>
 <script src="{% static 'js/custom.js' %}"></script>
 <script src="{% static 'js/active-branch-show.js' %}"></script>
 <script src="{% static 'js/mask.js' %}"></script>
@@ -242,10 +245,12 @@
 <script src="{% static 'js/main.js' %}"></script>
 {% block extra_js %}
 {% endblock %}
-{% endcompress %}
 
 {% block footer_js %}
 {% endblock %}
+{% endcompress %}
+
+
 </div>
 </body>
 </html>

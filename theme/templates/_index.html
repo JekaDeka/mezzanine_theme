@@ -66,26 +66,18 @@
 {% get_slideshow as images %}
 {% if images %}
 <div class="container fullwidth-element home-slider margin-bottom-10">
-	<div class="tp-banner-container">
-		<div class="tp-banner">
-			<ul>
-			{% for image in images %}
-				<li data-transition="fade" data-slotamount="7" data-masterspeed="1500">
-				<img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1200 500 %}" alt="" data-bgfit="cover" data-bgposition="left top" data-bgrepeat="no-repeat">	 
-				<div class="caption dark fade fadeout" 
-				data-x="left"
-				data-y="center"
-				data-hoffset="200"
-				data-voffset="0" 
-				data-speed="400" data-start="800"  data-easing="Power1.easeOut">
-				{{ image.short_description|safe }}
-				<a href="{{image.href }}" class="caption-btn">Подробнее</a>
-				</div>
-				</li>
-			{% endfor %}
-			</ul>
-		</div>
-	</div>
+    <div class="bss-slides">
+        {% for image in images %}
+        <figure>
+            <a href="{{image.href.get_absolute_url }}">
+                <img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1290 350 %}" />
+            <figcaption>
+                {{ image.short_description|safe }}
+            </figcaption>
+            </a>
+        </figure>
+        {% endfor %}
+    </div>
 	<div class="clearfix"></div>
 </div>
 {% endif %}
@@ -214,7 +206,7 @@
     </div>
 </div>
 
-
+{% if featured_products %}
 <div class="container">
 	<div class="sixteen columns">
 	    <div class="widget">
@@ -270,4 +262,5 @@
         <div class="clearfix"></div>
     </div>
 </div>
+{% endif %}
 {% endblock %}

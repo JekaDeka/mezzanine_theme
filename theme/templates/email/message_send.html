@@ -22,8 +22,12 @@
     <tr>
         <td style="padding: 25px 0 0 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
             Контактные данные пользователя:
-            {{ request.user.fisrt_name }} <br>
-            {{ request.user.email }}
+            {% if profile %}
+                <a href="http://{{ request.get_host }}{{ profile.get_absolute_url }}">{{ profile.first_name }}</a> <br>
+            {% else %}
+                <span>{{ first_name }}</span> <br>
+            {% endif %}
+            <span>Почта: {{ email }}</span>
         </td>
     </tr>
 </table>

@@ -134,6 +134,16 @@ $(function() {
 			<h3>Редактировать магазин</h3>
 		</a>	
 	</div>
+	<div class="four columns margin-bottom-5">
+		<a href="{% url 'shop_toggle_vacation' %}" class="icon-box {% if not shop %}disabled{% endif %}">
+				<span class=""><i class="fa fa-plane" aria-hidden="true"></i></span>
+				{% if shop.on_vacation %}
+					<h3>Вернуться с каникул</h3>
+				{% else %}
+					<h3>Уйти на каникулы</h3>
+				{% endif %}
+		</a>	
+	</div>
 	{% endif %}
 	<div class="clearfix"></div>
 
@@ -159,7 +169,7 @@ $(function() {
 	<div class="four columns margin-bottom-5">
 		<a href="{% url 'mezzanine_password_reset' %}" class="icon-box">
 				<span><i class="fa fa-lock" aria-hidden="true"></i></span>
-			<h3>Изменить пароль</h3>
+			<h3>Сбросить пароль</h3>
 		</a>	
 	</div>
 	<div class="clearfix"></div>

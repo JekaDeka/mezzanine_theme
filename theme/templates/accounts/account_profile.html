@@ -1,15 +1,45 @@
-{% extends "base.html" %}
-{% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %}
+{% extends "base.html" %} 
+{% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %} 
 
-{% block meta_title %}
-{% endblock %}
+{% block meta_title %}{{ profile_user.profile.get_full_name }}{% endblock %} 
 
-{% block breadcrumbs %}
-{% endblock %}
+{% block title %}{{ profile_user.profile.get_full_name }}{% endblock %} 
 
+{% block breadcrumbs_title %}
+<h2>{{ profile_user.profile.get_full_name }}</h2> 
+{% endblock breadcrumbs_title %} 
 
-{% block slider %}
-{% endblock %}
+{% block breadcrumb_element %} 
+{{ block.super }}
+<li><a href="{% url 'profile' profile_user.profile %}">Профиль мастера</a></li>
+{% endblock %} 
 
 {% block main %}
+<div class="sixteen columns">
+    <article class="the-team single">
+        <div class="eight alpha columns">
+            <figure class="post-img">
+                <!--<a href="{% url 'profile' profile_user %}">-->
+                {% if profile_user.profile.image %}
+                <img src="{{ MEDIA_URL }}{% thumbnail profile_user.profile.image 580 400 %}" alt="Фото профиля"> {% else %}
+                <img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 580 400 %}" alt="no-image"> {% endif %}
+                <!--</a>-->
+            </figure>
+        </div>
+        <div class="eight columns omega">
+            <section class="the-team-content">
+                <header class="meta">
+                    <h5 class="entry-title">{{ profile_user.profile.get_full_name }}</h5><i>Мастер</i>
+                </header>
+                <!-- .entry-header -->
+                <div class="entry-content">
+                    {{ profile_user.profile.bio | safe }}
+                    <div class="clearfix"></div>
+                </div>
+                <!-- .entry-content -->
+            </section>
+        </div>
+        <div class="clearfix"></div>
+    </article>
+</div>
 {% endblock %}

@@ -105,7 +105,7 @@
 						{% if messages %}
 					    
 					    	{% for message in messages %}
-					    	<div class="alert alert-dismissable alert-success mt">
+					    	<div class="alert alert-dismissable alert-{% if message.tags %}{{ message.tags }}{% else %}success{% endif %} mt">
 					    		<i class="fa fa-check"></i>&nbsp; {{ message }}
 					    		<button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
 					    	</div>

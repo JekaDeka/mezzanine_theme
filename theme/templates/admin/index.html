@@ -25,7 +25,7 @@
             <div class="info-tile info-tile-alt tile-indigo">
                 <div class="info">
                     <div class="tile-heading"><span>Товаров</span></div>
-                    <div class="tile-body"><span>{% if shop %}{{ request.user.shop.get_products_count }}{% else %}0{% endif %}</span></div>
+                    <div class="tile-body"><span>{% if request.user.shop %}{{ request.user.shop.get_products_count }}{% else %}0{% endif %}</span></div>
                 </div>
             </div>
         </div>
@@ -33,7 +33,7 @@
             <div class="info-tile info-tile-alt tile-danger">
                 <div class="info">
                     <div class="tile-heading"><span>Продаж</span></div>
-                    <div class="tile-body "><span>{% if shop %}{{ request.user.shop.get_active_orders }}{% else %}0{% endif %}</span></div>
+                    <div class="tile-body "><span>{% if request.user.shop %}{{ request.user.shop.get_active_orders }}{% else %}0{% endif %}</span></div>
                 </div>
             </div>
         </div>
@@ -83,12 +83,12 @@
                     </li>
                 </ul>
                 <div class="pull-left">
-                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего заявок</small>0</h4>
+                    <h4 class="mt-n mb-n pt-xs"><small class="mt-n mb-sm">Всего заявок</small>{{ request.user.author.all|length }}</h4>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+<!--    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
         <div class="panel panel-white">
             <div class="panel-heading">
                 <h2>Мой профиль</h2>
@@ -110,7 +110,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div>-->
     {% if request.user.shop %}
         <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12">
         <div class="panel panel-white">
@@ -119,7 +119,7 @@
                     <div class="ripple-container"></div>
                 </a>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href="{% url 'shop_toggle_vacation' %}">Уйти на каникулы</a></li>
+                    <li><a href="{% url 'shop_toggle_vacation' %}">{% if shop.on_vacation %}Вернуться с каникул{% else %}Уйти на каникулы{% endif %}</a></li>
                     <li class="divider"></li>
                     <li><a href="{{ request.user.shop.get_absolute_url }}">Посмотреть магазин на сайте</a></li>
                 </ul>
