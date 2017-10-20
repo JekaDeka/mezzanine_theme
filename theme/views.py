@@ -18,7 +18,7 @@ from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
 from django.middleware.csrf import get_token
-from django.db.models import Count
+from django.db.models import Q, Count
 from django.db import IntegrityError
 
 from mezzanine.blog.models import BlogPost, BlogCategory
@@ -62,6 +62,8 @@ def blog_post_list(request, tag=None, year=None, month=None, username=None,
     """
     templates = []
     blog_posts = BlogPost.objects.published(for_user=request.user)
+    if not request.user.is_superuser:
+        blog_posts = blog_posts.filter(status=2)
     blog_categories = BlogCategory.objects.all()
 
     if tag is not None:
@@ -226,15 +228,15 @@ def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_c
             message = request.POST.get('message', '')
             first_name = request.POST.get('first_name', '')
             email = request.POST.get('email', '')
-            template = get_template('email/message_send.html')
-            context = Context({
+            template = get_template('email/shop_message_send.html')
+            context = {
                 'request': request,
                 'shop': shop,
                 'profile': profile,
                 'first_name': first_name,
                 'email': email,
                 'message': message,
-            })
+            }
             content = template.render(context)
 
             email = EmailMessage(
@@ -378,17 +380,25 @@ def order_list(request, tag=None, year=None, month=None, username=None,
 
     templates = []
     orders = OrderItem.objects.filter(performer=None)
-    author = request.user
+    # author = request.user
     order_categories = OrderItemCategory.objects.all()
     if category is not None:
         category = get_object_or_404(OrderItemCategory, slug=category)
         orders = orders.filter(categories=category)
 
+    region = request.GET.get('region', None)
+    if region is not None:
+        try:
+            orders = orders.filter(Q(lock_in_region=False) | Q(
+                author__profile__region=region))
+        except Exception as e:
+            messages.error(request, "Не удалось применить фильтр региона")
+
     orders = paginate(orders, request.GET.get("page", 1),
                       15,
                       settings.MAX_PAGING_LINKS)
     context = {"orders": orders, "year": year, "month": month,
-               "tag": tag, "category": category, "author": author, "order_categories": order_categories}
+               "tag": tag, "category": category, "order_categories": order_categories}
     context.update(extra_context or {})
     templates.append(template)
     return TemplateResponse(request, templates, context)
@@ -406,26 +416,26 @@ def order_detail(request, pk, template="order/order_detail.html",
     if request.method == 'POST':
         form = OrderMessageForm(data=request.POST)
         if form.is_valid():
-            # message = request.POST.get('message', '')
-            # template = get_template('order/order_email_request_approved.html')
-            # context = Context({
-            #     'request': request,
-            #     'order': order,
-            #     'performer': request.user,
-            #     'message': message,
-            # })
-            # content = template.render(context)
+            message = request.POST.get('message', '')
+            template = get_template('email/order_email_request_approved.html')
+            context = {
+                'request': request,
+                'order': order,
+                'performer': request.user,
+                'message': message,
+            }
+            content = template.render(context)
 
-            # email = EmailMessage(
-            #     "Для вашего заказа нашелся исполнитель handmaker.top",
-            #     content,
-            #     settings.EMAIL_HOST_USER,
-            #     [order.author.email],
-            #     headers={'Reply-To': request.user.email}
-            # )
-            # email.content_subtype = 'html'
-            # email.send(fail_silently=True)
-            order_request_add(request, pk)
+            email = EmailMessage(
+                "Для вашего заказа нашелся исполнитель handmaker.top",
+                content,
+                settings.EMAIL_HOST_USER,
+                [order.author.email],
+                headers={'Reply-To': request.user.email}
+            )
+            email.content_subtype = 'html'
+            if order_request_add(request, pk):
+                email.send(fail_silently=True)
             return HttpResponseRedirect(reverse('order_detail', args=[pk]))
 
     context = {"order": order, "form": form}
@@ -436,6 +446,7 @@ def order_detail(request, pk, template="order/order_detail.html",
 
 
 def order_request_add(request, order_pk):
+    status = False
     try:
         order = OrderItem.objects.get(pk=order_pk, performer=None)
         if request.user == order.author:
@@ -454,8 +465,10 @@ def order_request_add(request, order_pk):
             messages.error(request, error.args[0])
 
     else:
+        status = True
         messages.success(
             request, "Ваше сообщение успешно отправлено. Автор данный заявки свяжется с вами по мере своих возможностей.")
+    return status
     # return HttpResponseRedirect(reverse('order_detail', args=[order_pk]))
     # return render(request, 'order/order_request_approved.html', {'order':
     # order})
@@ -471,15 +484,15 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
             order.active = False
             order.save()
         except Exception as e:
-            messages.success(
-                request, e.args[0])
+            messages.error(request, e.args[0])
         else:
-            template = get_template('order/order_email_request_assign.html')
-            context = Context({
+            template = get_template('email/order_email_request_assign.html')
+            context = {
                 'request': request,
                 'order': order,
+                'order_url': order.get_absolute_url,
                 'performer': performer,
-            })
+            }
             content = template.render(context)
 
             email = EmailMessage(
@@ -505,7 +518,9 @@ def order_request_delete(request, order_pk, performer_pk, extra_context=None):
                 order=order_pk, performer=performer_pk)
             order.delete()
         except Exception as e:
-            raise
+            messages.error(request, e.args[0])
+        else:
+            messages.success(request, "Отклик успешно отклонен.")
 
     return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
 

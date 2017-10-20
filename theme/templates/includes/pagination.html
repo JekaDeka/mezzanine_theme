@@ -4,26 +4,23 @@
 <div class="pagination-container masonry">
 <nav class="pagination">
 <ul>
-
 {% for page in current_page.visible_page_range %}
 <li>
-    <a {% if page == current_page.number %} class="current-page"{% endif %} href="?{{ page_var }}={{ page }}{% if querystring %}&{{ querystring }}{% endif %}">{{ page }}</a>
+    <a {% if page == current_page.number %} class="current-page"{% endif %} href="?{{ page_var }}={{ page }}{% if querystring %}&{{ querystring }}{% endif %}">
+    {{ page }}</a>
 </li>
 {% endfor %}
-
 </ul>
 </nav>
-
 <nav class="pagination-next-prev full-width">
-				<ul>
-					<li>
+<ul>
+<li>
     <a class="prev {% if not current_page.has_previous %} disabled{% endif %}" {% if current_page.has_previous %} href="?{{ page_var }}={{ current_page.previous_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"{% endif %}>&larr;</a>
 </li>
-					<li>
+<li>
     <a class="next {% if not current_page.has_next %} disabled{% endif %}" {% if current_page.has_next %} href="?{{ page_var }}={{ current_page.next_page_number }}{% if querystring %}&{{ querystring }}{% endif %}"{% endif %}>&rarr;</a>
 </li>
-				</ul>
-			</nav>
-
+</ul>
+</nav>
 </div>
 {% endif %}

@@ -324,7 +324,7 @@ def simple_menu(context, token):
     return t.render(Context(context))
 
 
-def moneyfmt(value, places=2, curr='', sep=',', dp='.',
+def moneyfmt(value, places=0, curr='', sep=',', dp='.',
              pos='', neg='-', trailneg=''):
     """Convert Decimal to a money formatted string.
 

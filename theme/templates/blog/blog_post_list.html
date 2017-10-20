@@ -16,8 +16,27 @@
 {% endmetablock %}{% endblock %}
 
 {% block breadcrumb_element %}
-{% if category %}
-	<li><a href="{% url 'blog_post_list_category' category.slug %}">{{ category }}</a></li>
+{% if tag or category or year or month or author %}
+<li>
+{% spaceless %}
+	{% if tag %}
+    {% trans "Tag:" %} {{ tag }}
+	{% else %}
+		{% if category %}
+    		{% trans "Category:" %} {{ category }}
+    		<a href="{% url 'blog_post_list_category' category.slug %}">{{ category }}</a>
+		{% else %}
+			{% if year or month %}
+    			{% if month %}{{ month }}, {% endif %}{{ year }}
+			{% else %}
+				{% if author %}
+    				{% trans "Author:" %} {{ author.get_full_name|default:author.username }}
+				{% endif %}
+			{% endif %}
+		{% endif %}
+	{% endif %}
+{% endspaceless %}
+</li>
 {% endif %}
 {% endblock %}
 
@@ -98,7 +117,7 @@
 <div class="twelve columns">
 <div id="masonry-wrapper" class="margin-top-10">
 {% for blog_post in blog_posts.object_list %}
-	<div class="one-third column masonry-item">
+	<div class="four columns masonry-item">
 		<article class="from-the-blog">
 			{% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %}
 			{% block blog_post_list_post_featured_image %}

@@ -30,6 +30,7 @@ from cartridge.shop.forms import FormsetForm, DiscountForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
 from theme.models import UserShop, UserProfile, OrderItem, Region, City
+
 # from django_countries.widgets import CountrySelectWidget
 
 
@@ -244,26 +245,32 @@ class DataGroupModelChoiceField(forms.ModelMultipleChoiceField):
 
 
 class SelectForm(forms.ModelForm):
+    # def get_tree_data(node, data):
+    #     level = 0
 
-    def get_tree_data(node, data):
-        level = 0
+    #     def allChildren(self, l=None, level=0):
+    #         if(l == None):
+    #             l = list()
+    #         if level != 0:
+    #             l.append(tuple((self.id, self.title)))
+    #         level += 1
+    #         for child in self.children.all():
+    #             l = allChildren(child, l, level)
+    #         return l
+    #     allChildren(node, data)
+    #     return data
 
-        def allChildren(self, l=None, level=0):
-            if(l == None):
-                l = list()
-            if level != 0:
-                l.append(tuple((self.id, self.title)))
-            level += 1
-            for child in self.children.all():
-                l = allChildren(child, l, level)
-            return l
-        allChildren(node, data)
-        return data
-
-    data = list()
+    # data = list()
+    # class Meta:
+    #     widgets = {
+    #         'unit_price': forms.NumberInput(attrs={'step': '1'}),
+    #     }
     categories = DataGroupModelChoiceField(
         queryset=Category.objects.all().order_by('id'),
         label="Категории")
+
+    # def __init__(self, *args, **kwargs):
+    #     super(SelectForm, self).__init__(*args, **kwargs)
 
 
 class OrderItemAdminForm(forms.ModelForm):

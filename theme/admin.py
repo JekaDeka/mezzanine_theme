@@ -55,6 +55,17 @@ class MyBlogPostAdmin(BlogPostAdmin):
             return qs
         return qs.filter(user_id=request.user)
 
+    def save_model(self, request, obj, form, change):
+        try:
+            tmp = BlogPost.objects.get(pk=obj.pk)
+        except Exception as e:
+            obj.status = 1
+            tmp = None
+
+        if tmp and not 'status' in form.changed_data and not request.user.is_superuser:
+            obj.status = tmp.status
+        super(MyBlogPostAdmin, self).save_model(request, obj, form, change)
+
 
 class MyProductAdmin(ProductAdmin):
     # formfield_overrides = {
@@ -89,6 +100,10 @@ class MyProductAdmin(ProductAdmin):
     def save_model(self, request, obj, form, change):
         if not request.user.is_superuser:
             obj.user = request.user
+        if not obj.unit_price:
+            obj.unit_price = 1
+        if obj.unit_price < 0:
+            obj.unit_price = - obj.unit_price
         super(MyProductAdmin, self).save_model(request, obj, form, change)
 
     def save_formset(self, request, form, formset, change):
@@ -278,7 +293,7 @@ class OrderItemRequestAdmin(admin.ModelAdmin):
             '</ul>'
             '</div><br>',
             reverse('profile', args=[order.performer]),
-            order.performer.get_full_name(),
+            order.performer.profile.get_full_name(),
             reverse('order_request_assign', args=[
                     order.order.id, order.performer.id]),
             reverse('profile', args=[order.performer]),

@@ -167,7 +167,7 @@ $(function() {
 		</a>	
 	</div>
 	<div class="four columns margin-bottom-5">
-		<a href="{% url 'mezzanine_password_reset' %}" class="icon-box">
+		<a {% if profile %}href="{% url 'mezzanine_password_reset' %}"{% endif %} class="icon-box {% if not profile %}disabled{% endif %}">
 				<span><i class="fa fa-lock" aria-hidden="true"></i></span>
 			<h3>Сбросить пароль</h3>
 		</a>	

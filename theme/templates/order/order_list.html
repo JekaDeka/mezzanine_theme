@@ -28,7 +28,7 @@
 {% endif %}
 {% endblock %}
 
-{% block main %}
+{% block leftsidebar %}
 <div class="four columns">
 	{% block order_categories %}
 		{% if order_categories %}
@@ -49,17 +49,28 @@
 		</div>
 		{% endif %}	
 	{% endblock %}
-	<div class="widget margin-top-10">
-			<h3 class="headline">Регион</h3><span class="line"></span><div class="clearfix"></div>
-			<nav class="categories">
-				<ul>
-					<li>Любой</li>
-					<li>Только мой</li>
-				</ul>
-			</nav>
-		</div>
-
+<div class="widget margin-top-10">
+    <h3 class="headline">Регион</h3><span class="line"></span>
+    <div class="clearfix"></div>
+    <form method="GET">
+	    <label class="control control--checkbox">
+			<input {% if request.GET.region %}checked="checked"{% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user.profile.region.id }}" onChange="this.form.submit()">
+			Только мой регион
+			<div class="control__indicator"></div>
+		</label>
+	</form>
+<!--    <nav class="categories">
+        <ul>
+            <li>
+				<a href="?region=">Только мой</a>
+			</li>
+        </ul>
+    </nav>-->
 </div>
+</div>
+{% endblock %}
+
+{% block main %}
 <div class="twelve columns">
 	{% for order in orders.object_list %}
 	<div class="order-container margin-bottom-15">

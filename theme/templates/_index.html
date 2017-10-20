@@ -68,7 +68,7 @@
 <div class="container fullwidth-element home-slider margin-bottom-10">
     <div class="bss-slides">
         {% for image in images %}
-        <figure>
+        <figure class="caption">
             <a href="{{image.href.get_absolute_url }}">
                 <img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1290 350 %}" />
             <figcaption>

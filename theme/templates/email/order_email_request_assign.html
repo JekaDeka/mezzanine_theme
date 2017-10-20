@@ -1,0 +1,23 @@
+{% extends "email/base.html" %}
+{% load static mezzanine_tags accounts_tags %}
+{% block main %}
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr>
+        <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;">
+            <b>Здравствуйте, {{ performer.profile.first_name }}!</b>
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0 0 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
+            Ваша заявка на исполнение <a href="http://{{ request.get_host }}{{ order_url }}">заказа</a> одобрена.
+        </td>
+    </tr>
+    <tr>
+        <td style="padding: 15px 0 0 0; color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
+            Данные заказчика: <br>
+            {{ request.user.email }} <br>
+            {{ request.user.profile.first_name }}
+        </td>
+    </tr>
+</table>
+{% endblock main %}

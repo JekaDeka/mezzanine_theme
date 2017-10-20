@@ -163,13 +163,11 @@
 							{% endif %}
 						{% endblock %}
 						{% block pagination %}{% pagination cl %}{% endblock %}		
-						{% if cl.formset and cl.result_count %}
+						{% if cl.formset and cl.result_count and request.user.is_superuser %}
 							<p class="submit-row">
 								<input class="btn-raised btn-primary btn" type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>
 							</p>
 						{% endif %}
-					
-						
 						</form>
 					</div>
 				</div>

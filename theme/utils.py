@@ -19,13 +19,16 @@ def slugify_unicode(s):
     return re.sub("[-\s]+", "-", "".join(s).strip()).lower()
 
 
-# def not_profile_message(f):
-#     def wrap(request, *args, **kwargs):
-#         try:
-#             profile = request.user.profile
-#         except Exception as e:
-
-#         return f(request, *args, **kwargs)
-#     wrap.__doc__ = f.__doc__
-#     wrap.__name__ = f.__name__
-#     return wrap
+def validate_filter(value):
+    if isinstance(value, str):
+        if value == 'True':
+            return True
+        elif value == 'False':
+            return False
+        try:
+            value = int(value)
+        except Exception as e:
+            value = None
+        else:
+            return value
+    return None

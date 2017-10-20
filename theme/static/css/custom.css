@@ -63,7 +63,7 @@
     opacity: 0;
     -webkit-transition: opacity 1.2s;
     transition: opacity 1.2s;
-    text-shadow: 1px 1px 2px black, 0 0 1em black;
+    /*text-shadow: 1px 1px 2px black, 0 0 1em black;*/
 }
 
 .bss-slides .bss-show figcaption {
@@ -81,22 +81,32 @@
 .bss-slides figcaption p {
     color: #fff;
     line-height: 1.1;
+    text-transform: uppercase;
+    padding: 0 0 5px 0;
+    letter-spacing: -1px;
+    font-weight: 300;
+    display: block;
+    text-shadow: 0px 0px 60px rgba(0, 0, 0, 0.35);
 }
 
-.bss-slides figcaption h1 {
-    font-size: 4.5em;
-}
+.bss-slides figcaption h1,
 .bss-slides figcaption h2 {
-    font-size: 3.5em;
+    font-size: 52px;
+    font-weight: 700;
 }
+
 .bss-slides figcaption h3 {
-    font-size: 2.5em;
+    font-size: 32px;
+    font-weight: 300;
 }
+
 .bss-slides figcaption h4 {
-    font-size: 1.5em;
+    font-size: 24px;
 }
-.bss-slides figcaption h5, .bss-slides figcaption h6 {
-    font-size: 1em;
+
+.bss-slides figcaption h5,
+.bss-slides figcaption h6 {
+    font-size: 20px;
 }
 
 .bss-next,
@@ -132,7 +142,28 @@
     left: 0;
 }
 
+.input_price {
+    display: inline-block;
+    position: relative;
+    width: calc(50% - 2px);
+}
+.input_price span {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    color: #bbb;
+}
+.input_price input[type="number"] {
+    padding-left: 24px;
+}
+/*#id_max_price,
+#id_min_price {
+    width: 30%;
+}
 
+#id_max_price {
+    margin-left: 3%;
+}*/
 #logo {
     margin-bottom: 5px;
     margin-top: 15px
@@ -290,6 +321,7 @@ a.button.light:hover {
 .width-100 {
     width: 100%
 }
+
 
 
 
@@ -1015,11 +1047,11 @@ input[type=number]::-webkit-outer-spin-button {
 .control--checkbox .control__indicator:after {
     border: solid #fff;
     border-width: 0 2px 2px 0;
-    height: 8px;
-    left: 8px;
-    top: 4px;
+    height: 10px;
+    left: 6px;
+    top: 3px;
     transform: rotate(45deg);
-    width: 5px;
+    width: 8px;
 }
 
 .control--checkbox input:disabled~.control__indicator:after {
@@ -1461,12 +1493,15 @@ input[type="password"],
         margin-left: 10px;
     }
 }
+
 .red {
     background-color: #c62020;
 }
+
 .pull-left {
     float: left!important;
 }
+
 .pull-right {
     float: right!important;
 }
