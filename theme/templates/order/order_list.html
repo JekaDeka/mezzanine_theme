@@ -72,6 +72,7 @@
 
 {% block main %}
 <div class="twelve columns">
+{% if orders %}
 	{% for order in orders.object_list %}
 	<div class="order-container margin-bottom-15">
 		<div class="three alpha columns margin-top-10">
@@ -104,6 +105,11 @@
 	<div class="margin-top-15"><span class="line"></span><div class="clearfix"></div></div>
 	{% endfor %}
 	{% pagination_for orders %}
+{% else %}
+	<section id="not-found">
+        <p>Заказов по заданным критериям не найдено</p>
+    </section>
+{% endif %}
 </div>
 {% endblock %}
 

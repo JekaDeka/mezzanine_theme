@@ -1,7 +1,7 @@
 {% load mezzanine_tags shop_tags i18n theme_tags pages_tags static  %}
 
 
-{% if true_products.object_list %}
+{% if true_products %}
 	<div class="twelve columns">
 		<form class="product-sorting" method="GET">
 		        <select onchange="location.href = this[this.selectedIndex].value;" class="orderby" id="sorting-select">
@@ -67,4 +67,10 @@
 			{% pagination_for true_products %}
 		{% endif %}
 	</div>
-	{% endif %}
+{% else %}
+<div class="twelve columns">
+	<section id="not-found">
+        <p>Товаров по заданным критериям не найдено</p>
+    </section>
+</div>
+{% endif %}

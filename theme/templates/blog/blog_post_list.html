@@ -115,6 +115,7 @@
 
 {% block main %}
 <div class="twelve columns">
+{% if blog_posts %}
 <div id="masonry-wrapper" class="margin-top-10">
 {% for blog_post in blog_posts.object_list %}
 	<div class="four columns masonry-item">
@@ -163,14 +164,17 @@
 	</div>
 {% endfor %}
 </div>
+{% else %}
+	<section id="not-found">
+        <p>Записей по заданным критериям не найдено</p>
+    </section>
+{% endif %}
+<div class="clearfix"></div>
+{% pagination_for blog_posts %}	
 </div>
+
 {% endblock %}
 
-{% block extra_content %}
-{% if blog_posts %}
-	{% pagination_for blog_posts %}	
-{% endif %}
-{% endblock extra_content %}
 
 
 
