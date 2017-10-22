@@ -113,11 +113,11 @@
 			{% if product.user.shop.on_vacation %}
 				<div class="product-example red">Магазин на каникулах</div>
 			{% endif %}
-			<a href="{{ shop.get_absolute_url }}">
-				<img src="{{ MEDIA_URL }}{% thumbnail shop.image 80 80 %}" class="pull-left margin-right-5">
-				<h2>{{ shop.shopname }}</h2>
+			<a href="{{ product.user.shop.get_absolute_url }}">
+				<img src="{{ MEDIA_URL }}{% thumbnail product.user.shop.image 80 80 %}" class="pull-left margin-right-5">
+				<h2>{{ product.user.shop.shopname }}</h2>
 			</a>
-			<p><i class="fa fa-map-marker"></i> <strong>{{ shop.user.profile.get_location }}</strong><p>
+			<p><i class="fa fa-map-marker"></i> <strong>{{ product.user.profile.get_location }}</strong><p>
 		</div>	
 	</section>
 	</div>
