@@ -1,8 +1,9 @@
 {% extends "base.html" %} 
-{% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %} 
+{% load i18n mezzanine_tags theme_tags staticfiles %} 
 {% block meta_title %}{{ profile_user.profile.get_full_name }}{% endblock %} 
 
 {% block title %}{{ profile_user.profile.get_full_name }}{% endblock %} 
+
 
 {% block breadcrumbs_title %}
 <h2>{{ profile_user.profile.get_full_name }}</h2> 
@@ -10,35 +11,141 @@
 
 {% block breadcrumb_element %} 
 {{ block.super }}
-<li><a href="{% url 'profile' profile_user.profile %}">Профиль мастера</a></li>
+<li><a href="{% url 'profile' profile_user %}">Профиль мастера</a></li>
 {% endblock %} 
 
+{% block leftsidebar %}
+<div class="five columns">
+    <figure class="post-img">
+    {% if profile_user.profile.image %}
+        <img src="{{ MEDIA_URL }}{% thumbnail profile_user.profile.image 420 300 %}" alt="Фото профиля"> {% else %}
+        <img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}" alt="no-image"> {% endif %}
+    </figure>
+    <section class="the-team-content">
+    <ul class="profile-user-list margin-bottom-15">
+        <li><a href="#15">Магазин</a></li>
+        <li><a href="#25">Отзывы (0)</a></li>
+        <li><a href="#35">Правила магазина</a></li>
+        <li><a href="#45">Персональный заказ</a></li>
+        <li><a href="#55">Блог (5)</a></li>
+        <li><a href="#">Достижения (0)</a></li>
+    </ul>
+</section>
+</div>
+{% endblock leftsidebar %}
+
+
 {% block main %}
+<div class="eleven columns">
+    <section class="the-team-content">
+        <header class="meta">
+            <h5 class="entry-title">{{ profile_user.profile.get_full_name }}</h5><i>Мастер</i>
+        </header>
+        <ul class="profile-user-list margin-bottom-15">
+            <li>{{ profile_user.profile.get_location }}</li>
+            <li>На сайте: {{ profile_user.date_joined|timesince }}</li>
+            {% if profile_user.shop %}
+                <li>Магазин: <a href="{{ profile_user.shop.get_absolute_url }}">{{ profile_user.shop.shopname }}</a></li>
+                <li>Товары: <a href="#1">Готовые <span>(15)</span></a>
+                <a href="#2">На заказ <span>(22)</span></a>
+                <a href="#4">Для примера <span>(7)</span></a>
+                <a href="#5">Все <span>(55)</span></a>
+            </li>
+            {% endif %}
+            <li><a href="#5">Исполненные заказы <span>(3)</span></a></li>
+            
+        </ul>
+        <div class="entry-content">
+            {{ profile_user.profile.bio | safe }}
+            <div class="clearfix"></div>
+        </div>
+    </section>
+</div>
 <div class="sixteen columns">
-    <article class="the-team single">
-        <div class="eight alpha columns">
-            <figure class="post-img">
-                <!--<a href="{% url 'profile' profile_user %}">-->
-                {% if profile_user.profile.image %}
-                <img src="{{ MEDIA_URL }}{% thumbnail profile_user.profile.image 580 400 %}" alt="Фото профиля"> {% else %}
-                <img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 580 400 %}" alt="no-image"> {% endif %}
-                <!--</a>-->
-            </figure>
-        </div>
-        <div class="eight columns omega">
-            <section class="the-team-content">
-                <header class="meta">
-                    <h5 class="entry-title">{{ profile_user.profile.get_full_name }}</h5><i>Мастер</i>
-                </header>
-                <!-- .entry-header -->
-                <div class="entry-content">
-                    {{ profile_user.profile.bio | safe }}
+    {% get_user_blog_posts profile_user as blog_posts %}
+    {% if blog_posts %}
+        <h3 class="headline">Темы и события</h3><span class="line margin-bottom-3-"></span><div class="clearfix"></div>
+        <div id="masonry-wrapper" class="margin-top-10">
+        {% for blog_post in blog_posts %}
+        <div class="four columns masonry-item">
+            <article class="from-the-blog">
+                {% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %}
+                {% block blog_post_list_post_featured_image %}
+                <figure class="from-the-blog-image">
+                    <a href="{{ blog_post.get_absolute_url }}">
+                        <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="" />
+                    </a>
+                    <div class="hover-icon"></div>
+                </figure>
+                {% endblock %}
+                {% endif %}
+                <section class="from-the-blog-content">
+                    {% block blog_post_list_post_title %}
+                    {# {% editable blog_post.title %} #}
+                        <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|title }}</h5></a>
+                    {# {% endeditable %} #}
+                    {% endblock %}
+                    {% block blog_post_list_post_metainfo %}
+                        {# {% editable blog_post.publish_date %} #}
+                        {% with blog_post.user as author %}
+                        <i>
+                        {% blocktrans with sometime=blog_post.publish_date|date %}{{ sometime }}{% endblocktrans %}
+                        </i>
+                        {% endwith %}
+                        {# {% endeditable %} #}
+                    {% endblock %}
                     <div class="clearfix"></div>
-                </div>
-                <!-- .entry-content -->
-            </section>
+                    {% block blog_post_list_post_content %}
+                        {% if blog_post.preview_content %}
+                            {# {% editable blog_post.preview_content %} #}
+                            {{ blog_post.preview_content|safe|truncatewords_html:55 }}
+                            {# {% endeditable %} #}
+                        {% else %}
+                            {# {% editable blog_post.content %} #}
+                            {{ blog_post.description_from_content|safe }}
+                            {# {% endeditable %} #}
+                        {% endif %}
+                    {% endblock %}
+                    <div class="clearfix"></div>
+                    <a href="{{ blog_post.get_absolute_url }}" class="button gray margin-top-5">{% trans "read more" %}</a>
+                </section>
+            </article>
         </div>
-        <div class="clearfix"></div>
-    </article>
+        {% endfor %}
+        </div>
+    {% endif %}
+</div>
+<div class="sixteen columns">
+    <h3 class="headline">Отзывы</h3><span class="line margin-bottom-3-"></span>
+    <div class="clearfix"></div>
+    <section class="comments">
+        <ul>
+            <li>
+                <div class="avatar"><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt=""></div>
+                <div class="comment-content">
+                    <div class="arrow-comment"></div>
+                    <div class="comment-by"><strong>John Doe</strong><span class="date">May 28, 2014</span>
+                    </div>
+                    <p>Maecenas dignissim euismod nunc, in commodo est luctus eget. Proin in nunc laoreet justo volutpat blandit enim. Sem felis, ullamcorper vel aliquam non, varius eget just.</p>
+                </div>
+            </li>
+            <li>
+                <div class="avatar"><img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt=""></div>
+                <div class="comment-content">
+                    <div class="arrow-comment"></div>
+                    <div class="comment-by"><strong>Kathy Brown</strong><span class="date">May 18, 2014</span>
+                    </div>
+                    <p>Morbi velit eros, sagittis in facilisis non, rhoncus et erat. Nam posuere tristique sem, eu ultricies tortor imperdiet vitae. Curabitur lacinia neque non metus</p>
+                </div>
+            </li>
+        </ul>
+    </section>
+</div>
+<div class="sixteen columns">
+    <h3 class="headline">Достижения</h3><span class="line margin-bottom-3-"></span>
+    <div class="clearfix"></div>
+    <p class="">
+        <img src="https://www.livemaster.ru/image/s/gamification/mk-color.png">
+        &emsp;Энтузиаст</p>
 </div>
 {% endblock %}

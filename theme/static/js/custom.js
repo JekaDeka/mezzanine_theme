@@ -568,6 +568,25 @@
                 $Filter.find('ul li:first-child a').removeClass('share-hovered');
             }, 250);
         });
+        $('.responsive-table').stacktable();
+        //fix cart table input issues
+        $(document).on('change', 'input[name^=items]', function() {
+            var name = $(this).attr('name')
+            var type = name.split('-')[2];
+            var $inputs = $('input[name=' + name );
+            if (type == 'DELETE')
+                $inputs.prop('checked', $(this).prop('checked'));
+            else {
+                var tmp = $(this).val();
+                $inputs.each(function(){ $(this).val(tmp);})
+            }
+            // $('input[name=items-0-DELETE]')
+            // console.log('test');
+        });
+        // $(document).on('change', 'input[name=items-0-DELETE]', function() {
+        //     $('input[name=items-0-DELETE]').prop('checked', $(this).prop('checked'));
+        // });
+
         $(window).resize(function() {
             if ($(window).width() < 960) {
                 $Filter.find('ul li:not(.active)').show();
@@ -576,7 +595,8 @@
             }
         });
         $(window).resize();
-        $('.responsive-table').stacktable();
+        
+
         var pxShow = 600;
         var fadeInTime = 400;
         var fadeOutTime = 400;

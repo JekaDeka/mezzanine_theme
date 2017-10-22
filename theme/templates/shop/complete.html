@@ -49,27 +49,33 @@ ga('ecommerce:send');
 {% endif %}
 {% endblock %}
 
-{% block title %}{% trans "Order Complete" %}{% endblock %}
+{% block breadcrumbs_title %}
+<h2>{% trans "Order Complete" %}</h2>
+{% endblock %}
 
-{% block breadcrumb_menu %}
-{% for step in steps %}
-<li>{{ step.title }}</li>
-{% endfor %}
+{% block breadcrumb_element %}
 <li><strong>{% trans "Complete" %}</strong></li>
 {% endblock %}
 
 
 {% block main %}
-<p>{% trans "Thank you for shopping with us, your order is complete." %}</p>
-<p>{% trans "We've sent you a receipt via email." %}</p>
-<p>{% trans "You can also view your invoice using one of the links below." %}</p>
-<br>
-<form class="order-complete-form" method="post" action="{% url "shop_invoice_resend" order.id %}?next={{ request.path }}">
-    {% csrf_token %}
-    {% if has_pdf %}
-    <a class="btn btn-primary" href="{% url "shop_invoice" order.id %}?format=pdf">{% trans "Download PDF invoice" %}</a>
-    {% endif %}
-    <a class="btn btn-default" target="_blank" href="{% url "shop_invoice" order.id %}">{% trans "View invoice in your browser" %}</a>
-    <input type="submit" class="btn btn-default" value="{% trans "Re-send order email" %}">
-</form>
+<div class="sixteen columns text-center margin-bottom-50">
+<div class="notification closeable success">
+    <p>Ваш заказ принят на исполнение.</p>
+    <a class="close"></a>
+</div>
+<section>
+<p>Мы отправили Вам чек по электронной почте.</p>
+<p>Вы также можете просмотреть свой счет, используя одну из приведенных ниже ссылок.</p>
+<a class="button dark" target="_blank" href="{% url "shop_invoice" order.id %}">{% trans "View invoice in your browser" %}</a>
+    <form class="order-complete-form" method="post" action="{% url "shop_invoice_resend" order.id %}?next={{ request.path }}">
+        {% csrf_token %}
+        {% if has_pdf %}
+            <a class="button color" href="{% url "shop_invoice" order.id %}?format=pdf">Скачать PDF-файл</a>
+        {% endif %}
+        <input type="submit" class="button color" value="Повторно отправить письмо">
+    </form>  
+</section>
+
+</div>
 {% endblock %}

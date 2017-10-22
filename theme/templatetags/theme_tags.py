@@ -844,47 +844,55 @@ def any_is_true(l):
     return False
 
 
-# @register.filter
-# def get_shop_slug(user):
-#     if not user:
-#         return "/"
-#     shop = get_object_or_404(UserShop, user=user)
-#     return shop.slug
-
-
-# @register.filter
-# def get_shop_name(user):
-#     if not user:
-#         return "/"
-#     shop = get_object_or_404(UserShop, user=user)
-#     return shop.shopname
-
-
 # @register.assignment_tag
-# def get_shop(user):
-#     try:
-#         shop = UserShop.objects.get(user=user)
-#     except Exception as e:
-#         return None
-#     return shop
+# def get_shop_by_product(sku):
+#     p = Product.objects.get(id=71)
+#     return sku
+    # try:
+
+    #     print(p)
+    #     shop = p.user.shop
+    # except Exception as e:
+    #     shop = None
+    # return shop
+    # @register.filter
+    # def get_shop_slug(user):
+    #     if not user:
+    #         return "/"
+    #     shop = get_object_or_404(UserShop, user=user)
+    #     return shop.slug
+
+    # @register.filter
+    # def get_shop_name(user):
+    #     if not user:
+    #         return "/"
+    #     shop = get_object_or_404(UserShop, user=user)
+    #     return shop.shopname
+
+    # @register.assignment_tag
+    # def get_shop(user):
+    #     try:
+    #         shop = UserShop.objects.get(user=user)
+    #     except Exception as e:
+    #         return None
+    #     return shop
+
+    # @register.assignment_tag
+    # def get_shop_products(user):
+    #     try:
+    #         # products = get_list_or_404(Product, user=user)
+    #         products = Product.objects.filter(user=user)
+    #     except Exception as e:
+    #         return None
+    #     return products
 
 
-# @register.assignment_tag
-# def get_shop_products(user):
-#     try:
-#         # products = get_list_or_404(Product, user=user)
-#         products = Product.objects.filter(user=user)
-#     except Exception as e:
-#         return None
-#     return products
-
-
-@register.assignment_tag
+@register.as_tag
 def get_user_blog_posts(user):
     try:
-        posts = BlogPost.objects.filter(user=user)
+        posts = BlogPost.objects.filter(user=user)[:4]
     except Exception as e:
-        return None
+        raise
     return posts
 
 
@@ -907,10 +915,10 @@ def get_device_width(context):
     return width
 
 
-@register.assignment_tag
-def get_product_images(product):
-    # reducing image count to 2 because of slider which contain only two
-    return ProductImage.objects.filter(product=product)[:2]
+# @register.assignment_tag
+# def get_product_images(product):
+#     # reducing image count to 2 because of slider which contain only two
+#     return ProductImage.objects.filter(product=product)[:2]
 
 
 @register.filter(is_safe=True, needs_autoescape=True)

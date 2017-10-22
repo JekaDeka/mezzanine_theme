@@ -3,7 +3,7 @@
 <div id="cart">
 <!-- Button -->
 	<div class="cart-btn">
-		<a href="#" class="button adc">{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0.00 ₽{% endif %}</a>
+		<a href="javascript:void(0);" class="button adc">{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0.00 ₽{% endif %}</a>
 			</div>
 			<div class="cart-list">
 			<div class="arrow"></div>

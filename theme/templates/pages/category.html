@@ -1,6 +1,5 @@
 {% extends "pages/page.html" %}
 {% load mezzanine_tags shop_tags i18n theme_tags pages_tags static  %}
-{% block body_id %}category{% endblock %}
 
 {% block breadcumbs_menu %}
 {% shop_menu "pages/menus/breadcrumb.html" %}
@@ -121,5 +120,78 @@
 
 
 {% block main %}
-{% include "includes/products.html" %}
+{% if true_products %}
+	<div class="twelve columns">
+		<form class="product-sorting" method="GET">
+		        <select onchange="location.href = this[this.selectedIndex].value;" class="orderby" id="sorting-select">
+		        {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
+		        {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
+		        <option{% if option == products.sort_by %} selected{% endif %}
+		            value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
+		            {{ name }}
+		        </option>
+		        {% endif %}
+		        {% endfor %}
+		        </select>
+		</form>
+	</div>
+	<div class="twelve columns products">
+		{% for product in true_products %}
+		<div class="four shop columns custom_column">
+			<figure class="product">
+				<div class="badges">
+				{% if product.pre_order %}
+					<div class="product-example">Для примера</div>
+				{# {% else %} #}
+					<!--<div class="product-ready">Готовый вариант</div>-->
+				{% endif %}
+				{% if product.on_custom_sale %}
+					<div class="product-discnt">СКИДКА</div>
+				{% endif %}
+				</div>
+				{% with product.images.all|slice:"2" as images %}
+				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
+				<a href="{{ product.get_absolute_url }}">
+					{% if images %}
+					<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+						{% if product.image.count != 1 %}
+						<div class="cover">
+								<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+						</div>
+						{% endif %}
+					{% else %}
+					<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+					{% endif %}
+				</a>
+				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+				</div>
+				{% endwith %}
+				<a href="{{ product.get_absolute_url }}">
+					<section>
+						<h5>{{ product.title|title|truncatechars:34 }}</h5>
+						<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
+						<!--<span class="product-category">
+						</span>-->
+						{% if product.on_custom_sale %}
+							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+						{% else %}
+						<span class="product-price">{{ product.price|rub_currency }}</span>
+						{% endif %}
+					</section>
+				</a>
+			</figure>
+		</div>
+		{% endfor %}
+		<div class="clearfix"></div>
+		{% if true_products.paginator.count != 0 %}
+			{% pagination_for true_products %}
+		{% endif %}
+	</div>
+{% else %}
+<div class="twelve columns">
+	<section id="not-found">
+        <p>Товаров по заданным критериям не найдено</p>
+    </section>
+</div>
+{% endif %}
 {% endblock %}

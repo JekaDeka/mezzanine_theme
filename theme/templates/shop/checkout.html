@@ -5,7 +5,13 @@
 {% block title %}
 {% trans "Checkout" %} - {% trans "Step" %} {{ step }} {% trans "of" %} {{ steps|length }}
 {% endblock %}
-{% block body_id %}checkout{% endblock %}
+
+{% block extra_js %}
+<script>
+var _gaq = [['_trackPageview', '{{ request.path }}{{ step_url }}/']];
+$(function() {$('.middle :input:visible:enabled:first').focus();});
+</script>
+{% endblock %}
 
 {% block breadcrumbs_title %}
     <h2>{{ step_title }} - {% trans "Step" %} {{ step }} {% trans "of" %} {{ steps|length }}</h2>
@@ -21,71 +27,65 @@
     {% endif %}
 </li>
 {% endfor %}
-<li>{% trans "Complete" %}</li>
+<li style="font-weight: inherit">{% trans "Complete" %}</li>
+<!--<li></li>-->
 {% endblock %}
 
-
+{% block messages %}
+    {{ block.super }}
+     {% if not request.user.is_authenticated %}
+        {% ifinstalled mezzanine.accounts %}
+        <div class="container">
+        <div class="sixteen columns">
+            <div class="notification info margin-bottom-10 text-center">
+                <p>{% url "login" as login_url %}{% url "signup" as signup_url %}
+                {% with request.path as next %}
+                    Если у вас есть существующая учетная запись или вы хотите ее создать, 
+                    <a href="{{ login_url }}?next={{ next }}">войдите</a> в систему или <a href="{{ signup_url }}?next={{ next }}">зарегистрируйтесь</a>.
+                {% endwith %}
+                </p>
+            </div>
+        </div>
+        </div>
+        {% endifinstalled %}
+    {% endif %}
+{% endblock messages %}
 
 {% block main %}
-<div class="eight columns">
-<form method="post" class="">
+<div class="eight columns ">
+<form method="post" class="checkout-form">
 {% csrf_token %}
     <!-- Billing Details Content -->
-    <div class="checkout-section active"><span>1</span> Контактная информация</div>
-
-        <div class="checkout-content">
-    {{ form }}
-            
-
-            <div class="clearfix"></div>
-            
-
-
-            <span class="shippping-checkbox"><input class="input-checkbox" id="shipping-address"  type="checkbox" name="shipping-address" checked="checked" value="1" />
-            <label for="shipping-address" class="checkbox">Billing address is same as shipping address</label></span>
-            <div class="clearfix"></div>
-
-
-            </div>
-            <div class="clearfix"></div>
-
-            {% if request.cart.has_items %}
+    {% block fields %}{% endblock %}
+    <!--<div class="checkout-section active"><span></span> Контактная информация</div>-->
+        <!--<div class="checkout-content">-->
+        <!--<div class="clearfix"></div>-->
+        <!--</div>-->
+    {% block nav-buttons %}
+        <div class="clearfix"></div>
+        {% if request.cart.has_items %}
             <div class="form-actions">
-                <input type="submit" class="continue button color" value="{% trans "Next" %}">
+                <input type="submit" class="button color pull-right" value="{% trans "Next" %}" style="width: 46%;">
                 {% if not CHECKOUT_STEP_FIRST %}
-                <input type="submit" class="btn btn-lg btn-default pull-left" name="back" value="{% trans "Back" %}">
+                    <input type="submit" class="button dark pull-left" name="back" value="{% trans "Back" %}" style="width: 46%;">
                 {% endif %}
             </div>
-        {% else %}
-            <p>{% trans "Your cart is empty." %}</p>
-            <p>{% trans "This may be due to your session timing out after a period of inactivity." %}</p>
-            <p>{% trans "We apologize for the inconvenience." %}</p>
-            <br>
-            <p><a class="btn btn-lg btn-primary" href="{% url "page" "shop" %}">{% trans "Continue Shopping" %}</a></p>
         {% endif %}
-    </form>
-        </div>
+    {% endblock %}
+</form>
+</div>
 
-        <!-- Billing Details / Enc -->
-
-
-    <!-- Checkout Cart -->
-   
-    <div class="eight columns">
-    {% if request.cart.has_items %}
+{% if request.cart.has_items %}
+<div class="eight columns">
         <div class="checkout-section cart">Корзина</div>
-        <!-- Cart -->
-        <table class="checkout cart-table responsive-table">
-
-            <tr>
-                <th class="hide-on-mobile">Товар</th>
-                <th></th>
-                <th>Кол-во</th>
-                <th>Цена</th>
-                <!--<th>Всего</th>-->
-            </tr>
+            <table class="checkout cart-table responsive-table">
+                <tr>
+                    <th class="hide-on-mobile">Товар</th>
+                    <th></th>
+                    <th>Кол-во</th>
+                    <th>Цена</th>
+                </tr>
             {% for item in request.cart %}
-            <!-- Item #1 -->
             <tr>
                 <td class="hide-on-mobile">
                     {% if item.image %}
@@ -95,7 +95,6 @@
                 <td class="cart-title"><a href="{{ item.get_absolute_url }}"> {{ item.description }}</a></td>
                 <td class="qty-checkout">{{ item.quantity }}</td>
                 <td>{{ item.total_price|rub_currency }}</td>
-<!--                <td class="cart-total">$79.00</td>-->
             </tr>
             {% endfor %}
             </table>
@@ -110,39 +109,20 @@
                     </tr>
                 </tbody>
             </table>
-            <div class="margin-top-5">
-            </div>
-            
+            <div class="margin-top-5"></div>
             {% order_totals %}
-            <!-- Apply Coupon Code / Buttons -->
-            <!--<table class="cart-table bottom">
-
-                <tr>
-                <th class="checkout-totals">
-                    <div class="checkout-subtotal">
-                        Subtotal: <span>$178.00</span>
-                    </div>
-                </th>
-                </tr>
-
-            </table>-->
-    {% else %}
-            <p>{% trans "Your cart is empty." %}</p>
-            <p>{% trans "This may be due to your session timing out after a period of inactivity." %}</p>
-            <p>{% trans "We apologize for the inconvenience." %}</p>
-            <br>
-            <p><a class="btn btn-lg btn-primary" href="{% url "page" "shop" %}">{% trans "Continue Shopping" %}</a></p>
-        {% endif %}
-    </div>
-    <!-- Checkout Cart / End -->
-
-
-
 </div>
-<!-- Container / End -->
+{% else %}
+<div class="sixteen columns text-center">
+    <section id="not-found">
+        <p>{% trans "Your cart is empty." %}</p>
+        <p>Приносим свои извинения за доставленные неудобства.</p>
+        <a class="button color" href="{% url "page" "catalog" %}">Продолжить покупки</a>
+    </section>
+</div>
+{% endif %}
 
-<div class="margin-top-50"></div>
-
+{% block after-form %}{% endblock %}
 {% endblock %}
 
 

@@ -3,7 +3,6 @@
 
 {% block meta_title %}{% trans "Your Cart" %}{% endblock %}
 {# {% block title %}{% trans "Your Cart" %}{% endblock %} #}
-{% block body_id %}cart{% endblock %}
 
 {% block breadcrumbs_title %}
 	<h2>{% trans "Your Cart" %}</h2>
@@ -33,15 +32,16 @@
 		<table class="cart-table responsive-table stacktable large-only">
 		    <tbody>
 		        <tr>
-		            <th>Товар</th>
 		            <th></th>
+		            <th>Товар</th>
 		            <th>Цена</th>
 		            <th>Кол-во</th>
-		            <th>Всего</th>
-		            <th></th>
+		            <th>Итого</th>
+		            <th>Удалить</th>
 		        </tr>
-		        {% for form in cart_formset.forms %}
+				{% for form in cart_formset.forms %}
 				{% with form.instance as item %}
+				{# {{ item.sku }} #}
 				<tr>
 					<td>
 						{{ form.id }}
@@ -56,15 +56,10 @@
 					</td>
 					<td>{{ item.unit_price|rub_currency }}</td>
 					<td>
-					    <form action="#">
-					        <div class="qtyminus"></div>
-					        <input type="text" name="quantity" value="1" class="qty">
-					        <div class="qtyplus"></div>
-					    </form>
 					    {{ form.quantity }}
 					</td>
 					<td class="cart-total">{{ item.total_price|rub_currency }}</td>
-					<td><a href="#" class="cart-remove">{{ form.DELETE }}</a></td>
+					<td>{{ form.DELETE }}</td>
 				</tr>
 				{% endwith %}
 				{% endfor %}
@@ -83,12 +78,10 @@
 		                </form>
 		                {% endif %}
 		                <div class="cart-btns">
-		                    <!--<a href="checkout-billing-details.html" class="button color cart-btns proceed">Proceed to Checkout</a>-->
 		                    <a href="{% url "shop_checkout" %}" class="button color cart-btns proceed">
 											{% if request.session.order.step %}К оплате
 											{% else %}Далее{% endif %}
 										</a>
-		                    <!--<a href="#" class="button gray cart-btns">Update Cart</a>-->
 		                    <input type="submit" name="update_cart" class="button gray cart-btns" value="Обновнить">
 		                </div>
 		            </th>
@@ -96,7 +89,7 @@
 		    </tbody>
 		</table>
 		</form>
-		{% order_totals %}
+		{# {% order_totals %} #}
 	{% else %}
 			<p>{% trans "Your Cart is empty." %}</p>
 		{% endif %}

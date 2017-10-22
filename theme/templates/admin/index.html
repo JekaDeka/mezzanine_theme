@@ -135,7 +135,7 @@
                 {% if request.user.shop.on_vacation %}
                     <p class="text-danger">Магазин в данное время на каникулах и не примиает заказы</p>
                 {% endif %}
-                <p>{{ request.user.profile.country }}, {{ request.user.profile.city }}</p>
+                <p>{{ request.user.profile.get_location }}</p>
                 <ul class="demo-btns">
                 <li>
                     <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shop_product_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>

@@ -1,10 +1,19 @@
 from django.conf.urls import include, url
 from theme import views
+# from theme.forms import NoQuantityAddProductForm  # , NoQCartItemFormSet
+from cartridge.shop.forms import CartItemFormSet
+from cartridge.shop import views as cart_views
 from imagefit import urls
 
 
 # prefix in main HelloDjango project
 urlpatterns = [
+    # url(r"^shop/product/(?P<slug>.*)/$", views.product, name="shop_product"),
+    # url(r"^shop/cart/$", cart_views.cart, name="shop_cart"),
+    # url(r"^shop/checkout/$", cart_views.checkout_steps, name="shop_checkout"),
+    url(r"^shop/", include("cartridge.shop.urls")),
+
+
     url(r"^ordertable/(?P<pk>[0-9]+)/$",
         views.order_detail, name="order_detail"),
     url("^ordertable/category/(?P<category>[\w\-]+)/$",

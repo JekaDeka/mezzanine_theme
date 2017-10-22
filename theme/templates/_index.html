@@ -141,7 +141,7 @@
 	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 100 100 %}" alt="{{shop.shopname}}" class="shop-image pull-left" />
 	    		</a>
 	    		<a href="{{ shop.get_absolute_url }}"><h2>{{shop.shopname}}</h2></a>
-	    			<span>{{shop.user.profile.country}}, {{shop.user.profile.city}} </span>
+	    			<span>{{ shop.user.profile.get_location }} </span>
     		</div>
     		</div>
     	{% endfor %}
@@ -229,22 +229,23 @@
                     	<div class="product-discnt">СКИДКА</div>
                     {% endif %}
                 </div>
-                {% get_product_images product as images %}
+                {% with product.images.all|slice:"2" as images %}
                 <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
-                    <a href="{{ product.get_absolute_url }}">
-						{% if images %}
-						<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
-							{% if images.count != 1 %}
-							<div class="cover">
-									<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
-							</div>
-							{% endif %}
-						{% else %}
-							<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
-						{% endif %}
-					</a>
-                    <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+                <a href="{{ product.get_absolute_url }}">
+                    {% if images %}
+                    <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+                        {% if product.image.count != 1 %}
+                        <div class="cover">
+                                <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+                        </div>
+                        {% endif %}
+                    {% else %}
+                    <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+                    {% endif %}
+                </a>
+                <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
                 </div>
+                {% endwith %}
                 <a href="{{ product.get_absolute_url }}">
                     <section>
                         <h5>{{ product.title|title|truncatechars:34 }}</h5>

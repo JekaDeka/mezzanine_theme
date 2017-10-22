@@ -7,7 +7,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
-from django.template import RequestContext, Context
 from django.template.response import TemplateResponse
 from django.template.loader import get_template, render_to_string
 from django.core.urlresolvers import reverse
@@ -17,32 +16,22 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
-from django.middleware.csrf import get_token
 from django.db.models import Q, Count
-from django.db import IntegrityError
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
-from cartridge.shop.models import Category, Product
+from cartridge.shop.models import Category, Product, ProductVariation
+from cartridge.shop.utils import recalculate_cart, sign
 from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop, UserProfile
-from theme.utils import AuthorIsRequested
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
 from mezzanine.generic.models import Keyword
-from mezzanine.core.models import SitePermission
 from mezzanine.utils.views import paginate
-from mezzanine.accounts import get_profile_form
-from theme.forms import СustomBlogForm, ContactForm, ShopForm, MessageForm, OrderMessageForm, UserProfileForm
-from mezzanine.utils.email import send_verification_mail, send_approve_mail
-from mezzanine.utils.urls import login_redirect, next_url
-from mezzanine.accounts.forms import LoginForm, PasswordResetForm
+from theme.forms import ContactForm, ShopForm, MessageForm, OrderMessageForm, UserProfileForm
 from django.contrib.auth.models import Group
-from django.views import generic
 from django.views.decorators.csrf import csrf_protect
-from django.views.generic.detail import BaseDetailView
 from django.contrib.auth.decorators import login_required
-# from django.contrib.messages import info, error
-# from mezzanine.utils.urls import login_redirect, next_url
+
 import datetime
 import json
 from PIL import Image
@@ -587,27 +576,67 @@ def get_categories(request):
     return JsonResponse(tree, safe=False,  json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
 
-# class UserList(generic.ListView):
-#     model = UserProfile
-#     template_name = 'accounts/account_profile_settings.html'
+# def product(request, slug, template="shop/product.html",
+#             form_class=NoQuantityAddProductForm, extra_context=None):
+#     """
+#     Display a product - convert the product variations to JSON as well as
+#     handling adding the product to either the cart or the wishlist.
+#     """
+#     published_products = Product.objects.published(for_user=request.user)
+#     product = get_object_or_404(published_products, slug=slug)
+#     shop = UserShop.objects.get(user=product.user)
+#     # related_products = Product.objects.published(for_user=request.user).filter(user=user)[:5]
 
+#     # fields = [f.name for f in ProductVariation.option_fields()]
+#     # print(fields)
+#     # variations = product.variations.all()
+#     # variations_json = json.dumps([dict([(f, getattr(v, f))
+#     # for f in fields + ["sku", "image_id"]]) for v in variations])
+#     to_cart = (request.method == "POST" and
+#                request.POST.get("add_wishlist") is None)
+#     initial_data = {}
+#     # if variations:
+#     # initial_data = dict([(f, getattr(variations[0], f)) for f in fields])
+#     initial_data["quantity"] = 1
+#     # initial_data["shop"] =
+#     add_product_form = form_class(request.POST or None, product=product, shop=shop,
+#                                   initial=initial_data, to_cart=to_cart)
+#     if request.method == "POST":
+#         if add_product_form.is_valid():
+#             if to_cart:
+#                 quantity = add_product_form.cleaned_data["quantity"]
+#                 request.cart.add_item(add_product_form._product, shop, quantity)
+#                 recalculate_cart(request)
+#                 messages.info(request, _("Item added to cart"))
+#                 return redirect("shop_cart")
+#             else:
+#                 skus = request.wishlist
+#                 sku = add_product_form.variation.sku
+#                 if sku not in skus:
+#                     skus.append(sku)
+#                 info(request, _("Item added to wishlist"))
+#                 response = redirect("shop_wishlist")
+#                 set_cookie(response, "wishlist", ",".join(skus))
+#                 return response
+#         else:
+#             messages.error(request, 'wtf')
 
-# class UserEdit(generic.UpdateView):
-#     model = UserProfile
-#     fields = '__all__'
+#     # related = Product.objects.published(for_user=request.user).filter(user=product.user)[:5]
 
-#     def get_context_data(self, **context):
-#         if 'edit' in self.request.GET:
-#             context['edit'] = True
-#         return super(UserEdit, self).get_context_data(**context)
+#     context = {
+#         "product": product,
+#         "editable_obj": product,
+#         "images": product.images.all(),
+#         "shop": shop,
+#         "on_vacation": shop.on_vacation,
+#         # "related_products": related_products,
+#         "add_product_form": add_product_form
+#     }
+#     context.update(extra_context or {})
 
-#     def get_template_names(self):
-#         if self.request.is_ajax():
-#             return 'accounts/includes/form.html'
-#         return 'accounts/account_profile_settings.html'
+#     templates = [u"shop/%s.html" % str(product.slug), template]
+#     # Check for a template matching the page's content model.
+#     if getattr(product, 'content_model', None) is not None:
+#         templates.insert(0, u"shop/products/%s.html" % product.content_model)
 
-#     def get_object(self, queryset=None):
-#         return self.request.user.profile
-
-#     def get_success_url(self):
-#         return reverse('profile_settings')
+#     return TemplateResponse(request, templates, context)

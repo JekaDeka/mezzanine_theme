@@ -1973,6 +1973,7 @@ a:hover .checkout-section span {
 .checkout-summary select {
     padding: 10px 12px;
     cursor: pointer;
+    width: 50%;
 }
 
 .checkout-content select,

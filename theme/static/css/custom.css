@@ -147,23 +147,30 @@
     position: relative;
     width: calc(50% - 2px);
 }
+
 .input_price span {
     position: absolute;
     top: 6px;
     left: 6px;
     color: #bbb;
 }
+
 .input_price input[type="number"] {
     padding-left: 24px;
 }
-/*#id_max_price,
-#id_min_price {
-    width: 30%;
+
+ul.profile-user-list>li {
+    margin-top: 5px;
 }
 
-#id_max_price {
-    margin-left: 3%;
-}*/
+.content-box h4 {
+    line-height: 26px;
+    padding-bottom: 2px;
+    color: #fff;
+    font-weight: 300;
+}
+
+
 #logo {
     margin-bottom: 5px;
     margin-top: 15px
@@ -321,6 +328,7 @@ a.button.light:hover {
 .width-100 {
     width: 100%
 }
+
 
 
 
@@ -1504,4 +1512,7 @@ input[type="password"],
 
 .pull-right {
     float: right!important;
+}
+input[name=quantity] {
+    width: 82px;
 }

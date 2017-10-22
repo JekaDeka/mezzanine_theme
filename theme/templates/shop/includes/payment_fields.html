@@ -1,6 +1,6 @@
 {% load i18n mezzanine_tags %}
-<fieldset>
-    <legend>{% trans "Payment Details" %}</legend>
+<div class="checkout-section active"><span>3</span>{% trans "Payment Details" %}</div>
+<div class="checkout-summary">
     {% fields_for form.card_name_field %}
     {% fields_for form.card_type_field %}
     {% with form.card_expiry_fields as card_expiry_fields %}
@@ -11,4 +11,5 @@
     <div class="clearfix"></div>
     {% endwith %}
     {% fields_for form.card_fields %}
-</fieldset>
+</div>
+<div class="clearfix"></div>

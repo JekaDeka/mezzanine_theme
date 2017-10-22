@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.dispatch import receiver
 from django.db.models import Count, Q
@@ -12,7 +13,8 @@ from mezzanine.pages.models import Page
 from mezzanine.blog.models import BlogPost
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.models import upload_to
-from cartridge.shop.models import Priced, Product
+from cartridge.shop.models import Priced, Product, CartItem
+from cartridge.shop import managers
 from django.utils.timezone import now
 from django.core.urlresolvers import reverse
 from django.core.validators import MinValueValidator
@@ -20,8 +22,6 @@ from django.core.exceptions import ValidationError
 # from slugify import slugify, Slugify, UniqueSlugify
 from theme.utils import slugify_unicode
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
-
-# from django_countries.fields import CountryField
 
 
 from datetime import date
@@ -140,6 +140,10 @@ class UserProfile(models.Model):
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
+
+    def get_location(self):
+        location = '%s, %s' % (self.country, self.city)
+        return location.strip()
 
     def get_absolute_url(self):
         url_name = "profile"
@@ -433,3 +437,66 @@ class OrderItemCategory(Slugged):
     @models.permalink
     def get_absolute_url(self):
         return ("order_list_category", (), {"category": self.slug})
+
+
+# class ShopRealtedCart(Cart):
+#     """remove item's quantity and provide shop"""
+#     objects = managers.CartManager()
+
+#     def __iter__(self):
+#         """
+#         Allow the cart to be iterated giving access to the cart's items,
+#         ensuring the items are only retrieved once and cached.
+#         """
+#         if not hasattr(self, "_cached_items"):
+#             self._cached_items = self.cart_items.all()
+#         return iter(self._cached_items)
+
+#     def add_item(self, product, shop, quantity):
+#         """
+#         Increase quantity of existing item if SKU matches, otherwise create
+#         new.
+#         """
+#         if not self.pk:
+#             self.save()
+#         print(product.actions)
+#         kwargs = {"sku": product.id, "unit_price": product.price(), "shop": shop}
+#         item, created = self.cart_items.get_or_create(**kwargs)
+#         if created:
+#             item.description = force_text(product)
+#             item.unit_price = product.price()
+#             item.url = product.get_absolute_url()
+#             image = product.image
+#             if image is not None:
+#                 item.image = force_text(image)
+#             product.actions.added_to_cart()
+#         item.quantity += quantity
+#         item.save()
+
+
+# class ShopRealtedCartItem(SelectedProduct):
+
+#     cart = models.ForeignKey("ShopRealtedCart", related_name="cart_items")
+#     shop = models.ForeignKey(UserShop)
+
+#     def get_absolute_url(self):
+#         return self.url
+
+#     def save(self, *args, **kwargs):
+#         super(ShopRealtedCartItem, self).save(*args, **kwargs)
+
+#         # Check if this is the last cart item being removed
+#         if self.quantity == 0 and not self.cart.cart_items.exists():
+#             self.cart.delete()
+
+class ShopRelatedCartItem(models.Model):
+
+    cart_item = models.ForeignKey(CartItem, related_name="cart_items")
+    cart_shop = models.ForeignKey(UserShop, related_name="cart_shop")
+
+    def save(self, *args, **kwargs):
+        super(ShopRelatedCartItem, self).save(*args, **kwargs)
+
+        # Check if this is the last cart item being removed
+        if self.quantity == 0 and not self.cart.items.exists():
+            self.cart.delete()

@@ -12,10 +12,10 @@ from django.utils.timezone import now
 from django.utils.encoding import force_text
 from django.utils.html import format_html
 from django.contrib import admin
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.forms.utils import flatatt, to_current_timezone
+from django.forms.models import inlineformset_factory
 from django.utils.datastructures import MultiValueDict
-from django.core.mail import send_mail
 
 
 from mezzanine.conf import settings
@@ -25,8 +25,8 @@ from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
 
 from cartridge.shop import checkout
-from cartridge.shop.models import Cart, CartItem, Order, DiscountCode, Category
-from cartridge.shop.forms import FormsetForm, DiscountForm
+from cartridge.shop.models import Cart, CartItem, Order, DiscountCode, Category, ProductOption, ProductVariation
+from cartridge.shop.forms import FormsetForm, DiscountForm, AddProductForm, OrderForm
 from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
                                   clear_session)
 from theme.models import UserShop, UserProfile, OrderItem, Region, City
@@ -43,23 +43,6 @@ setattr(Field, 'is_checkbox', lambda self: isinstance(
 # these specified.
 hidden_field_defaults = ("status", "gen_description", "allow_comments")
 User = get_user_model()
-
-
-class СustomBlogForm(forms.ModelForm):
-
-    class Meta:
-        model = BlogPost
-        fields = ("title", "preview_content", "featured_image", "content") + \
-            hidden_field_defaults
-
-    def __init__(self):
-        initial = {}
-        for field in hidden_field_defaults:
-            initial[field] = BlogPost._meta.get_field(field).default
-        initial["status"] = CONTENT_STATUS_DRAFT
-        super(СustomBlogForm, self).__init__(initial=initial)
-        for field in hidden_field_defaults:
-            self.fields[field].widget = forms.HiddenInput()
 
 
 class ContactForm(forms.Form):
@@ -323,3 +306,122 @@ class OrderItemRequestActionForm(forms.Form):
                 }
             )
         return order, action
+
+
+# class NoQuantityAddProductForm(forms.Form):
+#     """docstring for AddProductForm"""
+#     sku = forms.CharField(required=False, widget=forms.HiddenInput())
+#     quantity = forms.IntegerField(widget=forms.HiddenInput())
+#     # shop = forms.IntegerField(widget=forms.HiddenInput())
+
+#     def __init__(self, *args, **kwargs):
+#         """
+#         Handles adding a variation to the cart or wishlist.
+#         When adding from the product page, the product is provided
+#         from the view and a set of choice fields for all the
+#         product options for this product's variations are added to
+#         the form. When the form is validated, the selected options
+#         are used to determine the chosen variation.
+#         A ``to_cart`` boolean keyword arg is also given specifying
+#         whether the product is being added to a cart or wishlist.
+#         If a product is being added to the cart, then its stock
+#         level is also validated.
+#         When adding to the cart from the wishlist page, a sku is
+#         given for the variation, so the creation of choice fields
+#         is skipped.
+#         """
+#         self._product = kwargs.pop("product", None)
+#         self._shop = kwargs.pop("shop")
+#         self._to_cart = kwargs.pop("to_cart")
+#         super(NoQuantityAddProductForm, self).__init__(*args, **kwargs)
+#         # Adding from the wishlist with a sku, bail out.
+#         if args[0] is not None and args[0].get("sku", None):
+#             return
+#         # Adding from the product page, remove the sku field
+#         # and build the choice fields for the variations.
+#         # del self.fields["sku"]
+#         # option_fields = ProductVariation.option_fields()
+#         # if not option_fields:
+#         #     return
+#         # option_names, option_labels = list(zip(*[(f.name, f.verbose_name)
+#         #                                          for f in option_fields]))
+#         # option_values = list(zip(*self._product.variations.filter(
+#         #     unit_price__isnull=False).values_list(*option_names)))
+#         # if option_values:
+#         #     for i, name in enumerate(option_names):
+#         #         values = [_f for _f in set(option_values[i]) if _f]
+#         #         if values:
+#         #             field = forms.ChoiceField(label=option_labels[i],
+#         #                                       choices=make_choices(values))
+#         #             self.fields[name] = field
+
+#     def clean(self):
+#         """
+#         Determine the chosen variation, validate it and assign it as
+#         an attribute to be used in views.
+#         """
+#         if not self.is_valid():
+#             return
+#         # Posted data will either be a sku, or product options for
+#         # a variation.
+#         data = self.cleaned_data.copy()
+#         quantity = data.pop("quantity")
+#         # shop = data.pop("shop")
+#         # Ensure the product has a price if adding to cart.
+#         if self._to_cart:
+#             data["unit_price__isnull"] = False
+#         error = None
+
+#         if self._shop is None:
+#             return
+#         # self.shop = data['shop']
+#         # if self._product is not None:
+#         # self.variation = self._product
+#         # Chosen options will be passed to the product's
+#         # variations.
+#         # qs = self._product.variations
+#         # else:
+#         # A product hasn't been given since we have a direct sku.
+#         # qs = ProductVariation.objects
+#         # try:
+#         # variation = qs.get(**data)
+#         # except ProductVariation.DoesNotExist:
+#         # error = "invalid_options"
+#         # else:
+#         # Validate stock if adding to cart.
+#         # if self._to_cart:
+#         #     if not variation.has_stock():
+#         #         error = "no_stock"
+#         #     elif not variation.has_stock(quantity):
+#         #         error = "no_stock_quantity"
+
+#         # if error is not None:
+#         # raise forms.ValidationError(ADD_PRODUCT_ERRORS[error])
+
+#         # self.variation = variation
+#         return self.cleaned_data
+
+
+# class NoQuantityCartItemForm(forms.ModelForm):
+#     """docstring for NoQuantityCartItemForm"""
+#     quantity = forms.IntegerField(label=_("Quantity"), min_value=0)
+
+#     class Meta:
+#         model = NoQuantityCartItem
+#         exclude = ()
+
+#     def clean_quantity(self):
+#         """
+#         Validate that the given quantity is available.
+#         """
+#         variation = ProductVariation.objects.get(sku=self.instance.sku)
+#         quantity = self.cleaned_data["quantity"]
+#         if not variation.has_stock(quantity - self.instance.quantity):
+#             error = ADD_PRODUCT_ERRORS["no_stock_quantity"].rstrip(".")
+#             raise forms.ValidationError("%s: %s" % (error, quantity))
+#         return quantity
+
+# NoQuantityCartItemFormSet = inlineformset_factory(
+#     NQCart, NoQuantityCartItem, form=NoQuantityCartItemForm, can_delete=True, extra=0)
+
+# NoQCartItemFormSet = inlineformset_factory(NoQCart, NoQCartItem, CartItemForm, can_delete=True, extra=1)
