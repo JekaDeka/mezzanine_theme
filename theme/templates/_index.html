@@ -28,35 +28,35 @@
 	{% else %}
    		<figure>
             <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
-            <a href="{% url 'shop_create' %}">
-			    <figcaption>
+			 <figcaption>
+                <a href="{% url 'shop_create' %}">
 			        <span>Начните продавать уже сейчас</span>
 			        <h3>Создайте собственный магазин</h3>
-			    </figcaption>
-			</a>
+			     </a>
+            </figcaption>
         </figure>
     {% endif %}
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
             <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}" alt="Фон заказа" />
+            <figcaption>
             <a href="{% url 'admin:theme_orderitem_add' %}">
-                <figcaption>
                     <span>Хочешь индивидуальности?</span>
                     <h3>Сделай личный заказ у мастера</h3>
-                </figcaption>
             </a>
+            </figcaption>
         </figure>
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
             <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}" alt="Фон блога" />
-            <a href="{% url 'admin:blog_blogpost_add' %}">
-                <figcaption>
+            <figcaption>
+                <a href="{% url 'admin:blog_blogpost_add' %}">
                     <span>Открой в себе автора</span>
                     <h3>Сделай запись в Блог</h3>
-                </figcaption>
-            </a>
+                </a>
+            </figcaption>
         </figure>
     </div>
 </div>
@@ -222,8 +222,6 @@
                 <div class="badges">
                     {% if product.pre_order %}
                     	<div class="product-example">Для примера</div>
-                    {# {% else %} #}
-                    <!--<div class="product-ready">Готовый вариант</div>-->
                     {% endif %} 
                     {% if product.on_custom_sale %}
                     	<div class="product-discnt">СКИДКА</div>
@@ -233,10 +231,10 @@
                 <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
                 <a href="{{ product.get_absolute_url }}">
                     {% if images %}
-                    <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="images.0" />
+                    <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
                         {% if product.images.count != 1 %}
                         <div class="cover">
-                                <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="images.1"/>
+                                <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}"/>
                         </div>
                         {% endif %}
                     {% else %}
