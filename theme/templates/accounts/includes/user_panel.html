@@ -1,5 +1,5 @@
 {% load i18n mezzanine_tags accounts_tags %}
-<div id="additional-menu">
+<div class="additional-menu">
     <ul>
     	{% if not request.user.is_authenticated %}
 		<li><a href="{% url "signup" %}?next=/init/">Создать магазин</a></li>

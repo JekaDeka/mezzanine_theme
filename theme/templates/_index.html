@@ -30,7 +30,7 @@
             <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
             <a href="{% url 'shop_create' %}">
 			    <figcaption>
-			        <time>Начните продавать уже сейчас</time>
+			        <span>Начните продавать уже сейчас</span>
 			        <h3>Создайте собственный магазин</h3>
 			    </figcaption>
 			</a>
@@ -40,11 +40,11 @@
     <div class="one-third columns omega margin-bottom-10">
         <figure>
             <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}" alt="Фон заказа" />
-            <figcaption>
             <a href="{% url 'admin:theme_orderitem_add' %}">
-                <span>Хочешь индивидуальности?</span>
-                <h3>Сделай личный заказ у мастера</h3>
-            </figcaption>
+                <figcaption>
+                    <span>Хочешь индивидуальности?</span>
+                    <h3>Сделай личный заказ у мастера</h3>
+                </figcaption>
             </a>
         </figure>
     </div>
@@ -52,10 +52,10 @@
         <figure>
             <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}" alt="Фон блога" />
             <a href="{% url 'admin:blog_blogpost_add' %}">
-            <figcaption>
-                <span>Открой в себе автора</span>
-                <h3>Сделай запись в Блог</h3>
-            </figcaption>
+                <figcaption>
+                    <span>Открой в себе автора</span>
+                    <h3>Сделай запись в Блог</h3>
+                </figcaption>
             </a>
         </figure>
     </div>
@@ -234,29 +234,25 @@
                 <a href="{{ product.get_absolute_url }}">
                     {% if images %}
                     <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="images.0" />
-                        {% if product.image.count != 1 %}
+                        {% if product.images.count != 1 %}
                         <div class="cover">
                                 <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="images.1"/>
                         </div>
                         {% endif %}
                     {% else %}
-                    <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
+                        <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
                     {% endif %}
                 </a>
                 <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
                 </div>
                 {% endwith %}
-                <a href="{{ product.get_absolute_url }}">
                     <section>
-                        <h5>{{ product.title|title|truncatechars:34 }}</h5>
+                        <a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
                         <a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
-                        <!--<span class="product-category">
-							</span>-->
                         {% if product.on_custom_sale %}
                         <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span> {% else %}
                         <span class="product-price">{{ product.price|rub_currency }}</span> {% endif %}
                     </section>
-                </a>
             </figure>
         </div>
         {% endfor %}

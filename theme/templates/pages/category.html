@@ -154,7 +154,7 @@
 				<a href="{{ product.get_absolute_url }}">
 					{% if images %}
 					<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
-						{% if product.image.count != 1 %}
+						{% if product.images.count != 1 %}
 						<div class="cover">
 								<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
 						</div>
@@ -166,9 +166,8 @@
 				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
 				</div>
 				{% endwith %}
-				<a href="{{ product.get_absolute_url }}">
 					<section>
-						<h5>{{ product.title|title|truncatechars:34 }}</h5>
+						<a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
 						<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
 						<!--<span class="product-category">
 						</span>-->
@@ -178,7 +177,6 @@
 						<span class="product-price">{{ product.price|rub_currency }}</span>
 						{% endif %}
 					</section>
-				</a>
 			</figure>
 		</div>
 		{% endfor %}

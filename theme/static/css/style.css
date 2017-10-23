@@ -1610,37 +1610,37 @@ span.skill-title i {
     line-height: 32px;
 }
 
-#additional-menu {
+.additional-menu {
     display: block;
     float: right;
     margin: 18px 0 20px 0;
 }
 
-#additional-menu ul li {
+.additional-menu ul li {
     display: inline;
     padding: 0 11px;
     float: left;
 }
 
-#additional-menu ul li:first-child {
+.additional-menu ul li:first-child {
     background: none;
 }
 
-#additional-menu ul li:last-child {
+.additional-menu ul li:last-child {
     padding-right: 0;
 }
 
-#additional-menu ul li a {
+.additional-menu ul li a {
     font-size: 13px;
     color: #999;
 }
 
-#additional-menu ul li a span {
+.additional-menu ul li a span {
     color: #bbb;
 }
 
-#additional-menu ul li a:hover,
-#additional-menu ul li a:hover span {
+.additional-menu ul li a:hover,
+.additional-menu ul li a:hover span {
     color: #808080;
 }
 
@@ -8348,7 +8348,7 @@ html[xmlns] .slides {
         font-size: 22px;
         line-height: 32px;
     }
-    #additional-menu {
+    .additional-menu {
         display: block;
     }
     #cart {
