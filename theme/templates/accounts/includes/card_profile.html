@@ -2,8 +2,8 @@
 <div class="card-profile" id="user-info">
     <div class="image">
         {% if profile.image %}
-        <img src="{{ MEDIA_URL }}{% thumbnail profile.image 420 300 %}" alt="Фото профиля"> {% else %}
-        <img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}" alt="no-image"> {% endif %}
+        <img src="{{ MEDIA_URL }}{% thumbnail profile.image 420 300 %}" alt="Фото профиля" /> {% else %}
+        <img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}" alt="no-image" /> {% endif %}
     </div>
     <div class="content">
         <div class="meta">

@@ -19,7 +19,7 @@
                     {% block blog_post_list_post_featured_image %}
                     <figure class="from-the-blog-image">
                         <a href="{{ blog_post.get_absolute_url }}">
-                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="" />
+                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="{{ blog_post.title }}" />
                         </a>
                         <div class="hover-icon"></div>
                     </figure>
@@ -80,14 +80,14 @@
                         <div class="mediaholder">
                         <a href="{{ product.get_absolute_url }}">
                             {% if product.image %}
-                            <img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}">
+                            <img src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}" alt="{{ product.title }}" />
                             <div class="cover">
-                                <img alt="" src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}">
+                                <img src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}" alt="{{ product.title }}" />
                             </div>
                             {% else %}
-                            <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+                            <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
                             <div class="cover">
-                                <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 380 %}">
+                                <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 300 380 %}" alt="no-image" />
                             </div>
                             {% endif %}
                         </a>

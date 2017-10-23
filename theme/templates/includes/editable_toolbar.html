@@ -9,5 +9,5 @@
     <a href="{{ accounts_logout_url|default:admin_logout_url }}?{{ REDIRECT_FIELD_NAME }}={{ request.path }}">{% trans "Log out" %}</a>
 </div>
 
-<img id="editable-loading" src="{% static "mezzanine/img/loadingAnimation.gif" %}">
+<img id="editable-loading" src="{% static "mezzanine/img/loadingAnimation.gif" %}" alt="loading-gif" />
 

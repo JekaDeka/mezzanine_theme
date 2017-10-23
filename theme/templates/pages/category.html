@@ -18,16 +18,16 @@
 					<a href="{{ category.get_absolute_url }}">
 					{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
 						{% if category.featured_image %}
-							<img alt="" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
+							<img alt="{{ category.title }}" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
 						{% else %}
 							{% with "23456"|make_list|random as rnd %}
 							{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
-							    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="">
+							    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="{{ category.title }}" />
 							{% endwith %}
 							{% endwith %}
 						{% endif %}
 					{% else %}
-						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 280 280 %}" alt="">
+						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 280 280 %}" alt="no-image" />
 					{% endif %}
 						<div class="hover-cover"></div>
 						<div class="hover-icon"></div>
@@ -153,14 +153,14 @@
 				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
 				<a href="{{ product.get_absolute_url }}">
 					{% if images %}
-					<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+					<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
 						{% if product.image.count != 1 %}
 						<div class="cover">
-								<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+								<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
 						</div>
 						{% endif %}
 					{% else %}
-					<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+					<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
 					{% endif %}
 				</a>
 				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>

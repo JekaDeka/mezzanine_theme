@@ -114,14 +114,14 @@
                     <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
                     <a href="{{ product.get_absolute_url }}">
                         {% if images %}
-                        <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+                        <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ images.0 }}"/> 
                             {% if product.image.count != 1 %}
                             <div class="cover">
-                                    <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+                                    <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ images.1 }}" />
                             </div>
                             {% endif %}
                         {% else %}
-                        <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+                        <img alt="no-image" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" />
                         {% endif %}
                     </a>
                     <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>

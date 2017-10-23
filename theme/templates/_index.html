@@ -12,7 +12,7 @@
     <div class="two-third columns alpha omega margin-bottom-10">
     {% if request.user.shop %}
     	<figure>
-            <img src="{% static 'images/edit_shop.jpg'|resize:"820x400,C" %}">
+            <img src="{% static 'images/edit_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
             <figcaption>
                 <h3>Управление магазином</h3>
                 <ul>
@@ -27,7 +27,7 @@
         </figure>
 	{% else %}
    		<figure>
-            <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}">
+            <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
             <a href="{% url 'shop_create' %}">
 			    <figcaption>
 			        <time>Начните продавать уже сейчас</time>
@@ -39,7 +39,7 @@
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
-            <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}">
+            <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}" alt="Фон заказа" />
             <figcaption>
             <a href="{% url 'admin:theme_orderitem_add' %}">
                 <span>Хочешь индивидуальности?</span>
@@ -50,7 +50,7 @@
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
-            <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}">
+            <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}" alt="Фон блога" />
             <a href="{% url 'admin:blog_blogpost_add' %}">
             <figcaption>
                 <span>Открой в себе автора</span>
@@ -70,7 +70,7 @@
         {% for image in images %}
         <figure class="caption">
             <a href="{{image.href.get_absolute_url }}">
-                <img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1290 350 %}" />
+                <img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1290 350 %}" alt="{{ image }}">
             <figcaption>
                 {{ image.short_description|safe }}
             </figcaption>
@@ -90,7 +90,7 @@
     <div class="main-page-category columns">
         <a href="{{ category.get_absolute_url }}" class="img-caption">
             <figure>
-                <img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" alt="{{ category.slug }}">
+                <img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" alt="{{ category.slug }}" />
                 <figcaption>
                     <h3>{{ category.title }}</h3>
                     <span>Подробнее</span>
@@ -161,7 +161,7 @@
 			    <div class="widget-thumb">
 						<a href="{{ recent_post.get_absolute_url }}">
 						{% if recent_post.featured_image %}
-							<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 74 74 %}"/>
+							<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 74 74 %}" alt="{{ recent_post.title }}"/>
 						{% endif %}
 						</a>
 				</div>  
@@ -233,14 +233,14 @@
                 <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
                 <a href="{{ product.get_absolute_url }}">
                     {% if images %}
-                    <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
+                    <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="images.0" />
                         {% if product.image.count != 1 %}
                         <div class="cover">
-                                <img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
+                                <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="images.1"/>
                         </div>
                         {% endif %}
                     {% else %}
-                    <img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
+                    <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
                     {% endif %}
                 </a>
                 <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>

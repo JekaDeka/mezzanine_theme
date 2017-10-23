@@ -42,7 +42,7 @@
 			{% for image in images %}
 				<a href="{{ MEDIA_URL }}{% thumbnail image.file 0 0 True 80 %}" class="mfp-gallery" title="{{product.title}}">
 					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 485 485 True 80 %}" 
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ image.description }}" />
+					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ image.description }}" alt="{{ product.title }}" />
 				</a>
 			 {% endfor %}
 			 </div>
@@ -114,7 +114,7 @@
 				<div class="product-example red">Магазин на каникулах</div>
 			{% endif %}
 			<a href="{{ product.user.shop.get_absolute_url }}">
-				<img src="{{ MEDIA_URL }}{% thumbnail product.user.shop.image 80 80 %}" class="pull-left margin-right-5">
+				<img src="{{ MEDIA_URL }}{% thumbnail product.user.shop.image 80 80 %}" class="pull-left margin-right-5" alt="{{ product.user.shop.shopname }}" />
 				<h2>{{ product.user.shop.shopname }}</h2>
 			</a>
 			<p><i class="fa fa-map-marker"></i> <strong>{{ product.user.profile.get_location }}</strong><p>

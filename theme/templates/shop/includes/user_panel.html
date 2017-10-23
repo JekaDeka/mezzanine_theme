@@ -16,7 +16,7 @@
 				{% for item in request.cart %}
 					<li>
 						{% if item.image %}
-                        	<a href="{{ item.get_absolute_url }}"><img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"></a>
+                        	<a href="{{ item.get_absolute_url }}"><img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"/></a>
                    		{% endif %}
 						<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
 						<span>{{ item.quantity }} x {{ item.unit_price|rub_currency }}</span>

@@ -6,7 +6,7 @@
             {{ form.image }}
             <label for="file-2">
                 <img class="logo-image" src="{% if profile.image %}{{ MEDIA_URL }}{% thumbnail profile.image 420 300 %}
-                    {% else %}{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}{% endif %}">
+                    {% else %}{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 420 300 %}{% endif %}" alt="logo-image" />
             </label>
         </div>
         <div class="form-content">

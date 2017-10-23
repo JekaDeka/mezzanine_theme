@@ -153,7 +153,7 @@ $(document).ready(function() {
 		<label for="file-5">
 			<figure class="logo-image">
 				{% if shop.image %}
-					<img src="{{ shop.image.url }}">
+					<img src="{{ shop.image.url }}" alt="{{ shop.shopname }}"/>
 				{% endif %}
 			</figure>
 			{% if form.image.errors %}

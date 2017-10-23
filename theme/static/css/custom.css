@@ -61,6 +61,7 @@
     padding: .25em;
     border-radius: 2px;
     opacity: 0;
+    color: #fff;
     -webkit-transition: opacity 1.2s;
     transition: opacity 1.2s;
     /*text-shadow: 1px 1px 2px black, 0 0 1em black;*/
@@ -69,6 +70,11 @@
 .bss-slides .bss-show figcaption {
     z-index: 3;
     opacity: 1;
+}
+
+.bss-slides figcaption strong {
+    color: #fff;
+    font-weight: 700;
 }
 
 .bss-slides figcaption h1,
@@ -82,31 +88,31 @@
     color: #fff;
     line-height: 1.1;
     text-transform: uppercase;
-    padding: 0 0 5px 0;
     letter-spacing: -1px;
-    font-weight: 300;
+    font-weight: 500;
     display: block;
     text-shadow: 0px 0px 60px rgba(0, 0, 0, 0.35);
 }
 
-.bss-slides figcaption h1,
+.bss-slides figcaption h1 {
+    font-size: 46px;
+}
+
 .bss-slides figcaption h2 {
-    font-size: 52px;
-    font-weight: 700;
+    font-size: 40px;
 }
 
 .bss-slides figcaption h3 {
-    font-size: 32px;
-    font-weight: 300;
+    font-size: 34px;
 }
 
 .bss-slides figcaption h4 {
-    font-size: 24px;
+    font-size: 28px;
 }
 
 .bss-slides figcaption h5,
 .bss-slides figcaption h6 {
-    font-size: 20px;
+    font-size: 22px;
 }
 
 .bss-next,
@@ -328,6 +334,12 @@ a.button.light:hover {
 .width-100 {
     width: 100%
 }
+
+
+
+
+
+
 
 
 
@@ -665,6 +677,26 @@ figure.blue-effect img {
     .cd-dropdown-trigger::after {
         left: 100px;
         /*right: calc(63% - 5px);*/
+    }
+    .bss-slides figcaption h1 {
+        font-size: 36px;
+    }
+
+    .bss-slides figcaption h2 {
+        font-size: 30px;
+    }
+
+    .bss-slides figcaption h3 {
+        font-size: 24px;
+    }
+
+    .bss-slides figcaption h4 {
+        font-size: 18px;
+    }
+
+    .bss-slides figcaption h5,
+    .bss-slides figcaption h6 {
+        font-size: 14px;
     }
 }
 
@@ -1513,6 +1545,7 @@ input[type="password"],
 .pull-right {
     float: right!important;
 }
+
 input[name=quantity] {
     width: 82px;
 }
