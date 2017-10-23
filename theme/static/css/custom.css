@@ -111,7 +111,8 @@
 }
 
 .bss-slides figcaption h5,
-.bss-slides figcaption h6 {
+.bss-slides figcaption h6,
+.bss-slides figcaption p {
     font-size: 22px;
 }
 
