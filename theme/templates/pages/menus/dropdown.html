@@ -54,7 +54,7 @@
     {% if page.in_menu %}
         {% if page.has_children_in_menu %}
         <li class="has-children">
-            <a href="{{ page.get_absolute_url }}" {% if branch_level == 2 %}class="main-sub"{% endif %}>{{ page.title }}</a>
+            <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
             <ul class="is-hidden">
                 <li class="go-back"><a href="#{{branch_level}}">{{ page.parent.title }}</a></li>
                 <!--<li class="see-all"><a href="{{ page.get_absolute_url }}">{{ page.title }} полностью</a></li>-->

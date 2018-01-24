@@ -14,10 +14,18 @@ jQuery(document).ready(function($) {
     //on mobile - open submenu
     $('.has-children').children('a').on('click', function(event) {
         //prevent default clicking on direct children of .has-children 
-        if ($(this).is(".main-sub") && $(window).width() > 973) return;
         event.preventDefault();
         var selected = $(this);
         selected.next('ul').removeClass('is-hidden').end().parent('.has-children').parent('ul').addClass('move-out');
+    });
+    $('.cd-secondary-dropdown>li.has-children').children('a').unbind();
+    $('.cd-secondary-dropdown>li.has-children').children('a').on('click', function(event) {
+        //prevent default clicking on direct children of .has-children 
+        if ($(window).width() < 973) {
+            event.preventDefault();
+            var selected = $(this);
+            selected.next('ul').removeClass('is-hidden').end().parent('.has-children').parent('ul').addClass('move-out');
+        }
     });
 
     //on desktop - differentiate between a user trying to hover over a dropdown item vs trying to navigate into a submenu's contents

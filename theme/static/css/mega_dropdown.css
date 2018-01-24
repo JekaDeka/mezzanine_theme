@@ -605,7 +605,7 @@
         -o-transform: translateX(0);
         transform: translateX(0);
         left: 100%;
-        height: auto;
+        height: 100%;
         background-color: #ffffff;
         box-shadow: 0 2px 14px rgba(0, 0, 0, 0.1);
     }
@@ -698,8 +698,8 @@
     }
     .cd-dropdown-content .cd-dropdown-icons>li,
     .cd-dropdown-content .cd-secondary-dropdown>li {
-        width: 50%;
-        float: left;
+        /*width: 50%;*/
+        /*float: left;*/
     }
     .cd-dropdown-content .cd-secondary-dropdown {
         overflow: hidden;
@@ -716,9 +716,6 @@
         width: 550px;
         /*background-color: #ebebeb;*/
     }
-    .cd-dropdown-content .cd-secondary-dropdown>li>a.main-sub {
-    	pointer-events: auto;
-    }
     .cd-dropdown-content .cd-secondary-dropdown>li>a {
         color: #606060;
         margin-bottom: 5px;
@@ -730,11 +727,18 @@
     .cd-dropdown-content .cd-secondary-dropdown>li.has-children>a {
         background: #f0f0f0;
         color: #707070;
-        font-weight: 600;
-        padding: 0px 6px;
+        padding-left: 5px;
+        /*font-weight: 600;*/
+        /*padding: 0px 6px;*/
+        /*margin-left: -6px;*/
+        font-size: 15px;
     }
+    .cd-dropdown-content .cd-secondary-dropdown>li.has-children>a:hover {
+    	color: #3acf87;
+    }
+    .cd-dropdown-content .cd-secondary-dropdown>li.has-children>a,
     .cd-dropdown-content .cd-secondary-dropdown>li.empty-children>a {
-        color: #606060;
+        color: #3f8654;
         font-size: 15px;
         pointer-events: auto;
     }
@@ -752,16 +756,17 @@
         transform: translateX(0);
     }
     .cd-dropdown-content .cd-secondary-dropdown>li.has-children {
-        margin: 20px 0;
-        border-right-width: 1px;
-        border-color: #ebebeb;
-        border-style: solid;
-        padding: 0 30px;
+        margin: 20px 20px 5px 20px;
+        /*border-right-width: 1px;*/
+        /*border-color: #ebebeb;*/
+        /*border-style: solid;*/
+        /*padding: 0 20px;*/
         /*height: 250px;*/
+        border-bottom: 1px solid #ebebeb;
     }
     .cd-dropdown-content .cd-secondary-dropdown>li.empty-children {
-        padding: 20px;
-        height: 40px;
+        padding: 10px 0 0 20px;
+        /*height: 40px;*/
     }
     .cd-dropdown-content .cd-secondary-dropdown>li>a.screen-hide {
         display: none;
@@ -792,7 +797,7 @@
         color: #3acf87;
     }
     .cd-dropdown-content .cd-secondary-dropdown ul {
-        padding-bottom: 25px;
+        padding-bottom: 5px;
         overflow: hidden;
         height: auto;
     }
