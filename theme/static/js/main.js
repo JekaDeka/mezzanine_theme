@@ -33,6 +33,9 @@ jQuery(document).ready(function($) {
     $('.cd-dropdown-content').menuAim({
         activate: function(row) {
             $(row).children().addClass('is-active').removeClass('fade-out');
+            if ($(row).children('ul').height() && ($(row).position().top > $(row).children('ul').outerHeight())) {
+                $(row).children('ul').css('top', $(row).position().top + 50 - $(row).children('ul').outerHeight());
+            }
             if ($('.cd-dropdown-content .fade-in').length == 0) $(row).children('ul').addClass('fade-in');
         },
         deactivate: function(row) {
