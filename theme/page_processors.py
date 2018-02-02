@@ -38,7 +38,7 @@ def category_processor(request, page):
     payment_card_transfer = validate_filter(request.GET.get("payment_card_transfer"))
 
     products = Product.objects.filter(status=2).filter(
-        page.category.filters()).distinct()
+        page.category.filters()).distinct().prefetch_related('images')
     if min_price:
         products = products.filter(unit_price__gte=min_price)
     if max_price:

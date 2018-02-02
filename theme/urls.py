@@ -5,6 +5,10 @@ from cartridge.shop.forms import CartItemFormSet
 from cartridge.shop import views as cart_views
 from imagefit import urls
 
+# from rest_framework import routers
+
+# router = routers.DefaultRouter()
+# router.register(r'notes', views.NoteViewSet)
 
 # prefix in main HelloDjango project
 urlpatterns = [
@@ -54,4 +58,7 @@ urlpatterns = [
     url(r'^$', views.true_index, name="true_index"),
     url(r'^imagefit/', include('imagefit.urls')),
     url(r'^chaining/', include('smart_selects.urls')),
+    # url(r'^api/', include(router.urls, namespace='api')),
 ]
+
+# urlpatterns += router.urls

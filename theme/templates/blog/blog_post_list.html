@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags blog_tags pages_tags keyword_tags disqus_tags theme_tags %}
+{% load i18n mezzanine_tags blog_tags pages_tags keyword_tags theme_tags %}
 
 {% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}{% trans "Blog" %}{% endif %}{% endblock %}
 
@@ -30,7 +30,7 @@
     			{% if month %}{{ month }}, {% endif %}{{ year }}
 			{% else %}
 				{% if author %}
-    				{% trans "Author:" %} {{ author.get_full_name|default:author.username }}
+    				{% trans "Author:" %} {{ author_profile.get_full_name|default:author.username }}
 				{% endif %}
 			{% endif %}
 		{% endif %}
@@ -139,7 +139,8 @@
 				{% block blog_post_list_post_metainfo %}
 					{# {% editable blog_post.publish_date %} #}
 					{% with blog_post.user as author %}
-					<i>{% trans "Posted by" %}: <a href="{% url "blog_post_list_author" author %}">{{ author.get_full_name|default:author.username }}</a>,  
+					<i>{% trans "Posted by" %}: <a href="{% url "blog_post_list_author" author %}">{{ author.get_full_name|default:author.username }}</a>,
+					<br>  
 					{% blocktrans with sometime=blog_post.publish_date|date %}{{ sometime }}{% endblocktrans %}
 					</i>
 					{% endwith %}

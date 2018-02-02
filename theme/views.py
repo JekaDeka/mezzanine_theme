@@ -32,6 +32,10 @@ from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
 from django.contrib.auth.decorators import login_required
 
+
+# from rest_framework import viewsets
+# from .serializers import UserShopSerializer
+
 import datetime
 import json
 from PIL import Image
@@ -143,7 +147,7 @@ def true_index(request):
     # enddate]).filter(status=2).order_by('-created')[:7]
 
     featured_products = Product.objects.filter(
-        user__shop__on_vacation=False).order_by('-created')[:10]
+        user__shop__on_vacation=False).order_by('-created').prefetch_related('images')[:10]
 
     # recent_posts = BlogPost.objects.order_by('-created')[:4]
     tmp = User.objects.distinct().annotate(
@@ -368,7 +372,7 @@ def order_list(request, tag=None, year=None, month=None, username=None,
                extra_context=None):
 
     templates = []
-    orders = OrderItem.objects.filter(performer=None)
+    orders = OrderItem.objects.filter(performer=None).select_related('author')
     # author = request.user
     order_categories = OrderItemCategory.objects.all()
     if category is not None:
@@ -531,7 +535,7 @@ def get_categories(request):
         data = list()
 
         def allChildren(self, l=None, level=0):
-            if(l == None):
+            if(l is None):
                 l = list()
             # if level != 0:
             l.append(
@@ -573,7 +577,7 @@ def get_categories(request):
     tree = get_nodes(data[0])
     # return HttpResponse(json.dumps(tree, ensure_ascii=False, indent=4),
     # content_type="application/json")
-    return JsonResponse(tree, safe=False,  json_dumps_params={'ensure_ascii': False, 'indent': 4})
+    return JsonResponse(tree, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
 
 # def product(request, slug, template="shop/product.html",
@@ -640,3 +644,8 @@ def get_categories(request):
 #         templates.insert(0, u"shop/products/%s.html" % product.content_model)
 
 #     return TemplateResponse(request, templates, context)
+
+
+# class NoteViewSet(viewsets.ModelViewSet):
+#     queryset = UserShop.objects.all()
+#     serializer_class = UserShopSerializer

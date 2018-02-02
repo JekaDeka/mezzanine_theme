@@ -10,7 +10,7 @@
 {% block first_time_user %}
 <div class="container fullwidth-element userpanel">
     <div class="two-third columns alpha omega margin-bottom-10">
-    {% if request.user.shop %}
+    {% if request.user_shop %}
     	<figure>
             <img src="{% static 'images/edit_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
             <figcaption>
@@ -112,7 +112,7 @@
     		{% for shop in user_shops %}
     		<div class="six columns alpha margin-bottom-20">
     		<div class="shop-stacked-images">
-    			{% with shop.user.product_set.all|slice:"4" as product %}
+    			{% with shop_user_product_set.all|slice:"4" as product %}
     			<div class="main pull-left">
     				<a href="{{ product.0.get_absolute_url }}">
     					<img src="{{ MEDIA_URL }}{% thumbnail product.0.image 300 160 %}" alt="{{ product.0.title }}"/>
@@ -141,7 +141,7 @@
 	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 100 100 %}" alt="{{shop.shopname}}" class="shop-image pull-left" />
 	    		</a>
 	    		<a href="{{ shop.get_absolute_url }}"><h2>{{shop.shopname}}</h2></a>
-	    			<span>{{ shop.user.profile.get_location }} </span>
+	    			<span>{{ shop_user_profile.get_location }} </span>
     		</div>
     		</div>
     	{% endfor %}
@@ -246,7 +246,7 @@
                 {% endwith %}
                     <section>
                         <a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
-                        <a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
+                        <a href="{{ product_user_shop.get_absolute_url }}" class="shopname">{{ product_user_shop.shopname }}</a>
                         {% if product.on_custom_sale %}
                         <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span> {% else %}
                         <span class="product-price">{{ product.price|rub_currency }}</span> {% endif %}

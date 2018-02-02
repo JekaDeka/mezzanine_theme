@@ -69,7 +69,7 @@
 	{% for order in orders.object_list %}
 	<div class="order-container margin-bottom-15">
 		<div class="three alpha columns margin-top-10">
-			{% if order.images.first %}
+			{% if order_images.first %}
 		    	<a href="{{ order.get_absolute_url }}">
 					<img  src="{{ MEDIA_URL }}{% thumbnail order.images.first 300 300 %}" alt="no-image" style="margin: auto;" />
 				</a>
@@ -88,7 +88,7 @@
 		        <br>
 		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price|rub_currency }}</span>
 		        <br>
-		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author.profile.region }} {% else %} Любой {% endif %}</span>
+		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author_profile.region }} {% else %} Любой {% endif %}</span>
 		    </div>
 		    <p>{{ order.description|safe|truncatewords:80 }}</p>
 		        <a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>

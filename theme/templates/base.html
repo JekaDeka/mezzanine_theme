@@ -55,11 +55,11 @@
 		    <a id="open-switcher"><i class="arrow right"></i> </a>
 		    <div>
 		        <ul>
-		        	{% if request.user.profile %}
+		        	{% if request.user_profile %}
 		        		<li><a href="{% url 'admin:blog_blogpost_changelist' %}">Мой Блог</a></li>
 		            	<li><a href="{% url 'admin:theme_orderitem_changelist' %}">Мой стол заказов</a></li>
 		        	{% endif %}
-		            {% if request.user.shop %}
+		            {% if request.user_shop %}
 		            	<li><a href="{% url 'admin:shop_product_changelist' %}">Мои товары</a></li>
 		            {% endif %}
 		        </ul>
@@ -97,7 +97,7 @@
 	{% endfor %}
 </div>
 {% endif %}
-{% if request.user.is_authenticated and not request.user.profile %}
+{% if request.user.is_authenticated and not request.user_profile %}
 <div class="container">
     <div class="sixteen columns">
         <div class="notification notice margin-bottom-10 text-center">

@@ -12,7 +12,7 @@
 	<div id="portfolio-wrapper">
 	{% for category in sub_child_categories %}
 		<div class="four columns portfolio-item custom_column
-		{% if no_child %}{{category.title|hard_trim}}{% else %}{{category.parent.title|hard_trim}}{% endif %}">
+		{% if no_child %}{{category.title|hard_trim}}{% else %}{{category_parent.title|hard_trim}}{% endif %}">
 			<figure>
 				<div class="portfolio-holder">
 					<a href="{{ category.get_absolute_url }}">
@@ -35,7 +35,7 @@
 				</div>
 				<a href="{{ category.get_absolute_url }}">
 					<section class="item-description">
-						<span>{{ category.parent.title }}</span>
+						<span>{{ category_parent.title }}</span>
 						<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
 					</section>
 				</a>
@@ -77,7 +77,7 @@
 	    <h3 class="headline">Отобразить</h3><span class="line"></span>
 	    <div class="clearfix"></div>
 	    <label class="control control--checkbox">
-	        <input {% if request.GET.region %}checked="checked" {% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user.profile.region.id }}">
+	        <input {% if request.GET.region %}checked="checked" {% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user_profile.region.id }}">
 	        Товары из моего региона
 	        <div class="control__indicator"></div>
 	    </label>
@@ -168,7 +168,7 @@
 				{% endwith %}
 					<section>
 						<a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
-						<a href="{{ product.user.shop.get_absolute_url }}" class="shopname">{{ product.user.shop.shopname }}</a>
+						<a href="{{ product.user_shop.get_absolute_url }}" class="shopname">{{ product.user_shop.shopname }}</a>
 						<!--<span class="product-category">
 						</span>-->
 						{% if product.on_custom_sale %}
