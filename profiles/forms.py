@@ -34,7 +34,7 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = UserProfile
-        exclude = ('user', 'allow_blogpost_count', 'allow_product_count', 'allow_ordertable_count')
+        exclude = ('user', 'allow_blogpost_count', 'allow_product_count', 'allow_ordertable_count', 'status', 'background')
         # fields = ("phone",)
         widgets = {
             'first_name': forms.TextInput(attrs={'class': '', 'placeholder': 'Имя', }),
