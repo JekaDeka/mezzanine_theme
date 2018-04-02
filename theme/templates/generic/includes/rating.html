@@ -1,20 +1,33 @@
 {% load mezzanine_tags rating_tags i18n %}
 
-<span id="rating-{{ rating_object.id }}">
+<div id="rating-{{ rating_object.id }}">
     {% if rating_average %}
-    {% trans "Current rating" %}: {{ rating_average|floatformat }}
+    {% trans "Current rating" %}: <span id="rate-number" class="pull-right">{{ rating_average|floatformat }}</span>
     {% else %}
     {% trans "Currently unrated" %}
     {% endif %}
-</span>
+</div>
+
+{# {% if user_raiting %} #}
+    {# <p>Спасибо за Вашу оценку!</p> #}
+{# {% endif %} #}
 
 {% if not rated or request.user.is_authenticated %}
-<form class="form-inline" role="form" method="post" action="{% url "rating" %}">
+<form class="rate-form" role="form" method="post" action="{% url "rating" %}">
     {% nevercache %}
     {% csrf_token %}
     {% endnevercache %}
-    <ul class="radio radio-inline">{{ rating_form.as_ul }}</ul>
-    <input type="submit" class="btn btn-default btn-sm" value="{% trans "Rate" %}"
-        onclick="return $(this.form).find('input:checked').length == 1;">
+    {% for field in rating_form %}
+        {% if field.name == 'value' %}
+        <fieldset class="rating-star">
+            {% for x,y in rating_form.fields.value.choices reversed %}
+                <input type="radio" id="star{{ y }}" name="{{ field.name }}" value="{{ x }}"{% if x == user_raiting.value %} checked{% endif %}/>
+                <label class="{% cycle 'half' 'full' %}" for="star{{ y }}" title="{{ y }}"></label>
+            {% endfor %}
+        </fieldset>
+        {% else %}
+            {{ field }}
+        {% endif %}
+    {% endfor %}
 </form>
 {% endif %}

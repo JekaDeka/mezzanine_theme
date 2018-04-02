@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load staticfiles theme_tags %}
+{% block meta_title %}Личный кабинет{% endblock %}
+
+{% block breadcrumbs_title %}
+<h2>Личный кабинет</h2>
+{% endblock breadcrumbs_title %}
+{% block breadcrumb_element %}
+<li>{{ user.email }}</li>
+{% endblock breadcrumb_element %}
+
+
+
+{% block main %}
+<div class="twelve columns margin-bottom-25">
+		{% if not user.shop.id %}
+			1. Создать магазин
+		{% endif %}
+		Здравствуйте, {{ user.profile.first_name }}!
+        <div class="container">
+            <div class="eleven columns">
+                <section>
+                    <h2>Личный кабинет</h2>
+                    <p>
+                        Для того, чтоб в полной мере воспользоваться всеми полезными функциями нашего сайта Вам необходимо заполнить данные в Личном кабинете, чем более полно Вы заполните свои данные, тем больше о Вас узнают Ваши потенциальные покупатели. Функции сайта в полной мере станут доступными после того, как Вы загрузите свое <strong>фото</strong>, а также заполните следующие разделы: <strong>Имя, Фамилия, Страна, Регион, Город, Телефон, О себе</strong>.
+                    </p>
+                </section>
+            </div>
+            <div class="eleven columns">
+                <section>
+                    <h2>Магазин</h2>
+                    <p>Чтобы Ваш магазин стал популярным, выглядел эффектно и приобрел поклонников, необходимо, чтоб он выглядел привлекательно.</p>
+                    <p>
+                        <ul class="list-2">
+                            <li>Для этого Вам следует загрузить <strong>логотип и обложку</strong>, замечательно, если Вы имеете свой отличительный логотип, символизирующий Ваш бренд, но если нет – подойдет любое фото, дающее понять, что Вы продаете.</li>
+                            <li>Если у Вашего бренда есть <strong>название</strong> – также укажите его, если нет – название магазина может быть любым, отражающим ваш стиль и категорию товаров. </li>
+                            <li>Обязательно придумайте <strong>описание</strong> для вашего магазина, какие он имеет отличительные черты, что лежит в основе бренда, на каких покупателей он ориентирован. </li>
+                            <li>Очень важно указать <strong>правила</strong> магазина: принят ли в Вашем магазине возврат или обмен товара, на каких условиях, укажите прочие принципы и правила функционирования Вашего магазина.</li>
+                            <li>Не забудьте отразить <strong>способы доставки и способы оплаты</strong></li>
+                        </ul>
+                    </p>
+                </section>
+            </div>
+            <div class="eleven columns">
+                <section>
+                    <h2>Товары</h2>
+                    <p>Чтоб покупатель быстро нашел Ваш товар необходимо внимательно заполнить информацию о товаре:</p>
+                    <p>
+                        <ul class="list-2">
+                            <li><strong>Название</strong></li>
+                            <li><strong>Цена</strong></li>
+                            <li><strong>Состояние</strong>, под состоянием товара имеется ввиду есть ли он у Вас в наличие на момент предложения к продаже, либо Вы готовы сделать подобный под заказ – для этого следует выбрать один из двух предложенных вариантов: либо «в наличии», либо «под заказ».</li>
+                            <li>Укажите <strong>материал</strong>, из которого сделан Ваш товар</li>
+                            <li>Включите курсор «для примера», если представленный товар будет отличаться от итогового варианта</li>
+                            <li>Внимательно подойдите к заполнению разделов <strong>категория и подкатегория</strong>, для начала ознакомьтесь со всеми, чтоб понять к какой именно относится Ваш товар, чтоб наиболее точно разместить его в каталоге, в этом случае покупатель быстрее найдет Ваш товар </li>
+                            <li>Фотографии — одна из основных составляющих успеха вашего магазина.</li>
+                            <li>Дополнительная информация о товарах: не забывайте обновлять свой магазин, если товар продан или отсутствует – обязательно удаляйте его, чтоб быстрей продать товары, попробуйте менять фото, может они станут выглядеть более привлекательно для покупателя. Прежде чем размещать товар, ознакомьтесь пожалуйста с <a href="{% url 'true_index' %}"><span class="highlight light">Правилами сайта</span></a></li>
+                        </ul>
+                    </p>
+                </section>
+            </div>
+            <div class="eleven columns">
+                <section>
+                    <h2>Стол заказов</h2>
+                    <p>Если Вы хотите сделать заказ у мастера, совсем не важно, есть ли у вас свой магазин, достаточно заполнить информацию в личном кабинете и Вам будет доступна функция оформления заказа. Необходимые данные для оформления заявки:</p>
+                    <p>
+                        <ul class="list-2">
+                            <li><strong>Название</strong> желаемого товара</li>
+                            <li><strong>Цена</strong></li>
+                            <li><strong>Состояние</strong>, под состоянием товара имеется ввиду есть ли он у Вас в наличие на момент предложения к продаже, либо Вы готовы сделать подобный под заказ – для этого следует выбрать один из двух предложенных вариантов: либо «в наличии», либо «под заказ».</li>
+                            <li>Укажите <strong>материал</strong>, из которого сделан Ваш товар</li>
+                            <li>Включите курсор «для примера», если представленный товар будет отличаться от итогового варианта</li>
+                            <li>Внимательно подойдите к заполнению разделов <strong>категория и подкатегория</strong>, для начала ознакомьтесь со всеми, чтоб понять к какой именно относится Ваш товар, чтоб наиболее точно разместить его в каталоге, в этом случае покупатель быстрее найдет Ваш товар </li>
+                            <li>Фотографии — одна из основных составляющих успеха вашего магазина.</li>
+                            <li>Дополнительная информация о товарах: не забывайте обновлять свой магазин, если товар продан или отсутствует – обязательно удаляйте его, чтоб быстрей продать товары, попробуйте менять фото, может они станут выглядеть более привлекательно для покупателя. Прежде чем размещать товар, ознакомьтесь пожалуйста с <a href="{% url 'true_index' %}"><span class="highlight light">Правилами сайта</span></a></li>
+                        </ul>
+                    </p>
+                </section>
+            </div>
+            <div class="eleven columns">
+                <section>
+                    <h2>Запись в блог</h2>
+                    <p>Если Вы хотите делиться с другими полезной информацией или просто желаете писать на темы, связанные с рукоделием, творчеством или искусством, Вы можете вести свой собственный блог, тем самым привлечь больше внимание к своим товарам. Для того, чтоб сделать запись в блог, следует заполнить следующую информацию:</p>
+                </section>
+            </div>
+        </div>
+</div>
+{% endblock main %}
+
+{% block leftsidebar %}
+{% url 'profile-settings' as profile_settings %}
+{% url 'profile-add' as profile_add %}
+{% url 'profile-update' as profile_update %}
+{% url 'ordertableitem-list' as ordertableitem_list %}
+{% url 'ordertableitemoutrequest-list' as ordertableitem_out_request_list %}
+{% url 'ordertableitemrequest-list' as ordertableitem_request_list %}
+<div class="four columns margin-bottom-25">
+    <div class="widget margin-top-0">
+        <h3 class="headline">Профиль</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <ul class="nav-categories">
+        		<li><a href="{{ profile_settings }}" class="{% active request profile_settings %}">Моя активность</a></li>
+						<li><a href="{% url 'user-order-list' %}" class="">Мои покупки</a></li>
+            <li><a href="{{ profile_update }}" class="{% active request profile_update %}">Изменить данные</a></li>
+            <li><a href="{% url 'profile-detail' user.username %}">Посмотреть профиль на сайте</a></li>
+            <li><a href="{% url 'change_fck_password' %}">Изменить пароль</a></li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+    <div class="widget">
+        <h3 class="headline">Блог</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <ul class="nav-categories">
+            <li><a href="{% url 'blogpost-list' %}">Мои статьи</a></li>
+            <li><a href="{% url 'blogpost-add' %}">Написать в блог</a></li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+    	<div class="widget">
+        <h3 class="headline">Магазин</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <ul class="nav-categories">
+					{% if user.shop.id %}
+            <li><a href="{% url 'product-list' %}">Список моих товаров</a></li>
+            <li><a href="{% url 'product-add' %}">Добавить новый товар</a></li>
+            <li><a href="{% url 'shop-update' user.shop.slug %}">Настройки магазина</a></li>
+            <li><a href="{% url 'shop-view' user.shop.slug %}">Посмотреть магазин на сайте</a></li>
+            <li><a href="{% url 'shop-order-list' user.shop.slug user.shop.pk %}">Список заказов</a></li>
+					{% else %}
+						<li><a href="{% url 'shop-add' %}">Создать магазин</a>
+					{% endif %}
+        </ul>
+    </div>
+
+    <div class="clearfix"></div>
+    <div class="widget">
+        <h3 class="headline">Стол заказов</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <ul class="nav-categories">
+            <li><a href="{{ ordertableitem_list }}" class="{% active request ordertableitem_list %}">Список моих заявок</a></li>
+            <li><a href="{% url 'ordertableitem-add' %}">Добавить новую заявку</a></li>
+						<li><a href="{{ ordertableitem_request_list }}" class="{% active request ordertableitem_request_list %}">Список входящих откликов</a></li>
+            <li><a href="{{ ordertableitem_out_request_list }}" class="{% active request ordertableitem_out_request_list %}">Список исходящих откликов</a></li>
+        </ul>
+    </div>
+    <div class="clearfix"></div>
+</div>
+{% endblock %}

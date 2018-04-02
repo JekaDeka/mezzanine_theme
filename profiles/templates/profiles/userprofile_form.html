@@ -1,0 +1,74 @@
+{% extends "profiles/profile_settings.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
+
+{% block meta_title %}
+    Изменение данных
+{% endblock %}
+
+{% block breadcrumbs_title %}
+<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
+<li>Изменение данных</li>
+{% endblock breadcrumb_element %}
+{% block main %}
+<div class="twelve columns margin-bottom-25">
+    <form method="post">
+        {% csrf_token %}
+        {{ form.first_name|as_crispy_field }}
+        {{ form.last_name|as_crispy_field }}
+        {{ form.status|as_crispy_field }}
+        <div class="clearfix"></div>
+        <div class="shop-images custom-field margin-top-15">
+            <label for="id_{{form.image.name}}" class="form-control-label  requiredField">
+                {{form.image.label}}
+                <span class="asteriskField">*</span>
+            </label>
+            {{ form.image }}
+            {{ form.image.errors }}
+        </div>
+        <div class="shop-images custom-field margin-top-15">
+            <label for="id_{{form.background.name}}" class="form-control-label  requiredField">
+                {{form.background.label}}
+                <span class="asteriskField">*</span>
+            </label>
+            {{ form.background }}
+            {{ form.background.errors }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="margin-top-15">
+            {{ form.country|as_crispy_field }}
+            {{ form.region|as_crispy_field }}
+            {{ form.city|as_crispy_field }}
+            {{ form.phone|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="custom-field margin-top-15">
+            <label for="id_{{form.bio.name}}" class="form-control-label ">
+                {{ form.bio.label }}
+            </label>
+            <div>
+                {{ form.bio }}
+            </div>
+        </div>
+        <div class="margin-top-15">
+            <input type="submit" class="button pull-right margin-right-10" value="Сохранить"/>
+        </div>
+    </form>
+</div>
+{% endblock %} {% block extra_js %} {{ block.super }}
+<script type="text/javascript">
+$(function() {
+    $(".mask").mask('+0 (000) 000 0000');
+});
+</script>
+<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
+    <script type="text/javascript">
+        window.__csrf_token = '{{ csrf_token }}';
+        window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
+        window.__filebrowser_url = '{% url "fb_browse" %}';
+    </script>
+    <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
+    <script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
+    <script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
+{% endblock extra_js %}

@@ -1,8 +1,5 @@
 {% load i18n mezzanine_tags comment_tags %}
 <div>
-{% if not settings.COMMENTS_DISQUS_SHORTNAME %}
-{% include "generic/includes/disqus_comments.html" %}
-{% else %}
 <style>.input_id_honeypot {display:none !important;}</style>
 
 
@@ -18,5 +15,4 @@
         <input class="btn btn-primary btn-lg" type="submit" value="{% trans "Comment" %}">
     </div>
 </form> 
-{% endif %}
 </div>

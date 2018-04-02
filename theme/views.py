@@ -9,27 +9,36 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.template.loader import get_template, render_to_string
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q, Count
+from django.db import transaction
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from mezzanine.pages.models import Page
 from cartridge.shop.models import Category, Product, ProductVariation
 from cartridge.shop.utils import recalculate_cart, sign
-from theme.models import OrderItem, OrderItemCategory, OrderItemRequest, UserShop, UserProfile
+from cartridge.shop.forms import AddProductForm
+
+# from profiles.models import UserProfile
+# from ordertable.models import OrderTableItem, OrderTableItemCategory, OrderTableItemRequest
+from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage
+
+from theme.forms import ContactForm, MessageForm, OrderMessageForm, BlogPostForm
+
 from mezzanine.blog.feeds import PostsRSS, PostsAtom
 from mezzanine.conf import settings
-from mezzanine.generic.models import Keyword
+from mezzanine.generic.models import Keyword, AssignedKeyword
 from mezzanine.utils.views import paginate
-from theme.forms import ContactForm, ShopForm, MessageForm, OrderMessageForm, UserProfileForm
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.contrib.auth.decorators import login_required
 
 
@@ -37,88 +46,15 @@ from django.contrib.auth.decorators import login_required
 # from .serializers import UserShopSerializer
 
 import datetime
+import re
 import json
+from itertools import chain
 from PIL import Image
 
 
 User = get_user_model()
 
 
-def blog_post_list(request, tag=None, year=None, month=None, username=None,
-                   category=None, template="blog/blog_post_list.html",
-                   extra_context=None):
-    """
-    Display a list of blog posts that are filtered by tag, year, month,
-    author or category. Custom templates are checked for using the name
-    ``blog/blog_post_list_XXX.html`` where ``XXX`` is either the
-    category slug or author's username if given.
-    """
-    templates = []
-    blog_posts = BlogPost.objects.published(for_user=request.user)
-    if not request.user.is_superuser:
-        blog_posts = blog_posts.filter(status=2)
-    blog_categories = BlogCategory.objects.all()
-
-    if tag is not None:
-        tag = get_object_or_404(Keyword, slug=tag)
-        blog_posts = blog_posts.filter(keywords__keyword=tag)
-    if year is not None:
-        blog_posts = blog_posts.filter(publish_date__year=year)
-        if month is not None:
-            blog_posts = blog_posts.filter(publish_date__month=month)
-            try:
-                month = _(month_name[int(month)])
-            except IndexError:
-                raise Http404()
-    if category is not None:
-        category = get_object_or_404(BlogCategory, slug=category)
-        blog_posts = blog_posts.filter(categories=category)
-        templates.append(u"blog/blog_post_list_%s.html" %
-                         str(category.slug))
-    author = None
-    if username is not None:
-        author = get_object_or_404(User, username=username)
-        blog_posts = blog_posts.filter(user=author)
-        templates.append(u"blog/blog_post_list_%s.html" % username)
-
-    prefetch = ("categories", "keywords__keyword")
-    blog_posts = blog_posts.select_related("user").prefetch_related(*prefetch)
-    blog_posts = paginate(blog_posts, request.GET.get("page", 1),
-                          settings.BLOG_POST_PER_PAGE,
-                          settings.MAX_PAGING_LINKS)
-    context = {"blog_posts": blog_posts, "year": year, "month": month,
-               "tag": tag, "category": category, "author": author, "blog_categories": blog_categories}
-    context.update(extra_context or {})
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
-
-
-def blog_post_detail(request, slug, year=None, month=None, day=None,
-                     template="blog/blog_post_detail.html",
-                     extra_context=None):
-    """. Custom templates are checked for using the name
-    ``blog/blog_post_detail_XXX.html`` where ``XXX`` is the blog
-    posts's slug.
-    """
-    blog_posts = BlogPost.objects.published(
-        for_user=request.user).select_related()
-    blog_post = get_object_or_404(blog_posts, slug=slug)
-    related_posts = blog_post.related_posts.published(for_user=request.user)
-    context = {"blog_post": blog_post, "editable_obj": blog_post,
-               "related_posts": related_posts}
-    context.update(extra_context or {})
-    templates = [u"blog/blog_post_detail_%s.html" % str(slug), template]
-    return TemplateResponse(request, templates, context)
-
-
-def blog_post_feed(request, format, **kwargs):
-    """
-    Blog posts feeds - maps format to the correct feed view.
-    """
-    try:
-        return {"rss": PostsRSS, "atom": PostsAtom}[format](**kwargs)(request)
-    except KeyError:
-        raise Http404()
 
 
 # def promote_user(request, template="accounts/account_signup.html",
@@ -137,24 +73,18 @@ def blog_post_feed(request, format, **kwargs):
 #     return redirect('/')
 
 def true_index(request):
-    main_category = Page.objects.get(slug='catalog')
+    # main_category = Page.objects.get(slug='catalog')
     # categories = main_category.children.all()
-    categories = Category.objects.filter(parent=main_category)[:10]
+    categories = Category.objects.filter(parent__slug='catalog')[:10]
     # enddate = datetime.datetime.today()
     # startdate = enddate - datetime.timedelta(days=60)
     # new_arrivals = Product.objects.filter(
     # created__range=[startdate,
     # enddate]).filter(status=2).order_by('-created')[:7]
 
-    featured_products = Product.objects.filter(
-        user__shop__on_vacation=False).order_by('-created').prefetch_related('images')[:10]
-
-    # recent_posts = BlogPost.objects.order_by('-created')[:4]
-    tmp = User.objects.distinct().annotate(
-        product_num=Count('product')).filter(product_num__gt=3)
-
-    user_shops = UserShop.objects.filter(
-        user__in=tmp).filter(on_vacation=False)
+    featured_products = ShopProduct.objects.filter(
+        shop__on_vacation=False).order_by('-date_added').prefetch_related('images')[:10]
+    user_shops = UserShop.objects.filter(on_vacation=False)
     context = {
         'featured_products': featured_products,
         'user_shops': user_shops,
@@ -201,332 +131,181 @@ def profile_view(request, template_name='admin/index.html',
     return TemplateResponse(request, template_name, context)
 
 
-def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_context=None):
-    try:
-        shop = UserShop.objects.get(slug=slug)
-    except Exception as e:
-        return HttpResponseRedirect(reverse('true_index'))
-    try:
-        profile = request.user.profile
-        data = {'first_name': profile.first_name,
-                'email': request.user.email}
-    except Exception as e:
-        profile = None
-        data = None
+# def shop_view(request, slug, template_name='accounts/shop_profile.html', extra_context=None):
+#     try:
+#         shop = UserShop.objects.get(slug=slug)
+#     except Exception as e:
+#         return HttpResponseRedirect(reverse('true_index'))
+#     try:
+#         profile = request.user.profile
+#         data = {'first_name': profile.first_name,
+#                 'email': request.user.email}
+#     except Exception as e:
+#         profile = None
+#         data = None
 
-    form = MessageForm(data)
-    if request.method == 'POST':
-        form = MessageForm(data=request.POST)
-        if form.is_valid():
-            message = request.POST.get('message', '')
-            first_name = request.POST.get('first_name', '')
-            email = request.POST.get('email', '')
-            template = get_template('email/shop_message_send.html')
-            context = {
-                'request': request,
-                'shop': shop,
-                'profile': profile,
-                'first_name': first_name,
-                'email': email,
-                'message': message,
-            }
-            content = template.render(context)
+#     form = MessageForm(data)
+#     if request.method == 'POST':
+#         form = MessageForm(data=request.POST)
+#         if form.is_valid():
+#             message = request.POST.get('message', '')
+#             first_name = request.POST.get('first_name', '')
+#             email = request.POST.get('email', '')
+#             template = get_template('email/shop_message_send.html')
+#             context = {
+#                 'request': request,
+#                 'shop': shop,
+#                 'profile': profile,
+#                 'first_name': first_name,
+#                 'email': email,
+#                 'message': message,
+#             }
+#             content = template.render(context)
 
-            email = EmailMessage(
-                "Вашему магазину задали вопрос handmaker.top",
-                content,
-                settings.EMAIL_HOST_USER,
-                [shop.user.email],
-                headers={'Reply-To': email}
-            )
-            email.content_subtype = 'html'
-            email.send(fail_silently=True)
-            messages.success(request, "Ваше сообщение успешно отправлено")
-            return HttpResponseRedirect(reverse('shop_view', args=[shop.slug]))
+#             email = EmailMessage(
+#                 "Вашему магазину задали вопрос handmaker.top",
+#                 content,
+#                 settings.EMAIL_HOST_USER,
+#                 [shop.user.email],
+#                 headers={'Reply-To': email}
+#             )
+#             email.content_subtype = 'html'
+#             email.send(fail_silently=True)
+#             messages.success(request, "Ваше сообщение успешно отправлено")
+#             return HttpResponseRedirect(reverse('shop_view', args=[shop.slug]))
 
-    context = {'shop': shop, "form": form}
-    if extra_context is not None:
-        context.update(extra_context)
-    return TemplateResponse(request, template_name, context)
-
-
-@login_required
-def shop_toggle_vacation(request):
-    try:
-        shop = request.user.shop
-        if shop.on_vacation:
-            shop.on_vacation = False
-            messages.success(
-                request, "Ваш магазин успешно вернулся с каникул!")
-        else:
-            shop.on_vacation = True
-            messages.info(
-                request, 'Ваш магазин теперь на каникулах и не принимает заказы.')
-        shop.save()
-    except Exception as e:
-        shop = None
-        messages.append('go')
-
-    if request.META['HTTP_REFERER']:
-        return HttpResponseRedirect(request.META['HTTP_REFERER'])
-    else:
-        return HttpResponseRedirect('/')
+#     context = {'shop': shop, "form": form}
+#     if extra_context is not None:
+#         context.update(extra_context)
+#     return TemplateResponse(request, template_name, context)
 
 
-@login_required
-def shop_create(request, template="accounts/account_shop_create.html"):
-    try:
-        shop = UserShop.objects.get(user=request.user)
-    except:
-        shop = None
+# @login_required
+# def shop_toggle_vacation(request):
+#     try:
+#         shop = request.user.shop
+#         if shop.on_vacation:
+#             shop.on_vacation = False
+#             messages.success(
+#                 request, "Ваш магазин успешно вернулся с каникул!")
+#         else:
+#             shop.on_vacation = True
+#             messages.info(
+#                 request, 'Ваш магазин теперь на каникулах и не принимает заказы.')
+#         shop.save()
+#     except Exception as e:
+#         shop = None
+#         messages.append('go')
 
-    if request.method == 'POST':
-        form = ShopForm(request.POST, request.FILES, instance=shop)
-        if form.is_valid():
-            if shop:
-                messages.success(request, "Магазин успешно изменен.")
-            else:
-                messages.success(request, "Магазин успешно создан.")
-
-            shop = form.save(commit=False)
-            shop.user = request.user
-            if request.FILES.get('image', False):
-                shop.image = request.FILES['image']
-
-            if request.FILES.get('background', False):
-                shop.background = request.FILES['background']
-            shop.save()
-
-            if not shop.user.groups.filter(name='custom').exists():
-                shop.user.is_staff = True
-                group = Group.objects.get(name='custom')
-                shop.user.groups.add(group)
-                shop.user.save()
-            return redirect('shop_view', slug=shop.slug)
-    else:
-        form = ShopForm(instance=shop)
-    templates = []
-    context = {"form": form, "shop": shop}
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
+#     if request.META['HTTP_REFERER']:
+#         return HttpResponseRedirect(request.META['HTTP_REFERER'])
+#     else:
+#         return HttpResponseRedirect('/')
 
 
-@login_required
-def profile_settings(request, template="accounts/account_profile_settings.html",
-                     extra_context=None):
-    """
-    Profile basic settings
-    """
-    user = request.user
-    try:
-        shop = UserShop.objects.get(user=user)
-    except:
-        shop = None
-    try:
-        profile = user.profile
-    except:
-        profile = None
+# @login_required
+# def shop_create(request, template="accounts/account_shop_create.html"):
+#     try:
+#         shop = UserShop.objects.get(user=request.user)
+#     except:
+#         shop = None
 
-    if request.method == 'POST':
-        form = UserProfileForm(request.POST, request.FILES, instance=profile)
-        if form.is_valid():
-            profile = form.save(commit=False)
-            profile.user = user
-            first_time = False
-            if request.FILES.get('image', False):
-                profile.image = request.FILES['image']
+#     if request.method == 'POST':
+#         form = ShopForm(request.POST, request.FILES, instance=shop)
+#         if form.is_valid():
+#             if shop:
+#                 messages.success(request, "Магазин успешно изменен.")
+#             else:
+#                 messages.success(request, "Магазин успешно создан.")
 
-            if not profile.user.groups.filter(name='blog_only').exists():
-                profile.user.is_staff = True
-                group = Group.objects.get(name='blog_only')
-                profile.user.groups.add(group)
-                profile.user.save()
-                messages.success(request, "Профиль успешно обновлен.")
-                first_time = True
+#             shop = form.save(commit=False)
+#             shop.user = request.user
+#             if request.FILES.get('image', False):
+#                 shop.image = request.FILES['image']
 
-            profile.save()
-            html = render_to_string(
-                'accounts/includes/card_profile.html', {'profile': profile, 'MEDIA_URL': settings.MEDIA_URL})
-            response_data = {}
-            response_data['first_time'] = first_time
-            response_data['result'] = 'success'
-            response_data['response'] = html
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
-        else:
-            response_data = {}
-            response_data['errors'] = form.errors
-            response_data['result'] = 'error'
-            return HttpResponse(json.dumps(response_data), content_type="application/json")
+#             if request.FILES.get('background', False):
+#                 shop.background = request.FILES['background']
+#             shop.save()
 
-    else:
-        form = UserProfileForm(instance=profile)
-
-    context = {"shop": shop, "user": user,
-               "profile": profile, "form": form, "title": "Личный кабинет"}
-    context.update(extra_context or {})
-    return TemplateResponse(request, template, context)
+#             if not shop.user.groups.filter(name='custom').exists():
+#                 shop.user.is_staff = True
+#                 group = Group.objects.get(name='custom')
+#                 shop.user.groups.add(group)
+#                 shop.user.save()
+#             return redirect('shop_view', slug=shop.slug)
+#     else:
+#         form = ShopForm(instance=shop)
+#     templates = []
+#     context = {"form": form, "shop": shop}
+#     templates.append(template)
+#     return TemplateResponse(request, templates, context)
 
 
-def order_list(request, tag=None, year=None, month=None, username=None,
-               category=None, template="order/order_list.html",
-               extra_context=None):
+# @login_required
+# def profiles:profile-settings(request, template="accounts/account_profiles:profile-settings.html",
+#                      extra_context=None):
+#     """
+#     Profile basic settings
+#     """
+#     user = request.user
+#     try:
+#         shop = UserShop.objects.get(user=user)
+#     except:
+#         shop = None
+#     try:
+#         profile = user.profile
+#     except:
+#         profile = None
 
-    templates = []
-    orders = OrderItem.objects.filter(performer=None).select_related('author')
-    # author = request.user
-    order_categories = OrderItemCategory.objects.all()
-    if category is not None:
-        category = get_object_or_404(OrderItemCategory, slug=category)
-        orders = orders.filter(categories=category)
+#     if request.method == 'POST':
+#         form = UserProfileForm(request.POST, request.FILES, instance=profile)
+#         if form.is_valid():
+#             profile = form.save(commit=False)
+#             profile.user = user
+#             first_time = False
+#             if request.FILES.get('image', False):
+#                 profile.image = request.FILES['image']
 
-    region = request.GET.get('region', None)
-    if region is not None:
-        try:
-            orders = orders.filter(Q(lock_in_region=False) | Q(
-                author__profile__region=region))
-        except Exception as e:
-            messages.error(request, "Не удалось применить фильтр региона")
+#             if not profile.user.groups.filter(name='blog_only').exists():
+#                 profile.user.is_staff = True
+#                 group = Group.objects.get(name='blog_only')
+#                 profile.user.groups.add(group)
+#                 profile.user.save()
+#                 messages.success(request, "Профиль успешно обновлен.")
+#                 first_time = True
 
-    orders = paginate(orders, request.GET.get("page", 1),
-                      15,
-                      settings.MAX_PAGING_LINKS)
-    context = {"orders": orders, "year": year, "month": month,
-               "tag": tag, "category": category, "order_categories": order_categories}
-    context.update(extra_context or {})
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
+#             profile.save()
+#             html = render_to_string(
+#                 'accounts/includes/card_profile.html', {'profile': profile, 'MEDIA_URL': settings.MEDIA_URL})
+#             response_data = {}
+#             response_data['first_time'] = first_time
+#             response_data['result'] = 'success'
+#             response_data['response'] = html
+#             return HttpResponse(json.dumps(response_data), content_type="application/json")
+#         else:
+#             response_data = {}
+#             response_data['errors'] = form.errors
+#             response_data['result'] = 'error'
+#             return HttpResponse(json.dumps(response_data), content_type="application/json")
 
+#     else:
+#         form = UserProfileForm(instance=profile)
 
-def order_detail(request, pk, template="order/order_detail.html",
-                 extra_context=None):
-    templates = []
-    try:
-        order = OrderItem.objects.get(pk=pk)
-    except Exception as e:
-        return redirect('order_list')
-
-    form = OrderMessageForm()
-    if request.method == 'POST':
-        form = OrderMessageForm(data=request.POST)
-        if form.is_valid():
-            message = request.POST.get('message', '')
-            template = get_template('email/order_email_request_approved.html')
-            context = {
-                'request': request,
-                'order': order,
-                'performer': request.user,
-                'message': message,
-            }
-            content = template.render(context)
-
-            email = EmailMessage(
-                "Для вашего заказа нашелся исполнитель handmaker.top",
-                content,
-                settings.EMAIL_HOST_USER,
-                [order.author.email],
-                headers={'Reply-To': request.user.email}
-            )
-            email.content_subtype = 'html'
-            if order_request_add(request, pk):
-                email.send(fail_silently=True)
-            return HttpResponseRedirect(reverse('order_detail', args=[pk]))
-
-    context = {"order": order, "form": form}
-
-    context.update(extra_context or {})
-    templates.append(template)
-    return TemplateResponse(request, templates, context)
+#     context = {"shop": shop, "user": user,
+#                "profile": profile, "form": form, "title": "Личный кабинет"}
+#     context.update(extra_context or {})
+#     return TemplateResponse(request, template, context)
 
 
-def order_request_add(request, order_pk):
-    status = False
-    try:
-        order = OrderItem.objects.get(pk=order_pk, performer=None)
-        if request.user == order.author:
-            raise ValueError('Нельзя откликнуться на собственную заявку')
-        orderRequest = OrderItemRequest(order=order, performer=request.user)
-        orderRequest.save()
-    except Exception as error:
-        if 'UNIQUE constraint' in error.args[0]:
-            messages.error(request, 'Вы уже откликнулись на данный заказ')
-        elif 'matching query does not exist' in error.args[0]:
-            order = OrderItem.objects.get(pk=order_pk)
-            order.active = False
-            order.save()
-            messages.error(request, 'Данная заявка закрыта')
-        else:
-            messages.error(request, error.args[0])
+# def validate_shopname(request):
+#     shopname = request.GET.get('shopname', None)
+#     data = {
+#         'is_taken': UserShop.objects.filter(shopname__iexact=shopname).exclude(user=request.user).exists()
+#     }
+#     if data['is_taken']:
+#         data['error_message'] = 'Магазин с таким именем уже существует.'
 
-    else:
-        status = True
-        messages.success(
-            request, "Ваше сообщение успешно отправлено. Автор данный заявки свяжется с вами по мере своих возможностей.")
-    return status
-    # return HttpResponseRedirect(reverse('order_detail', args=[order_pk]))
-    # return render(request, 'order/order_request_approved.html', {'order':
-    # order})
-
-
-@login_required
-def order_request_assign(request, order_pk, performer_pk, extra_context=None):
-    if request.user.has_perm('theme.change_orderitemrequest'):
-        try:
-            order = OrderItem.objects.get(pk=order_pk)
-            performer = User.objects.get(pk=performer_pk)
-            order.performer = performer
-            order.active = False
-            order.save()
-        except Exception as e:
-            messages.error(request, e.args[0])
-        else:
-            template = get_template('email/order_email_request_assign.html')
-            context = {
-                'request': request,
-                'order': order,
-                'order_url': order.get_absolute_url,
-                'performer': performer,
-            }
-            content = template.render(context)
-
-            email = EmailMessage(
-                "Ваша заявка на исполнение заказа одобрена handmaker.top",
-                content,
-                settings.EMAIL_HOST_USER,
-                [order.author.email],
-                headers={'Reply-To': performer.email}
-            )
-            email.content_subtype = 'html'
-            email.send(fail_silently=True)
-            messages.success(
-                request, "Исполнитель успешно назначен. Ему отправлено уведомление.")
-
-    return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
-
-
-@login_required
-def order_request_delete(request, order_pk, performer_pk, extra_context=None):
-    if request.user.has_perm('theme.change_orderitemrequest'):
-        try:
-            order = OrderItemRequest.objects.get(
-                order=order_pk, performer=performer_pk)
-            order.delete()
-        except Exception as e:
-            messages.error(request, e.args[0])
-        else:
-            messages.success(request, "Отклик успешно отклонен.")
-
-    return HttpResponseRedirect(reverse('admin:theme_orderitemrequest_changelist'))
-
-
-def validate_shopname(request):
-    shopname = request.GET.get('shopname', None)
-    data = {
-        'is_taken': UserShop.objects.filter(shopname__iexact=shopname).exclude(user=request.user).exists()
-    }
-    if data['is_taken']:
-        data['error_message'] = 'Магазин с таким именем уже существует.'
-
-    return JsonResponse(data)
+#     return JsonResponse(data)
 
 
 def get_categories(request):
@@ -580,72 +359,401 @@ def get_categories(request):
     return JsonResponse(tree, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
 
-# def product(request, slug, template="shop/product.html",
-#             form_class=NoQuantityAddProductForm, extra_context=None):
-#     """
-#     Display a product - convert the product variations to JSON as well as
-#     handling adding the product to either the cart or the wishlist.
-#     """
-#     published_products = Product.objects.published(for_user=request.user)
-#     product = get_object_or_404(published_products, slug=slug)
-#     shop = UserShop.objects.get(user=product.user)
-#     # related_products = Product.objects.published(for_user=request.user).filter(user=user)[:5]
+def product(request, slug, template="shop/product.html",
+            form_class=AddProductForm, extra_context=None):
+    """
+    Display a product - convert the product variations to JSON as well as
+    handling adding the product to either the cart or the wishlist.
+    """
+    # published_products = Product.objects.published(for_user=request.user)
+    product = Product.objects.select_related('shop').get(slug=slug)
+    profile = UserProfile.objects.select_related('country', 'city').get(user=product.shop.user_id)
+    # fields = [f.name for f in ProductVariation.option_fields()]
+    # variations = product.variations.all()
+    # variations_json = dumps([dict([(f, getattr(v, f))
+    #                                for f in fields + ["sku", "image_id"]]) for v in variations])
+    to_cart = (request.method == "POST" and
+               request.POST.get("add_wishlist") is None)
+    initial_data = {}
+    # if variations:
+    #     initial_data = dict([(f, getattr(variations[0], f)) for f in fields])
+    initial_data["quantity"] = 1
+    # add_product_form = form_class(request.POST or None, product=product,
+    # initial=initial_data, to_cart=to_cart)
+    # if request.method == "POST":
+    #     if add_product_form.is_valid():
+    #         if to_cart:
+    #             quantity = add_product_form.cleaned_data["quantity"]
+    #             request.cart.add_item(add_product_form.variation, quantity)
+    #             recalculate_cart(request)
+    #             info(request, _("Item added to cart"))
+    #             return redirect("shop_cart")
+    #         else:
+    #             skus = request.wishlist
+    #             sku = add_product_form.variation.sku
+    #             if sku not in skus:
+    #                 skus.append(sku)
+    #             info(request, _("Item added to wishlist"))
+    #             response = redirect("shop_wishlist")
+    #             set_cookie(response, "wishlist", ",".join(skus))
+    #             return response
+    # related = []
+    # if settings.SHOP_USE_RELATED_PRODUCTS:
+    #     related = product.related_products.published(for_user=request.user)
+    context = {
+        "product": product,
+        "profile": profile,
+        # "editable_obj": product,
+        # "images": product.images.all(),
+        # "variations": variations,
+        # "variations_json": variations_json,
+        # "has_available_variations": any([v.has_price() for v in variations]),
+        # "related_products": related,
+        # "add_product_form": add_product_form
+    }
+    context.update(extra_context or {})
+    return TemplateResponse(request, template, context)
 
-#     # fields = [f.name for f in ProductVariation.option_fields()]
-#     # print(fields)
-#     # variations = product.variations.all()
-#     # variations_json = json.dumps([dict([(f, getattr(v, f))
-#     # for f in fields + ["sku", "image_id"]]) for v in variations])
-#     to_cart = (request.method == "POST" and
-#                request.POST.get("add_wishlist") is None)
-#     initial_data = {}
-#     # if variations:
-#     # initial_data = dict([(f, getattr(variations[0], f)) for f in fields])
-#     initial_data["quantity"] = 1
-#     # initial_data["shop"] =
-#     add_product_form = form_class(request.POST or None, product=product, shop=shop,
-#                                   initial=initial_data, to_cart=to_cart)
-#     if request.method == "POST":
-#         if add_product_form.is_valid():
-#             if to_cart:
-#                 quantity = add_product_form.cleaned_data["quantity"]
-#                 request.cart.add_item(add_product_form._product, shop, quantity)
-#                 recalculate_cart(request)
-#                 messages.info(request, _("Item added to cart"))
-#                 return redirect("shop_cart")
-#             else:
-#                 skus = request.wishlist
-#                 sku = add_product_form.variation.sku
-#                 if sku not in skus:
-#                     skus.append(sku)
-#                 info(request, _("Item added to wishlist"))
-#                 response = redirect("shop_wishlist")
-#                 set_cookie(response, "wishlist", ",".join(skus))
-#                 return response
+
+@method_decorator(login_required, name='dispatch')
+class BlogPostList(ListView):
+    model = BlogPost
+    template_name = "blog/blogpost_user_list.html"
+    context_object_name = "blogpost_list"
+
+    def get_queryset(self):
+        return BlogPost.objects.filter(user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        remain = self.request.user.profile.allow_blogpost_count - len(context['object_list'])
+        context['remain'] = remain
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
+class BlogPostCreate(CreateView):
+    model = BlogPost
+    form_class = BlogPostForm
+    # fields = ['title', 'featured_image', 'preview_content', 'content', 'categories', 'allow_comments', 'keywords']
+    success_url = reverse_lazy('blogpost-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.blogposts.count() >= 10:
+            messages.warning(self.request, "Исчерпан лимит")
+            return redirect(self.success_url)
+        return super(BlogPostCreate, self).dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        instance = form.save(commit=False)
+        instance.user = self.request.user
+        instance.save()
+        messages.success(self.request, "Статья успешно добавлена в Блог.")
+        return redirect(self.success_url)
+
+
+@method_decorator(login_required, name='dispatch')
+class BlogPostUpdate(UpdateView):
+    model = BlogPost
+    form_class = BlogPostForm
+    success_url = reverse_lazy('blogpost-list')
+    # fields = ['title', 'featured_image', 'preview_content', 'content', 'categories', 'allow_comments', 'keywords']
+
+    def form_valid(self, form):
+        instance = form.save(commit=True)
+        messages.success(self.request, "Запись успешно изменена")
+        return redirect(self.success_url)
+
+    def get_object(self, queryset=None):
+        """ Hook to ensure object is owned by request.user. """
+        obj = super(BlogPostUpdate, self).get_object()
+        if not obj.user == self.request.user:
+            raise Http404
+        return obj
+
+
+@method_decorator(login_required, name='dispatch')
+class BlogPostDelete(DeleteView):
+    model = BlogPost
+    success_url = reverse_lazy('blogpost-list')
+
+    def get_object(self, queryset=None):
+        """ Hook to ensure object is owned by request.user. """
+        obj = super(BlogPostDelete, self).get_object()
+        if not obj.user == self.request.user:
+            raise Http404
+        return obj
+
+
+# @method_decorator(login_required, name='dispatch')
+# class ProductList(ListView):
+#     model = ShopProduct
+#     template_name = "product/product_user_list.html"
+#     context_object_name = "product_list"
+
+#     def get_queryset(self):
+#         return ShopProduct.objects.filter(shop=self.request.user.shop).prefetch_related('images')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         remain = self.request.user.profile.allow_blogpost_count - len(context['object_list'])
+#         context['remain'] = remain
+#         return context
+
+
+# @method_decorator(login_required, name='dispatch')
+# class ProductCreate(CreateView):
+#     model = ShopProduct
+#     form_class = ProductForm
+#     success_url = reverse_lazy('product-list')
+
+
+# @method_decorator(login_required, name='dispatch')
+# class ProductUpdate(UpdateView):
+#     model = ShopProduct
+#     form_class = ProductForm
+#     success_url = reverse_lazy('product-list')
+#     template_name = "product/product_form.html"
+#     # fields = '__all__'
+
+
+# @method_decorator(login_required, name='dispatch')
+# class ProductDelete(DeleteView):
+#     model = ShopProduct
+#     success_url = reverse_lazy('product-list')
+#     template_name = "product/product_confirm_delete.html"
+
+#     def get_object(self, queryset=None):
+#         obj = super(ProductDelete, self).get_object()
+#         if not obj.shop == self.request.user.shop:
+#             raise Http404
+#         return obj
+
+
+# @method_decorator(login_required, name='dispatch')
+# class ProductImageCreate(CreateView):
+#     """docstring for ProductImageCreate"""
+#     model = ShopProduct
+#     form_class = ProductForm
+#     success_url = reverse_lazy('product-list')
+#     template_name = "product/product_form.html"
+
+#     def dispatch(self, request, *args, **kwargs):
+#         if request.user.shop.products.count() >= 10:
+#             messages.warning(self.request, "Исчерпан лимит")
+#             return redirect(self.success_url)
+#         return super(ProductImageCreate, self).dispatch(request, *args, **kwargs)
+
+#     def get_context_data(self, **kwargs):
+#         data = super(ProductImageCreate, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['productimage'] = ProductImageFormSet(self.request.POST)
 #         else:
-#             messages.error(request, 'wtf')
+#             data['productimage'] = ProductImageFormSet()
+#         return data
 
-#     # related = Product.objects.published(for_user=request.user).filter(user=product.user)[:5]
+#     def form_valid(self, form):
+#         context = self.get_context_data()
+#         productimage = context['productimage']
+#         with transaction.atomic():
+#             self.object = form.save(commit=False)
+#             self.object.shop = self.request.user.shop
+#             self.object.save()
 
-#     context = {
-#         "product": product,
-#         "editable_obj": product,
-#         "images": product.images.all(),
-#         "shop": shop,
-#         "on_vacation": shop.on_vacation,
-#         # "related_products": related_products,
-#         "add_product_form": add_product_form
-#     }
-#     context.update(extra_context or {})
-
-#     templates = [u"shop/%s.html" % str(product.slug), template]
-#     # Check for a template matching the page's content model.
-#     if getattr(product, 'content_model', None) is not None:
-#         templates.insert(0, u"shop/products/%s.html" % product.content_model)
-
-#     return TemplateResponse(request, templates, context)
+#             if productimage.is_valid():
+#                 productimage.instance = self.object
+#                 productimage.save()
+#         return super(ProductImageCreate, self).form_valid(form)
 
 
-# class NoteViewSet(viewsets.ModelViewSet):
-#     queryset = UserShop.objects.all()
-#     serializer_class = UserShopSerializer
+# @method_decorator(login_required, name='dispatch')
+# class ProductImageUpdate(UpdateView):
+#     model = ShopProduct
+#     form_class = ProductForm
+#     success_url = reverse_lazy('product-list')
+#     template_name = "product/product_form.html"
+#     queryset = ShopProduct.objects.select_related()
+
+#     def get_context_data(self, **kwargs):
+#         data = super(ProductImageUpdate, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['productimage'] = ProductImageFormSet(self.request.POST, instance=self.object)
+#         else:
+#             data['productimage'] = ProductImageFormSet(instance=self.object)
+#         return data
+
+#     def form_valid(self, form):
+#         context = self.get_context_data()
+#         productimage = context['productimage']
+#         with transaction.atomic():
+#             self.object = form.save(commit=False)
+#             self.object.shop = self.request.user.shop
+#             self.object.save()
+
+#             if productimage.is_valid():
+#                 productimage.instance = self.object
+#                 productimage.save()
+#         return super(ProductImageUpdate, self).form_valid(form)
+
+#     def get_object(self, queryset=None):
+#         """ Hook to ensure object is owned by request.user. """
+#         obj = super(ProductImageUpdate, self).get_object()
+#         if not obj.shop == self.request.user.shop:
+#             raise Http404
+#         return obj
+
+
+# class ProductDetailView(DetailView):
+#     model = ShopProduct
+#     template_name = "shop/product.html"
+#     context_object_name = 'product'
+#     queryset = ShopProduct.objects.prefetch_related(
+#         'keywords__keyword', 'images').select_related("shop__user__profile", "shop__user__profile__country", "shop__user__profile__city")
+
+
+class SearchAll(ListView):
+    template_name = "search_results.html"
+    context_object_name = 'results'
+
+    def get_queryset(self):
+        query = Q()
+        search = self.request.GET.get('q')
+        words = search.split(" ")
+        for word in words:
+            query |= Q(keywords_string__icontains=word)
+            query |= Q(title__icontains=word)
+        products = ShopProduct.objects.filter(query).all()
+        blog_post = BlogPost.objects.filter(query).all()
+        shops = UserShop.objects.filter(shopname__in=words)
+
+        result_list = list(chain(products, blog_post, shops))
+        return result_list
+
+
+# class ShopList(ListView):
+#     model = UserShop
+#     template_name = "shop/shop_list.html"
+
+
+# class ShopCreate(CreateView):
+#     model = UserShop
+#     # form = ShopForm
+#     fields = ["background", "image", "shopname", "bio", "rules",
+#               "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other"]
+
+
+# class ShopDeliveryOptionCreate(CreateView):
+#     model = UserShop
+#     fields = ["background", "image", "shopname", "bio", "rules",
+#               "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other"]
+#     success_url = reverse_lazy('profile-list')
+#     template_name = "shop/shop_form.html"
+
+#     def get_context_data(self, **kwargs):
+#         data = super(ShopDeliveryOptionCreate, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['deliveryoption'] = UserShopDeliveryOptionFormSet(self.request.POST)
+#         else:
+#             data['deliveryoption'] = UserShopDeliveryOptionFormSet()
+#         return data
+
+#     def form_valid(self, form):
+#         context = self.get_context_data()
+#         deliveryoption = context['deliveryoption']
+#         with transaction.atomic():
+#             self.object = form.save()
+
+#             if deliveryoption.is_valid():
+#                 deliveryoption.instance = self.object
+#                 deliveryoption.save()
+#         return super(ShopDeliveryOptionCreate, self).form_valid(form)
+
+
+# class ShopUpdate(UpdateView):
+#     model = UserShop
+#     success_url = '/'
+#     fields = ["background", "image", "shopname", "bio", "rules",
+#               "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other"]
+#     template_name = "shop/shop_form.html"
+
+
+# class ShopDeliveryOptionUpdate(UpdateView):
+#     model = UserShop
+#     fields = ["background", "image", "shopname", "bio", "rules",
+#               "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other"]
+#     success_url = reverse_lazy('shop-list')
+#     template_name = "shop/shop_form.html"
+
+#     def get_context_data(self, **kwargs):
+#         data = super(ShopDeliveryOptionUpdate, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['deliveryoption'] = UserShopDeliveryOptionFormSet(self.request.POST, instance=self.object)
+#         else:
+#             data['deliveryoption'] = UserShopDeliveryOptionFormSet(instance=self.object)
+#         return data
+
+#     def form_valid(self, form):
+#         context = self.get_context_data()
+#         deliveryoption = context['deliveryoption']
+#         with transaction.atomic():
+#             self.object = form.save()
+
+#             if deliveryoption.is_valid():
+#                 deliveryoption.instance = self.object
+#                 deliveryoption.save()
+#         return super(ShopDeliveryOptionUpdate, self).form_valid(form)
+
+
+# class ShopDelete(DeleteView):
+#     model = UserShop
+#     success_url = reverse_lazy('shop-list')
+
+
+# class ShopDetailView(DetailView):
+#     model = UserShop
+#     template_name = "accounts/shop_profile.html"
+#     context_object_name = 'shop'
+#     queryset = UserShop.objects.prefetch_related('products', 'products__images')
+
+#     def post(self, request, *args, **kwargs):
+#         form = MessageForm(data=request.POST)
+#         if form.is_valid():
+#             message = request.POST.get('message', '')
+#             first_name = request.POST.get('first_name', '')
+#             email = request.POST.get('email', '')
+#             template = get_template('email/shop_message_send.html')
+#             context = {
+#                 'request': request,
+#                 'shop': self.get_object(),
+#                 'profile': self.get_object().user.profile,
+#                 'first_name': first_name,
+#                 'email': email,
+#                 'message': message,
+#             }
+#             content = template.render(context)
+
+#             email = EmailMessage(
+#                 "Вашему магазину задали вопрос handmaker.top",
+#                 content,
+#                 settings.EMAIL_HOST_USER,
+#                 [self.get_object().user.email],
+#                 headers={'Reply-To': email}
+#             )
+#             email.content_subtype = 'html'
+#             email.send(fail_silently=True)
+#             messages.success(request, "Ваше сообщение успешно отправлено")
+#         else:
+#             messages.error(request, "Проверьте правильность введенных данных")
+#         return HttpResponseRedirect(self.get_object().get_absolute_url())
+
+#     def get_context_data(self, **kwargs):
+#         data = super(ShopDetailView, self).get_context_data(**kwargs)
+#         if self.request.POST:
+#             data['form'] = MessageForm(self.request.POST)
+#         else:
+#             data['form'] = MessageForm()
+#         return data
+#     # def get_queryset(self):
+#     # return UserShop.objects.prefetch_related('products')
+#     # queryset = UserShop.objects.prefetch_related(
+#     # 'keywords__keyword').select_related("shop__user__profile", "shop__user__profile__country", "shop__user__profile__city")

@@ -1,6 +1,6 @@
 {% load mezzanine_tags i18n %}
 <nav class="top-search">
-    <form action="{% url "search" %}">
+    <form action="{% url "search-all" %}">
         <button><i class="fa fa-search"></i></button>
         <input class="search-field" placeholder="Поиск" type="text" name="q" value="{{ request.REQUEST.q }}" />
     </form>

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block main %}
+
+    <h2>Here are all user profiles: </h2>
+    <div>
+        <ul>
+            {% for profile in object_list %}
+                <li>{{ profile }} | <a href="#">edit</a>
+                    <a href="#">delete</a>
+                </li>
+            {% empty %}
+                <li>No profile yet.</li>
+            {% endfor %}
+
+        </ul>
+        <p>
+            <a href="#">add a profile</a>
+        </p>
+    </div>
+{% endblock %}

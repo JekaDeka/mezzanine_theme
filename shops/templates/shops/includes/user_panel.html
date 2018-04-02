@@ -1,0 +1,44 @@
+{% load i18n shop_tags mezzanine_tags theme_tags staticfiles %} {% spaceless %}
+<div class="cart-draw">
+	<div class="cart-btn">
+		<a href="javascript:void(0);" class="button adc">
+			{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0 руб{% endif %}
+		</a>
+	</div>
+	<div class="cart-btn loader">
+		<a href="javascript:void(0);" class="button adc">
+			<img class="loading-image" src="{% static 'js/ajax_loader.gif' %}" alt="loading..">
+		</a>
+	</div>
+	<div class="cart-list">
+		<div class="arrow"></div>
+		<div class="cart-amount">
+			<span>{% if request.cart.has_items %}
+							{{ request.cart.total_quantity|rupluralize:"товар,товара,товаров" }}
+						{% else %}
+							{{ 0|rupluralize:"товар,товара,товаров" }}
+						{% endif %} {% trans "in cart" %}</span>
+
+		</div>
+		<ul>
+			{% if request.cart.has_items %} {% for item in request.cart %}
+			<li>
+				{% if item.image %}
+				<a href="{{ item.get_absolute_url }}"><img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"/></a> {% endif %}
+				<a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+				<span>{{ item.quantity }} x {{ item.price|rub_currency }}</span>
+				<div class="clearfix"></div>
+			</li>
+			{% endfor %} {% else %}
+			<li class="empty">{% trans "Your Cart is empty." %}</li>
+			{% endif %}
+		</ul>
+
+		<div class="cart-buttons button">
+			<a href="{% url 'shop-cart' %}" class="checkout"><span data-hover="В корзину">В корзину</span></a>
+		</div>
+		<div class="clearfix">
+		</div>
+	</div>
+</div>
+{% endspaceless %}

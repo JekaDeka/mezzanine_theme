@@ -9,7 +9,7 @@ from mezzanine.utils.views import paginate
 
 from cartridge.shop.models import Category, Product
 from mezzanine.pages.models import Page
-
+from shops.models import ShopProduct
 from theme.utils import validate_filter
 
 
@@ -36,9 +36,7 @@ def category_processor(request, page):
     payment_personal = validate_filter(request.GET.get("payment_personal"))
     payment_bank_transfer = validate_filter(request.GET.get("payment_bank_transfer"))
     payment_card_transfer = validate_filter(request.GET.get("payment_card_transfer"))
-
-    products = Product.objects.filter(status=2).filter(
-        page.category.filters()).distinct().prefetch_related('images')
+    products = ShopProduct.objects.filter(categories=page.category).prefetch_related('images').select_related('shop')
     if min_price:
         products = products.filter(unit_price__gte=min_price)
     if max_price:
@@ -78,20 +76,12 @@ def category_processor(request, page):
                         settings.SHOP_PER_PAGE_CATEGORY,
                         settings.MAX_PAGING_LINKS)
     products.sort_by = sort_by
+
     sub_categories = page.category.children.published()
     child_categories = Category.objects.published(
-        for_user=request.user).filter(id__in=sub_categories)
-    true_sub_categories = Category.objects.published(
-        for_user=request.user).filter(parent_id__in=child_categories)
-    no_child = False
-    if not true_sub_categories:
-        true_sub_categories = child_categories
-        no_child = True
-
+        for_user=request.user).filter(id__in=sub_categories).select_related('parent')
     return {"true_products": products,
             "sub_categories": child_categories,
             "main_filters": settings.SHOP_PRODUCT_FILTERS,
             "delivery_filters": settings.SHOP_DELIVERY_FILTERS,
-            "payment_filters": settings.SHOP_PAYMENT_FILTERS,
-            "sub_child_categories": child_categories,
-            'no_child': no_child}
+            "payment_filters": settings.SHOP_PAYMENT_FILTERS, }

@@ -8,19 +8,14 @@
 <meta name="robots" content="noindex">
 {% endblock %}
 
-{% block breadcrumb_menu %}
-<ul class="breadcrumb">
-{% spaceless %}
-{% page_menu "pages/menus/breadcrumb.html" %}
-{% endspaceless %}
+{% block breadcrumb_element %}
 <li class="active">{% trans "Search Results" %}</li>
-</ul>
-
 {% endblock %}
 
 {% block main %}
 <div class="col-md-9 box">
 <p>
+{{ results }}
 {% if results.paginator.count == 0 %}
 {% blocktrans %}
 No results were found in {{ search_type }} matching your query: {{ query }}
@@ -33,10 +28,11 @@ Showing {{ start }} to {{ end }} of {{ total }} results in {{ search_type }} mat
 </p>
 
 <div id="search-results">
-{% for result in results.object_list %}
+{% for result in results %}
+{{ result }}
 {% with result.get_absolute_url as result_url %}
     <h5>
-        {{ forloop.counter0|add:results.start_index }})
+        {{ forloop.counter0 }})
         {% if result_url %}
             <a href="{{ result_url }}">{{ result }}</a>
         {% else %}

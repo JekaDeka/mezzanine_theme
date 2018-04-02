@@ -30,6 +30,22 @@ ul.top-bar-menu li i {
     margin: 0 5px 0 0;
 }
 
+.post-content ol,
+.post-content ul,
+.content ol,
+.content ul {
+  margin-left: 35px;
+}
+
+.post-content h1, .post-content h2, .post-content h3,.post-content h4, .post-content h5,
+.content h1, .content h2, .content h3, .content h4, .content h5,
+.post-content ol, .post-content ul,
+.content ol, .content ul {
+  margin-bottom: 15px;
+}
+
+
+
 #logo {
     margin-top: 34px;
 }
@@ -1782,6 +1798,10 @@ span.skill-title i {
 #cart ul li:first-child {
     padding: 0 0 13px 0;
 }
+#cart ul li:only-child {
+    border-bottom: none;
+    padding: 0px 0 0 0;
+}
 
 #cart ul li a {
     display: block;
@@ -1906,6 +1926,7 @@ span.skill-title i {
     -ms-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out;
     margin: 0 0 15px 0;
+    padding: 12px 23px 14px 23px;
 }
 
 .checkout-section.active {
@@ -2868,8 +2889,7 @@ li.dropdown ul li a:hover {
     text-align: center;
     text-transform: uppercase;
     font-weight: bold;
-    background-color: transparent;
-    background-color: rgba(0, 0, 0, 0.45);
+    background: linear-gradient( to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3));
 }
 
 .parallax-title {
@@ -2951,36 +2971,62 @@ a.button.color:hover {
     margin: 0 auto;
     margin-bottom: 38px;
     height: 200px;
+    background-image: url('https://static.vecteezy.com/system/resources/previews/000/100/314/non_2x/trendy-abstract-geometric-pattern-background-vector.jpg');
+    background-repeat: repeat;
+    background-size: inherit;
 }
 
 .parallax-titlebar img {
     position: absolute;
+    max-width: none!important;
 }
 
 .parallax-titlebar h2 {
     position: relative;
     z-index: 10;
-    font-size: 32px;
+    font-size: 30px;
     color: #fff;
+    text-shadow: 0 1px 10px #555;
     font-weight: 700;
     display: block;
     top: 50%;
     transform: translateY(-50%);
     left: 55px;
+
+    width: 90%;
+    /* line-height: 40px; */
 }
 
 .parallax-titlebar span {
-    font-size: 22px;
+    font-size: 20px;
     color: #fff;
+    text-shadow: 0 1px 10px #555;
     font-weight: 300;
     margin-top: 5px;
     display: block;
+    line-height: 22px;
 }
 
 .parallax-content {
     position: relative;
     height: 100%;
 }
+
+.parallax-titlebar > #breadcrumbs ul li {
+  text-shadow: 0 1px 10px #555;
+}
+
+/* .image-titlebar {
+  background: #606060;
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 200px;
+}
+.image-titlebar ul li a,
+.image-titlebar h2 {
+  color: #fff;
+  text-shadow: 0 1px 1px #555;
+} */
 
 .titlebar {
     background-color: #f4f4f4;
@@ -2999,8 +3045,8 @@ a.button.color:hover {
 }
 
 .titlebar span {
-    font-weight: 300;
-    color: #aaa;
+    /* font-weight: 300; */
+    /* color: #aaa; */
 }
 
 .titlebar #breadcrumbs ul {
@@ -3026,8 +3072,8 @@ a.button.color:hover {
 
 #breadcrumbs ul {
     float: right;
-    font-size: 13px;
-    margin-top: 27px;
+    font-size: 14px;
+    margin-top: 33px;
     font-weight: 500;
     position: relative;
     z-index: 10;
@@ -5567,6 +5613,10 @@ a.product-button i {
     position: relative;
 }
 
+a.product-button.added {
+  background: rgba(58, 207, 135, 0.8)
+}
+
 .product:hover .product-button {
     opacity: 1;
     -webkit-transform: translateY(0px);
@@ -5952,11 +6002,13 @@ ul.footer-links {
     margin-bottom: 22px;
 }
 
+.nav-categories,
 #categories {
     float: left;
     width: 100%;
 }
-
+.nav-categories li a,
+.nav-categories li a span,
 #categories li a,
 #categories li a span {
     -webkit-transition: all 0.2s ease-in-out;
@@ -5965,10 +6017,10 @@ ul.footer-links {
     -ms-transition: all 0.2s ease-in-out;
     transition: all 0.2s ease-in-out, ;
 }
-
+.nav-categories li a,
 #categories li a {
     display: block;
-    padding: 11px 13px 10px 2px;
+    padding: 10px 0px 10px 2px;
     text-decoration: none;
     color: #777;
     border-bottom: 1px solid #eee;
@@ -5982,6 +6034,7 @@ ul.footer-links {
     /*padding-left: 15px;*/
 }
 
+.nav-categories li li ul,
 #categories li li ul {
     padding: 0;
 }
@@ -5993,6 +6046,7 @@ ul.footer-links {
     color: #808080;
 }
 
+.nav-categories li li ul,
 #categories li li ul {
     padding-left: 15px;
 }
@@ -6000,7 +6054,7 @@ ul.footer-links {
 #categories li li a.active span {
     color: #808080;
 }
-
+.nav-categories li a span,
 #categories li a span {
     color: #aaa;
 }
@@ -6010,6 +6064,7 @@ ul.footer-links {
     color: #fff;
 }
 
+.nav-categories li ul,
 #categories li ul {
     display: none;
     background-color: #f8f8f8;
@@ -7080,7 +7135,7 @@ table.cart-table th {
     border: none;
     background-color: #f6f6f6;
     text-align: left;
-    padding: 10px 20px;
+    padding: 15px;
     color: #606060;
     vertical-align: top;
     font-size: 14px;
@@ -7088,7 +7143,7 @@ table.cart-table th {
 }
 
 table.cart-table td {
-    padding: 20px;
+    padding: 15px;
     border-bottom: #eee 1px solid;
     border-top: none;
     border-right: none;
@@ -7803,17 +7858,18 @@ html[xmlns] .slides {
 
 .post-quote {
     background: #505050;
-    padding: 25px 25px 10px 25px;
+    /*padding: 25px;*/
 }
 
 .post-quote blockquote {
     color: #fff;
-    font-size: 18px;
+    font-size: 60px;
     font-style: normal;
-    line-height: 26px;
-    border-left: 1px solid #666;
-    padding: 0 0 0 18px;
-    margin-left: 45px;
+    line-height: 60px;
+    border-left: none;
+    padding: 63px;
+    margin: 0;
+    text-align: center;
     font-weight: 300;
 }
 
@@ -8352,18 +8408,18 @@ html[xmlns] .slides {
         display: block;
     }
     #cart {
-        float: left;
+        /*float: left;*/
     }
     .top-search {
-        float: right;
+        float: left;
     }
     #cart,
     .top-search {
         margin: 35px 0 0 0;
     }
-    .cart-list {
+    /* .cart-list {
         left: 0;
-    }
+    } */
     .cart-list .arrow {
         left: 20px;
     }
@@ -8512,13 +8568,13 @@ html[xmlns] .slides {
 
 @media only screen and (max-width: 479px) {
     .top-search input {
-        width: 78px;
+        width: 100px;
     }
     .apply-coupon input {
         width: 112px;
     }
     .top-search {
-        float: right;
+        float: left;
     }
     .cart-list {
         width: 300px;

@@ -1,247 +1,200 @@
 <!DOCTYPE html>
 <!--[if IE 8 ]><html class="ie ie8" lang="en"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!-->
-<html lang="{{ LANGUAGE_CODE }}"{% if LANGUAGE_BIDI %} dir="rtl"{% endif %}> <!--<![endif]-->
+<html lang="{{ LANGUAGE_CODE }}" {% if LANGUAGE_BIDI %} dir="rtl" {% endif %}>
+<!--<![endif]-->
 {% load pages_tags theme_tags mezzanine_tags accounts_tags i18n staticfiles compress %}
 
 <head>
 
-<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
-<meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
-<meta name="description" content="{% block meta_description %}{% endblock %}">
-<meta name="theme-color" content="#505050"/>
-<title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
-<link rel="shortcut icon" href="{% static "images/logo/logo.png" %}">
-
-{% ifinstalled mezzanine.blog %}
-<link rel="alternate" type="application/rss+xml" title="RSS" href="{% url "blog_post_feed" "rss" %}">
-<link rel="alternate" type="application/atom+xml" title="Atom" href="{% url "blog_post_feed" "atom" %}">
-{% endifinstalled %}
-
-{% compress css %}
-<link rel="stylesheet" href="{% static "css/style.css" %}">
-<link rel="stylesheet" href="{% static "css/green.css" %}">
-<link rel="stylesheet" href="{% static "css/mega_dropdown.css" %}">
-<link rel="stylesheet" href="{% static "css/custom.css" %}">
-<!--[if lt IE 9]>
+  <meta http-equiv="Content-type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+  <meta name="keywords" content="{% block meta_keywords %}{% endblock %}">
+  <meta name="description" content="{% block meta_description %}{% endblock %}">
+  <meta name="theme-color" content="#505050" />
+  <title>{% block meta_title %}{% endblock %}{% if settings.SITE_TITLE %} | {{ settings.SITE_TITLE }}{% endif %}</title>
+  <link rel="shortcut icon" href="{% static 'images/logo/logo.png' %}"> {% ifinstalled mezzanine.blog %}
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="{% url 'blog_post_feed' 'rss' %}">
+  <link rel="alternate" type="application/atom+xml" title="Atom" href="{% url 'blog_post_feed' 'atom' %}"> {% endifinstalled %} {% compress css %}
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="stylesheet" href="{% static 'css/green.css' %}">
+  <link rel="stylesheet" href="{% static 'css/mega_dropdown.css' %}">
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  <link rel="stylesheet" href="{% static 'css/table_responsive.css' %}">
+  <!--[if lt IE 9]>
 	<script src="http://html5shim.googlecode.com/svn/trunk/html5.js' %}"></script>
 <![endif]-->
-{% block extra_css %}
-{% endblock %}
-{% endcompress %}
+  {% block extra_css %} {% endblock %} {% endcompress %}
 
-<!--[if lt IE 9]>
+  <!--[if lt IE 9]>
 <script src="{% static 'js/html5shiv.js' %}"></script>
 <script src="{% static 'js/respond.min.js' %}"></script>
 <![endif]-->
 
-{% block extra_head %}
-{% endblock %}
+  {% block extra_head %} {% endblock %}
 </head>
 
 <body class="{% block body_class %}boxed{% endblock %}">
-<div id="wrapper">
-{% block top_bar %}
-<div class="top-bar-menu-wrapper">
-    <div class="container">
+  <div id="wrapper">
+    {% block top_bar %}
+    <div class="top-bar-menu-wrapper">
+      <div class="container">
         <div class="sixteen columns">
-            {% block navbar_dropdown_menu %} {% page_menu "pages/menus/dropdown.html" %} {% endblock%}
+          {% block navbar_dropdown_menu %} {% page_menu "pages/menus/dropdown.html" %} {% endblock %}
         </div>
+      </div>
+      {# {% if request.user.is_staff %} #}
+      {# <div id="style-switcher"> #}
+        {# <h2><a href="{% url 'admin:index' %}">Панель управления</a></h2> #}
+        {# <a href="{% url 'admin:index' %}" id="settings"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></a> #}
+        {# <a id="open-switcher"><i class="arrow right"></i> </a> #}
+        {# <div> #}
+          {# <ul> #}
+            {# {% if request.user.profile %} #}
+            {# <li><a href="{% url 'blogpost-list' %}">Мой Блог</a></li> #}
+            {# <li><a href="{% url 'ordertableitem-list' %}">Мой стол заказов</a></li> #}
+            {# {% endif %} #}
+            {# {% if request.user_shop %} #}
+            {# <li><a href="{% url 'product-list' %}">Мои товары</a></li> #}
+            {# {% endif %} #}
+          {# </ul> #}
+        {# </div> #}
+      {# </div> #}
+      {# {% endif %} #}
     </div>
-{% if request.user.is_staff %}
-		<div id="style-switcher">
-		    <h2><a href="{% url 'admin:index' %}">Панель управления</a></h2>
-		    <a href="{% url 'admin:index' %}" id="settings"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></a>
-		    <a id="open-switcher"><i class="arrow right"></i> </a>
-		    <div>
-		        <ul>
-		        	{% if request.user_profile %}
-		        		<li><a href="{% url 'admin:blog_blogpost_changelist' %}">Мой Блог</a></li>
-		            	<li><a href="{% url 'admin:theme_orderitem_changelist' %}">Мой стол заказов</a></li>
-		        	{% endif %}
-		            {% if request.user_shop %}
-		            	<li><a href="{% url 'admin:shop_product_changelist' %}">Мои товары</a></li>
-		            {% endif %}
-		        </ul>
-		    </div>
-		</div>
-		{% endif %}
-</div>
-{% endblock %}
-
-{% block header %}
-<div class="container">
-	<div class="four columns">
-		<div id="logo">
-			<a href="{% url 'true_index' %}"><img src="{% static 'images/logo/hm3.png' %}" alt="logo" /></a>
-		</div>
-	</div>
-		{% nevercache %}
-    		{% include "includes/user_panel.html" %}
-    	{% endnevercache %}
-</div>
-{% endblock %}
-
-
-{% nevercache %}
-{% block messages %}
-{% if messages %}
-<div class="container">
-	{% for message in messages %}
-		<div class="sixteen columns">
-			<div class="notification closeable {% if message.tags %}{{ message.tags }}{% endif %} margin-bottom-10 text-center">
-				<p>{{ message | safe }}</p>
-				<a class="close"></a>
-			</div>
-		</div>
-	{% endfor %}
-</div>
-{% endif %}
-{% if request.user.is_authenticated and not request.user_profile %}
-<div class="container">
-    <div class="sixteen columns">
-        <div class="notification notice margin-bottom-10 text-center">
-            <p><span>Внимание!</span> 
-            	Для того, чтобы воспользоваться всеми услугами сайта, заполните информацию в 
-            	<a href="{% url 'profile_settings' %}"><span>Личном кабинете</span></a>.
-        	</p>
+    {% endblock %}
+    {% block header %}
+    <div class="container">
+      <div class="four columns">
+        <div id="logo">
+          <a href="{% url 'true_index' %}"><img src="{% static 'images/logo/hm3.png' %}" alt="logo" /></a>
         </div>
+      </div>
+      {% nevercache %} {% include "includes/user_panel.html" %} {% endnevercache %}
     </div>
-</div>
-{% endif %}
-{% endblock messages %}
-{% endnevercache %}
+    {% endblock %}
 
+    {% spaceless %}
+    {% nevercache %}
+    {% block messages %}
+    <div class="messages">
+      {% include "includes/messages.html" %}
+    </div>
+    {% endblock messages %}
+    {% endnevercache %}
+    {% endspaceless %}
 
-{% block breadcrumbs %}
-<div class="titlebar">
-<div class="container">
-	<div class="sixteen columns">
-		{% block breadcrumbs_title %}
-			<h2>{{ page.title|title }}</h2>
-		{% endblock breadcrumbs_title %}
-		<nav id="breadcrumbs">
-			<ul>
-			{% block breadcumbs_menu %}
-				{% page_menu "pages/menus/breadcrumb.html" %}
-			{% endblock %}
-			{% block breadcrumb_element %}
-			{% endblock %}
-			</ul>
-		</nav>
-	</div>
-</div>
-</div>
-{% endblock %}
+    {% block breadcrumbs %}
+    <div class="titlebar">
+      <div class="container">
+        <div class="sixteen columns">
+          {% block breadcrumbs_title %}
+          <h2>{{ page.title|title }}</h2> {% endblock breadcrumbs_title %}
+          <nav id="breadcrumbs">
+            <ul>
+              {% block breadcumbs_menu %} {% page_menu "pages/menus/breadcrumb.html" %} {% endblock %} {% block breadcrumb_element %} {% endblock %}
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
 
-{% block slider %}
-{% endblock %}
+    {% autoescape on %}
+    {% block slider %}
+    {% endblock %}
 
-{% block first_time_user %}
-{% endblock first_time_user %}
+    {% block first_time_user %}
+    {% endblock first_time_user %}
 
+    {% spaceless %}
+    {% block main_containter %}
+    <div class="container">
+      {% block leftsidebar %}{% endblock %}
+      {% block main %}{% endblock %}
+      {% block rightsidebar %}{% endblock %}
+    </div>
+    {% endblock %}
+    {% endspaceless %}
 
+    {% block extra_content %}
+    {% endblock %}
 
-{% block main_containter %}
-	<div class="container">
-		{% block leftsidebar %}
-		{% endblock %}
+    {% endautoescape %}
 
-		{% block main %}
-		{% endblock %}
-
-		{% block rightsidebar %}
-		{% endblock %}
-	</div>
-{% endblock %}
-
-{% block extra_content %}
-{% endblock %}
-
-
-{% block footer %}
-<div id="footer" class="margin-top-30">
-	<div class="container">
-		<div class="four columns">
-		    <div class="footer-widget widget_text">
-		        <div class="textwidget"><img src="{% static "images/logo/logo-footer.png" %}" alt="logo-footer" />
-		            <p class="margin-top-15">
-		            	Сайт для творческих людей.
-		            </p>
-		        </div>
-		    </div>
-		</div>
-		<div class="four columns">
-			<h3 class="headline footer">Правила сайта</h3>
-			<span class="line"></span>
-			<div class="clearfix"></div>
-			<ul class="footer-links">
-		            <li><a href="/rules/">Временное соглашение</a></li>
-		            <li><a href="/copyrights/">Защита авторских прав</a></li>
-		            <li><a href="">Требование к фото</a></li>
-		            </ul>
-		</div>
-		<div class="{% if request.user.is_staff %}four{% else %} eight {% endif %} columns">
-			<h3 class="headline footer">Меню</h3>
-			<span class="line"></span>
-			<div class="clearfix"></div>
-			<ul class="footer-links">
-			{% page_menu "pages/menus/footer.html" %}
-			</ul>
-		</div>
-		{% if request.user.is_staff %}
-		<div class="four columns">
-			<h3 class="headline footer">Мой магазин</h3>
-			<span class="line"></span>
-			<div class="clearfix"></div>
-			<ul class="footer-links">
-				<li><a href="/admin/shop/product/">Список моих товаров</a></li>
-				<li><a href="{% url 'shop_edit' %}">Редактировать магазин</a></li>
-				<li><a href="/admin/shop/product/add/">Добавить новый товар</a></li>
-			</ul>
-		</div>
-		{% endif %}
-	</div>
-</div>
-<div id="footer-bottom">
-	<div class="container">
-		<div class="eight columns">
-			<a href="{# {% url 'true_index' %} #}">handmaker.top</a></div>
-		</div>
-	</div>
-</div>
-{% endblock %}
-{% compress js %}
-<script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
-<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
-<script src="{% static 'js/hoverIntent.js' %}"></script>
-<script src="{% static 'js/superfish.js' %}"></script>
-<script src="{% static 'js/jquery.pureparallax.js' %}"></script>
-<script src="{% static 'js/jquery.pricefilter.js' %}"></script>
-<script src="{% static 'js/jquery.selectric.min.js' %}"></script>
-<script src="{% static 'js/jquery.royalslider.min.js' %}"></script>
-<script src="{% static 'js/SelectBox.js' %}"></script>
-<script src="{% static 'js/modernizr.custom.js' %}"></script>
-<script src="{% static 'js/waypoints.min.js' %}"></script>
-<script src="{% static 'js/jquery.flexslider-min.js' %}"></script>
-<script src="{% static 'js/jquery.counterup.min.js' %}"></script>
-<script src="{% static 'js/jquery.tooltips.min.js' %}"></script>
-<script src="{% static 'js/jquery.isotope.min.js' %}"></script>
-<script src="{% static 'js/puregrid.js' %}"></script>
-<script src="{% static 'js/stacktable.js' %}"></script>
-<script src="{% static 'js/better-simple-slideshow.js' %}"></script>
-<script src="{% static 'js/custom.js' %}"></script>
-<script src="{% static 'js/active-branch-show.js' %}"></script>
-<script src="{% static 'js/mask.js' %}"></script>
-<script src="{% static 'js/jquery.menu-aim.js' %}"></script>
-<script src="{% static 'js/main.js' %}"></script>
-{% block extra_js %}
-{% endblock %}
-
-{% block footer_js %}
-{% endblock %}
-{% endcompress %}
-
+    {% block footer %}
+    <div id="footer" class="margin-top-30">
+      <div class="container">
+        <div class="four columns">
+          <div class="footer-widget widget_text">
+            <div class="textwidget"><img src="{% static 'images/logo/logo-footer.png' %}" alt="logo-footer" />
+              <p class="margin-top-15">
+                Сайт для творческих людей.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="four columns">
+          <h3 class="headline footer">Правила сайта</h3>
+          <span class="line"></span>
+          <div class="clearfix"></div>
+          <ul class="footer-links">
+            {% page_rules_menu as page_rules %}
+            {% for page in page_rules %}
+              <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="four columns">
+          <h3 class="headline footer">Меню</h3>
+          <span class="line"></span>
+          <div class="clearfix"></div>
+          <ul class="footer-links">
+            {% page_menu "pages/menus/footer.html" %}
+          </ul>
+        </div>
+        <div class="four columns">
+          <h3 class="headline footer">Личный кабинет</h3>
+          <span class="line"></span>
+          <div class="clearfix"></div>
+          <ul class="footer-links">
+            {% page_menu "pages/menus/footer.html" %}
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div id="footer-bottom">
+      <div class="container">
+        <div class="eight columns">
+          <a href="{% url 'true_index' %}">handmaker.top</a></div>
+      </div>
+    </div>
+  </div>
+  {% endblock %} {% compress js %}
+  <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
+  <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+  <script src="{% static 'js/hoverIntent.js' %}"></script>
+  <script src="{% static 'js/superfish.js' %}"></script>
+  <script src="{% static 'js/jquery.pureparallax.js' %}"></script>
+  <script src="{% static 'js/jquery.pricefilter.js' %}"></script>
+  <script src="{% static 'js/jquery.selectric.min.js' %}"></script>
+  <script src="{% static 'js/jquery.royalslider.min.js' %}"></script>
+  <script src="{% static 'js/SelectBox.js' %}"></script>
+  <script src="{% static 'js/modernizr.custom.js' %}"></script>
+  <script src="{% static 'js/waypoints.min.js' %}"></script>
+  <script src="{% static 'js/jquery.flexslider-min.js' %}"></script>
+  <script src="{% static 'js/jquery.counterup.min.js' %}"></script>
+  <script src="{% static 'js/jquery.tooltips.min.js' %}"></script>
+  <script src="{% static 'js/jquery.isotope.min.js' %}"></script>
+  <script src="{% static 'js/puregrid.js' %}"></script>
+  <script src="{% static 'js/stacktable.js' %}"></script>
+  <script src="{% static 'js/better-simple-slideshow.js' %}"></script>
+  <script src="{% static 'js/custom.js' %}"></script>
+  <script src="{% static 'js/active-branch-show.js' %}"></script>
+  <script src="{% static 'js/mask.js' %}"></script>
+  <script src="{% static 'js/jquery.menu-aim.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %} {% endblock %} {% block footer_js %} {% endblock %} {% endcompress %}
 </body>
+
 </html>

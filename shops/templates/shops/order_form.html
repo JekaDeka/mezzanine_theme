@@ -1,0 +1,17 @@
+{% extends "profiles/profile_settings.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
+
+{% block meta_title %}
+    Изменение данных
+{% endblock %}
+
+{% block breadcrumbs_title %}
+<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
+<li>Мои покупки</li>
+{% endblock breadcrumb_element %}
+{% block main %}
+  <form class="" action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+  </form>
+{% endblock %}

@@ -2,7 +2,7 @@
 {% load mezzanine_tags shop_tags i18n theme_tags pages_tags static  %}
 
 {% block breadcumbs_menu %}
-{% shop_menu "pages/menus/breadcrumb.html" %}
+	{% page_menu "pages/menus/breadcrumb.html" %}
 {% endblock %}
 
 
@@ -10,9 +10,8 @@
 <div class="container">
 {% if sub_categories %}
 	<div id="portfolio-wrapper">
-	{% for category in sub_child_categories %}
-		<div class="four columns portfolio-item custom_column
-		{% if no_child %}{{category.title|hard_trim}}{% else %}{{category_parent.title|hard_trim}}{% endif %}">
+	{% for category in sub_categories %}
+		<div class="four columns portfolio-item custom_column">
 			<figure>
 				<div class="portfolio-holder">
 					<a href="{{ category.get_absolute_url }}">
@@ -35,7 +34,7 @@
 				</div>
 				<a href="{{ category.get_absolute_url }}">
 					<section class="item-description">
-						<span>{{ category_parent.title }}</span>
+						<span>{{ category.parent.title }}</span>
 						<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
 					</section>
 				</a>
@@ -43,7 +42,7 @@
 		</div>
 	{% endfor %}
 	</div>
-{% endif %} 
+{% endif %}
 </div>
 {{ block.super }}
 {% endblock %}
@@ -53,7 +52,7 @@
 	<div class="widget margin-top-0">
 		<h3 class="headline"> {% trans "Categories" %} </h3>
 		<span class="line"></span><div class="clearfix"></div>
-		{% shop_menu "pages/menus/shop_tree.html" %}
+		{% page_menu "pages/menus/sidebar_menu.html" %}
 		<div class="clearfix"></div>
 	</div>
 
@@ -70,7 +69,7 @@
 	    	<span>до</span>
 	    	<input class="" id="id_max_price" name="max_price" step="1" type="number" {% if request.GET.max_price %}value="{{ request.GET.max_price }}"{% endif %}>
 	    </div>
-	    
+
 	</div>
 
 	<div class="widget margin-top-10">
@@ -137,7 +136,7 @@
 	</div>
 	<div class="twelve columns products">
 		{% for product in true_products %}
-		<div class="four shop columns custom_column">
+		<div class="four shop columns half-columns">
 			<figure class="product">
 				<div class="badges">
 				{% if product.pre_order %}
@@ -149,32 +148,32 @@
 					<div class="product-discnt">СКИДКА</div>
 				{% endif %}
 				</div>
-				{% with product.images.all|slice:"2" as images %}
+				{% with product.images.all as images %}
 				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
 				<a href="{{ product.get_absolute_url }}">
 					{% if images %}
-					<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
-						{% if product.images.count != 1 %}
-						<div class="cover">
-								<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
-						</div>
-						{% endif %}
+						<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
+							{% if product.images.count != 1 %}
+							<div class="cover">
+									<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
+							</div>
+							{% endif %}
 					{% else %}
-					<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
+						<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
 					{% endif %}
 				</a>
-				<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+				<a href="{% url 'get_cart' %}" product-id="{{ product.id }}" class="product-button"><i class="fa fa-shopping-cart"></i></i>В корзину</a>
 				</div>
 				{% endwith %}
 					<section>
 						<a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
-						<a href="{{ product.user_shop.get_absolute_url }}" class="shopname">{{ product.user_shop.shopname }}</a>
+						<a href="{{ product.shop.get_absolute_url }}" class="shopname">{{ product.shop.shopname }}</a>
 						<!--<span class="product-category">
 						</span>-->
 						{% if product.on_custom_sale %}
-							<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+							<span class="product-price-discount">{{ product.unit_price }}<i>{{ product.price }}</i></span>
 						{% else %}
-						<span class="product-price">{{ product.price|rub_currency }}</span>
+						<span class="product-price">{{ product.price }}</span>
 						{% endif %}
 					</section>
 			</figure>

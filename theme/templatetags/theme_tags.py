@@ -4,7 +4,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from collections import defaultdict
-
+from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import default_storage
 from django.contrib.auth import get_user_model
 from django.contrib.admin import site
@@ -25,15 +25,15 @@ from django.template import Context, TemplateSyntaxError, Variable
 from django.template.loader import get_template
 from django.utils.translation import ugettext_lazy as _
 from mezzanine.utils.urls import home_slug
-
+from django.template.defaultfilters import stringfilter
 from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from mezzanine.blog.models import BlogPost, BlogCategory
-from theme.models import Slider, SliderItem, UserShop
+from theme.models import Slider, SliderItem, RulesPage
 from cartridge.shop.models import Category, Product, ProductImage
 from mezzanine.pages.models import Page
 from mezzanine.generic.models import Keyword
-
+from mezzanine.generic.forms import RatingForm
 import os
 
 
@@ -67,8 +67,7 @@ def smart_truncate_chars(value, max_length):
 @register.as_tag
 def get_slideshow(*args):
     try:
-        slider = Slider.objects.all()[:1].get()
-        items = SliderItem.objects.filter(slider__title=slider.title)
+        items = SliderItem.objects.all().select_related('href')
     except Exception as e:
         return None
     if items:
@@ -76,252 +75,15 @@ def get_slideshow(*args):
     return None
 
 
-@register.as_tag
-def blog_menu_categories(*args):
-    """
-    Put a list of categories for blog posts into the template context.
-    """
-    # posts = BlogPost.objects.published()
-    # categories = BlogCategory.objects.filter(blogposts__in=posts)
-    categories = BlogCategory.objects.all()
-    return list(categories.annotate(post_count=Count("blogposts")))
-
-
-@register.render_tag
-def shop_menu(context, token):
-    """
-    Return a list of child pages for the given parent, storing all
-    pages in a dict in the context when first called using parents as keys
-    for retrieval on subsequent recursive calls from the menu template.
-    """
-    # First arg could be the menu template file name, or the parent page.
-    # Also allow for both to be used.
-    template_name = None
-    parent_page = None
-    parts = token.split_contents()[1:]
-    for part in parts:
-        part = Variable(part).resolve(context)
-        if isinstance(part, str):
-            template_name = part
-        elif isinstance(part, Page):
-            parent_page = part
-    if template_name is None:
-        try:
-            template_name = context["menu_template_name"]
-        except KeyError:
-            error = "No template found for page_menu in: %s" % parts
-            raise TemplateSyntaxError(error)
-    context["menu_template_name"] = template_name
-    if "shop_menu_pages" not in context:
-        try:
-            user = context["request"].user
-            slug = context["request"].path
-        except KeyError:
-            user = None
-            slug = ""
-        num_children = lambda id: lambda: len(context["shop_menu_pages"][id])
-        has_children = lambda id: lambda: num_children(id)() > 0
-        rel = [m.__name__.lower() for m in Page.get_content_models()]
-        published = Page.objects.published(for_user=user).filter(
-            content_model='category').select_related(*rel)
-        # Store the current page being viewed in the context. Used
-        # for comparisons in page.set_menu_helpers.
-        if "page" not in context:
-            try:
-                context["_current_page"] = published.exclude(
-                    content_model="link").get(slug=slug)
-            except Page.DoesNotExist:
-                context["_current_page"] = None
-        elif slug:
-            context["_current_page"] = context["page"]
-        # Some homepage related context flags. on_home is just a helper
-        # indicated we're on the homepage. has_home indicates an actual
-        # page object exists for the homepage, which can be used to
-        # determine whether or not to show a hard-coded homepage link
-        # in the page menu.
-        home = home_slug()
-        context["on_home"] = slug == home
-        context["has_home"] = False
-        # Maintain a dict of page IDs -> parent IDs for fast
-        # lookup in setting page.is_current_or_ascendant in
-        # page.set_menu_helpers.
-        context["_parent_page_ids"] = {}
-        pages = defaultdict(list)
-        for page in published.order_by("_order"):
-            page.set_helpers(context)
-            context["_parent_page_ids"][page.id] = page.parent_id
-            setattr(page, "num_children", num_children(page.id))
-            setattr(page, "has_children", has_children(page.id))
-            pages[page.parent_id].append(page)
-            if page.slug == home:
-                context["has_home"] = False
-        # Include shop_menu_pages in all contexts, not only in the
-        # block being rendered.
-        context.dicts[0]["shop_menu_pages"] = pages
-    # ``branch_level`` must be stored against each page so that the
-    # calculation of it is correctly applied. This looks weird but if we do
-    # the ``branch_level`` as a separate arg to the template tag with the
-    # addition performed on it, the addition occurs each time the template
-    # tag is called rather than once per level.
-    context["branch_level"] = 0
-    parent_page_id = None
-    if parent_page is not None:
-        context["branch_level"] = getattr(parent_page, "branch_level", 0) + 1
-        parent_page_id = parent_page.id
-
-    # Build the ``page_branch`` template variable, which is the list of
-    # pages for the current parent. Here we also assign the attributes
-    # to the page object that determines whether it belongs in the
-    # current menu template being rendered.
-    context["page_branch"] = context["shop_menu_pages"].get(parent_page_id, [])
-    context["page_branch_in_menu"] = False
-    for page in context["page_branch"]:
-        page.in_menu = page.in_menu_template(template_name)
-        page.num_children_in_menu = 0
-        if page.in_menu:
-            context["page_branch_in_menu"] = True
-        for child in context["shop_menu_pages"].get(page.id, []):
-            if child.in_menu_template(template_name):
-                page.num_children_in_menu += 1
-        page.has_children_in_menu = page.num_children_in_menu > 0
-        page.branch_level = context["branch_level"]
-        page.parent = parent_page
-        context["parent_page"] = page.parent
-
-        # Prior to pages having the ``in_menus`` field, pages had two
-        # boolean fields ``in_navigation`` and ``in_footer`` for
-        # controlling menu inclusion. Attributes and variables
-        # simulating these are maintained here for backwards
-        # compatibility in templates, but will be removed eventually.
-        page.in_navigation = page.in_menu
-        page.in_footer = not (not page.in_menu and "footer" in template_name)
-        if page.in_navigation:
-            context["page_branch_in_navigation"] = True
-        if page.in_footer:
-            context["page_branch_in_footer"] = True
-
-    t = get_template(template_name)
-    return t.render(Context(context))
-    # categories = Page.objects.filter(content_model='category')
-    # return list(categories)
-
-
-@register.render_tag
-def simple_menu(context, token):
-    """
-    Return a list of child pages for the given parent, storing all
-    pages in a dict in the context when first called using parents as keys
-    for retrieval on subsequent recursive calls from the menu template.
-    """
-    # First arg could be the menu template file name, or the parent page.
-    # Also allow for both to be used.
-    template_name = None
-    parent_page = None
-    parts = token.split_contents()[1:]
-    for part in parts:
-        part = Variable(part).resolve(context)
-        if isinstance(part, str):
-            template_name = part
-        elif isinstance(part, Page):
-            parent_page = part
-    if template_name is None:
-        try:
-            template_name = context["menu_template_name"]
-        except KeyError:
-            error = "No template found for page_menu in: %s" % parts
-            raise TemplateSyntaxError(error)
-    context["menu_template_name"] = template_name
-    if "simple_menu_pages" not in context:
-        try:
-            user = context["request"].user
-            slug = context["request"].path
-        except KeyError:
-            user = None
-            slug = ""
-        num_children = lambda id: lambda: len(context["simple_menu_pages"][id])
-        has_children = lambda id: lambda: num_children(id)() > 0
-        rel = [m.__name__.lower() for m in Page.get_content_models()]
-        published = Page.objects.published(for_user=user).exclude(
-            content_model='category').select_related(*rel)
-        # Store the current page being viewed in the context. Used
-        # for comparisons in page.set_menu_helpers.
-        if "page" not in context:
-            try:
-                context["_current_page"] = published.exclude(
-                    content_model="link").get(slug=slug)
-            except Page.DoesNotExist:
-                context["_current_page"] = None
-        elif slug:
-            context["_current_page"] = context["page"]
-        # Some homepage related context flags. on_home is just a helper
-        # indicated we're on the homepage. has_home indicates an actual
-        # page object exists for the homepage, which can be used to
-        # determine whether or not to show a hard-coded homepage link
-        # in the page menu.
-        # home = home_slug()
-        # context["on_home"] = slug == home
-        # context["has_home"] = False
-        # Maintain a dict of page IDs -> parent IDs for fast
-        # lookup in setting page.is_current_or_ascendant in
-        # page.set_menu_helpers.
-        context["_parent_page_ids"] = {}
-        pages = defaultdict(list)
-        for page in published.order_by("_order"):
-            page.set_helpers(context)
-            context["_parent_page_ids"][page.id] = page.parent_id
-            setattr(page, "num_children", num_children(page.id))
-            setattr(page, "has_children", has_children(page.id))
-            pages[page.parent_id].append(page)
-            # if page.slug == home:
-            #     context["has_home"] = True
-        # Include simple_menu_pages in all contexts, not only in the
-        # block being rendered.
-        context.dicts[0]["simple_menu_pages"] = pages
-    # ``branch_level`` must be stored against each page so that the
-    # calculation of it is correctly applied. This looks weird but if we do
-    # the ``branch_level`` as a separate arg to the template tag with the
-    # addition performed on it, the addition occurs each time the template
-    # tag is called rather than once per level.
-    context["branch_level"] = 0
-    parent_page_id = None
-    if parent_page is not None:
-        context["branch_level"] = getattr(parent_page, "branch_level", 0) + 1
-        parent_page_id = parent_page.id
-
-    # Build the ``page_branch`` template variable, which is the list of
-    # pages for the current parent. Here we also assign the attributes
-    # to the page object that determines whether it belongs in the
-    # current menu template being rendered.
-    context["page_branch"] = context[
-        "simple_menu_pages"].get(parent_page_id, [])
-    context["page_branch_in_menu"] = False
-    for page in context["page_branch"]:
-        page.in_menu = page.in_menu_template(template_name)
-        page.num_children_in_menu = 0
-        if page.in_menu:
-            context["page_branch_in_menu"] = True
-        for child in context["simple_menu_pages"].get(page.id, []):
-            if child.in_menu_template(template_name):
-                page.num_children_in_menu += 1
-        page.has_children_in_menu = page.num_children_in_menu > 0
-        page.branch_level = context["branch_level"]
-        page.parent = parent_page
-        context["parent_page"] = page.parent
-
-        # Prior to pages having the ``in_menus`` field, pages had two
-        # boolean fields ``in_navigation`` and ``in_footer`` for
-        # controlling menu inclusion. Attributes and variables
-        # simulating these are maintained here for backwards
-        # compatibility in templates, but will be removed eventually.
-        page.in_navigation = page.in_menu
-        page.in_footer = not (not page.in_menu and "footer" in template_name)
-        if page.in_navigation:
-            context["page_branch_in_navigation"] = True
-        if page.in_footer:
-            context["page_branch_in_footer"] = True
-
-    t = get_template(template_name)
-    return t.render(Context(context))
+# @register.as_tag
+# def blog_menu_categories(*args):
+#     """
+#     Put a list of categories for blog posts into the template context.
+#     """
+#     # posts = BlogPost.objects.published()
+#     # categories = BlogCategory.objects.filter(blogposts__in=posts)
+#     categories = BlogCategory.objects.all()
+#     return list(categories.annotate(post_count=Count("blogposts")))
 
 
 def moneyfmt(value, places=0, curr='', sep=',', dp='.',
@@ -384,10 +146,7 @@ def rub_currency(value):
         return "Цена по запросу"
     elif value == 0:
         return "Бесплатно"
-    value = moneyfmt(value, curr='', sep=' ')
-    value = value + " ₽"
-    return value
-    # return '{:.2f} ₽'.format(value)
+    return str(value) + " руб"
 
 
 @register.as_tag
@@ -437,123 +196,127 @@ def shop_recent_products(limit=5):
     return list(published_products[:limit])
 
 
-@register.render_tag
-def page_breadcrumb_menu(context, token):
-    """
-    Return a list of child pages for the given parent, storing all
-    pages in a dict in the context when first called using parents as keys
-    for retrieval on subsequent recursive calls from the menu template.
-    """
-    # First arg could be the menu template file name, or the parent page.
-    # Also allow for both to be used.
-    template_name = None
-    parent_page = None
-    parts = token.split_contents()[1:]
-    for part in parts:
-        part = Variable(part).resolve(context)
-        if isinstance(part, str):
-            template_name = part
-        elif isinstance(part, Page):
-            parent_page = part
-    if template_name is None:
-        try:
-            template_name = context["menu_template_name"]
-        except KeyError:
-            error = "No template found for page_menu in: %s" % parts
-            raise TemplateSyntaxError(error)
-    context["menu_template_name"] = template_name
-    if "bread_menu_pages" not in context:
-        try:
-            user = context["request"].user
-            slug = context["request"].path
-        except KeyError:
-            user = None
-            slug = ""
-        num_children = lambda id: lambda: len(context["bread_menu_pages"][id])
-        has_children = lambda id: lambda: num_children(id)() > 0
-        rel = [m.__name__.lower()
-               for m in Page.get_content_models()
-               if not m._meta.proxy]
-        published = Page.objects.published(for_user=user).select_related(*rel)
-        # Store the current page being viewed in the context. Used
-        # for comparisons in page.set_menu_helpers.
-        if "page" not in context:
-            try:
-                context.dicts[0]["_current_page"] = published.filter(
-                    content_model='category').get(slug=slug)
-            except Page.DoesNotExist:
-                context.dicts[0]["_current_page"] = None
-        elif slug:
-            context.dicts[0]["_current_page"] = context["page"]
-        # Some homepage related context flags. on_home is just a helper
-        # indicated we're on the homepage. has_home indicates an actual
-        # page object exists for the homepage, which can be used to
-        # determine whether or not to show a hard-coded homepage link
-        # in the page menu.
-        home = home_slug()
-        context.dicts[0]["on_home"] = slug == home
-        context.dicts[0]["has_home"] = False
-        # Maintain a dict of page IDs -> parent IDs for fast
-        # lookup in setting page.is_current_or_ascendant in
-        # page.set_menu_helpers.
-        context.dicts[0]["_parent_page_ids"] = {}
-        pages = defaultdict(list)
-        for page in published.order_by("_order"):
-            page.set_helpers(context)
-            context["_parent_page_ids"][page.id] = page.parent_id
-            setattr(page, "num_children", num_children(page.id))
-            setattr(page, "has_children", has_children(page.id))
-            pages[page.parent_id].append(page)
-            if page.slug == home:
-                context.dicts[0]["has_home"] = True
-        # Include bread_menu_pages in all contexts, not only in the
-        # block being rendered.
-        context.dicts[0]["bread_menu_pages"] = pages
-    # ``branch_level`` must be stored against each page so that the
-    # calculation of it is correctly applied. This looks weird but if we do
-    # the ``branch_level`` as a separate arg to the template tag with the
-    # addition performed on it, the addition occurs each time the template
-    # tag is called rather than once per level.
-    context["branch_level"] = 0
-    parent_page_id = None
-    if parent_page is not None:
-        context["branch_level"] = getattr(parent_page, "branch_level", 0) + 1
-        parent_page_id = parent_page.id
+@register.simple_tag
+def page_rules_menu():
+    return RulesPage.objects.all()
 
-    # Build the ``page_branch`` template variable, which is the list of
-    # pages for the current parent. Here we also assign the attributes
-    # to the page object that determines whether it belongs in the
-    # current menu template being rendered.
-    context["page_branch"] = context[
-        "bread_menu_pages"].get(parent_page_id, [])
-    context["page_branch_in_menu"] = False
-    for page in context["page_branch"]:
-        page.in_menu = page.in_menu_template(template_name)
-        page.num_children_in_menu = 0
-        if page.in_menu:
-            context["page_branch_in_menu"] = True
-        for child in context["bread_menu_pages"].get(page.id, []):
-            if child.in_menu_template(template_name):
-                page.num_children_in_menu += 1
-        page.has_children_in_menu = page.num_children_in_menu > 0
-        page.branch_level = context["branch_level"]
-        page.parent = parent_page
-        context["parent_page"] = page.parent
+# @register.render_tag
+# def page_breadcrumb_menu(context, token):
+#     """
+#     Return a list of child pages for the given parent, storing all
+#     pages in a dict in the context when first called using parents as keys
+#     for retrieval on subsequent recursive calls from the menu template.
+#     """
+#     # First arg could be the menu template file name, or the parent page.
+#     # Also allow for both to be used.
+#     template_name = None
+#     parent_page = None
+#     parts = token.split_contents()[1:]
+#     for part in parts:
+#         part = Variable(part).resolve(context)
+#         if isinstance(part, str):
+#             template_name = part
+#         elif isinstance(part, Page):
+#             parent_page = part
+#     if template_name is None:
+#         try:
+#             template_name = context["menu_template_name"]
+#         except KeyError:
+#             error = "No template found for page_menu in: %s" % parts
+#             raise TemplateSyntaxError(error)
+#     context["menu_template_name"] = template_name
+#     if "bread_menu_pages" not in context:
+#         try:
+#             user = context["request"].user
+#             slug = context["request"].path
+#         except KeyError:
+#             user = None
+#             slug = ""
+#         num_children = lambda id: lambda: len(context["bread_menu_pages"][id])
+#         has_children = lambda id: lambda: num_children(id)() > 0
+#         rel = [m.__name__.lower()
+#                for m in Page.get_content_models()
+#                if not m._meta.proxy]
+#         published = Page.objects.published(for_user=user).select_related(*rel)
+#         # Store the current page being viewed in the context. Used
+#         # for comparisons in page.set_menu_helpers.
+#         if "page" not in context:
+#             try:
+#                 context.dicts[0]["_current_page"] = published.filter(
+#                     content_model='category').get(slug=slug)
+#             except Page.DoesNotExist:
+#                 context.dicts[0]["_current_page"] = None
+#         elif slug:
+#             context.dicts[0]["_current_page"] = context["page"]
+#         # Some homepage related context flags. on_home is just a helper
+#         # indicated we're on the homepage. has_home indicates an actual
+#         # page object exists for the homepage, which can be used to
+#         # determine whether or not to show a hard-coded homepage link
+#         # in the page menu.
+#         home = home_slug()
+#         context.dicts[0]["on_home"] = slug == home
+#         context.dicts[0]["has_home"] = False
+#         # Maintain a dict of page IDs -> parent IDs for fast
+#         # lookup in setting page.is_current_or_ascendant in
+#         # page.set_menu_helpers.
+#         context.dicts[0]["_parent_page_ids"] = {}
+#         pages = defaultdict(list)
+#         for page in published.order_by("_order"):
+#             page.set_helpers(context)
+#             context["_parent_page_ids"][page.id] = page.parent_id
+#             setattr(page, "num_children", num_children(page.id))
+#             setattr(page, "has_children", has_children(page.id))
+#             pages[page.parent_id].append(page)
+#             if page.slug == home:
+#                 context.dicts[0]["has_home"] = True
+#         # Include bread_menu_pages in all contexts, not only in the
+#         # block being rendered.
+#         context.dicts[0]["bread_menu_pages"] = pages
+#     # ``branch_level`` must be stored against each page so that the
+#     # calculation of it is correctly applied. This looks weird but if we do
+#     # the ``branch_level`` as a separate arg to the template tag with the
+#     # addition performed on it, the addition occurs each time the template
+#     # tag is called rather than once per level.
+#     context["branch_level"] = 0
+#     parent_page_id = None
+#     if parent_page is not None:
+#         context["branch_level"] = getattr(parent_page, "branch_level", 0) + 1
+#         parent_page_id = parent_page.id
 
-        # Prior to pages having the ``in_menus`` field, pages had two
-        # boolean fields ``in_navigation`` and ``in_footer`` for
-        # controlling menu inclusion. Attributes and variables
-        # simulating these are maintained here for backwards
-        # compatibility in templates, but will be removed eventually.
-        page.in_navigation = page.in_menu
-        page.in_footer = not (not page.in_menu and "footer" in template_name)
-        if page.in_navigation:
-            context["page_branch_in_navigation"] = True
-        if page.in_footer:
-            context["page_branch_in_footer"] = True
+#     # Build the ``page_branch`` template variable, which is the list of
+#     # pages for the current parent. Here we also assign the attributes
+#     # to the page object that determines whether it belongs in the
+#     # current menu template being rendered.
+#     context["page_branch"] = context[
+#         "bread_menu_pages"].get(parent_page_id, [])
+#     context["page_branch_in_menu"] = False
+#     for page in context["page_branch"]:
+#         page.in_menu = page.in_menu_template(template_name)
+#         page.num_children_in_menu = 0
+#         if page.in_menu:
+#             context["page_branch_in_menu"] = True
+#         for child in context["bread_menu_pages"].get(page.id, []):
+#             if child.in_menu_template(template_name):
+#                 page.num_children_in_menu += 1
+#         page.has_children_in_menu = page.num_children_in_menu > 0
+#         page.branch_level = context["branch_level"]
+#         page.parent = parent_page
+#         context["parent_page"] = page.parent
 
-    t = get_template(template_name)
-    return t.render(Context(context))
+#         # Prior to pages having the ``in_menus`` field, pages had two
+#         # boolean fields ``in_navigation`` and ``in_footer`` for
+#         # controlling menu inclusion. Attributes and variables
+#         # simulating these are maintained here for backwards
+#         # compatibility in templates, but will be removed eventually.
+#         page.in_navigation = page.in_menu
+#         page.in_footer = not (not page.in_menu and "footer" in template_name)
+#         if page.in_navigation:
+#             context["page_branch_in_navigation"] = True
+#         if page.in_footer:
+#             context["page_branch_in_footer"] = True
+
+#     t = get_template(template_name)
+#     return t.render(Context(context))
 
 
 @register.filter(name='get_product_category')
@@ -568,6 +331,11 @@ def get_product_category(product):
         return None
 
     return ", ".join(str(x) for x in titles)
+
+
+# @register.filter(name='get_categories')
+# def get_categories(categories):
+#     return categories
 
 
 @register.filter(name='get_variation_list')
@@ -820,7 +588,7 @@ def get_fields(shop, starts_with):
         except AttributeError:
             value = None
 
-        if fname.startswith(starts_with) and f.editable and (f.name not in ('id', 'user', 'express_other')):
+        if fname.startswith(starts_with) and f.editable and (f.name not in ('id', 'express_other')):
             fields.append(
                 {
                     'label': f.verbose_name,
@@ -966,3 +734,72 @@ def theme_parent_list(value, autoescape=True):
 # @register.filter("not_on_vacation")
 # def not_on_vacation(object_list):
 #     return object_list.filter(user__shop__on_vacation=False)
+
+
+@register.simple_tag
+def active(request, pattern):
+    import re
+    if re.search(pattern, request.path):
+        return 'active'
+    return ''
+
+
+@register.inclusion_tag("generic/includes/rating.html", takes_context=True)
+def rating_for(context, obj):
+    """
+    Provides a generic context variable name for the object that
+    ratings are being rendered for, and the rating form.
+    """
+    request = context['request']
+    try:
+        context['user_raiting'] = request.user.ratings.get(
+            object_pk=obj.pk, content_type=ContentType.objects.get_for_model(obj))
+    except:
+        context['user_raiting'] = None
+    else:
+        pass
+
+    context["rating_object"] = context["rating_obj"] = obj
+    context["rating_form"] = RatingForm(context["request"], obj)
+    ratings = context["request"].COOKIES.get("mezzanine-rating", "")
+    rating_string = "%s.%s" % (obj._meta, obj.pk)
+    context["rated"] = (rating_string in ratings)
+    rating_name = obj.get_ratingfield_name()
+    for f in ("average", "count", "sum"):
+        context["rating_" + f] = getattr(obj, "%s_%s" % (rating_name, f))
+
+    context["rating_average"] /= 2
+    return context
+
+@register.filter(is_safe = False)
+@stringfilter
+def rupluralize(value, arg):
+    bits = arg.split(u',')
+    quantity = value
+    value = int(value)
+    try:
+        value = str( 0 if not value or value <= 0 else value )[-1:] # patched version
+        return str(quantity) + ' ' + bits[ 0 if value=='1' else (1 if value in '234' else 2) ]
+    except:
+        pass
+    return value
+
+
+@register.assignment_tag
+def split(value=None):
+    return value.split(',')
+
+@register.assignment_tag
+def get_shop_data(obj, shop_id=None):
+    return obj.get_shop_data(int(shop_id))
+
+@register.assignment_tag
+def get_shop_items(obj, shop_id=None):
+    return obj.get_shop_items(int(shop_id))
+# @register.filter
+# def get_item_quantity(obj, arg):
+#     return obj.total_quantity_for_shop(arg)
+#
+# @register.filter
+# def get_item_total_price(obj, arg):
+#     return obj.total_price_for_shop(arg)

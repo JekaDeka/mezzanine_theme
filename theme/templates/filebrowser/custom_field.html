@@ -1,29 +1,30 @@
 {% load mezzanine_tags i18n %}
+{% block extrastyle %}
 <style>
-.mezz-fb-thumbnail {display:inline; margin-left:5px !important;}
+/*.mezz-fb-thumbnail {display:block; margin-left:5px !important;}*/
 /*.mezz-fb-thumbnail img {width:60px; height:20px; margin-top:0 !important;}*/
 .vFileBrowseField {display:none;}
-</style>
-<input id="{{ final_attrs.id }}" type="text" class="vFileBrowseField" name="{{ final_attrs.name }}" value="{{ value }}" />
-<a style="padding:5px 16px;" href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" class="fb_show">
-    <img src="{{ final_attrs.search_icon }}" alt="" />
+</style>				
+{% endblock %}	
+<input id="{{ final_attrs.id }}" type="text" class="vFileBrowseField {{ final_attrs.class }}" name="{{ final_attrs.name }}" value="{{ value }}" />
+<a href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" class="fb_show">
 </a>
 {% ifequal value.filetype "Image" %}
 <p class="help mezz-fb-thumbnail" id="help_{{ final_attrs.id }}">
-    <a href="{{ value.url }}" target="_blank" id="link_{{ final_attrs.id }}">
-        <img id="image_{{ final_attrs.id }}" src="{{ MEDIA_URL }}{% thumbnail value.name 60 60 %}" class="preview" />
+    <a href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}');" target="_blank" id="link_{{ final_attrs.id }}"> 
+        <img id="image_{{ final_attrs.id }}" src="{{ MEDIA_URL }}{% thumbnail value.name 300 200 %}" class="preview" />
     </a>
 </p>
 {% else %}
 <p class="help mezz-fb-thumbnail" id="help_{{ final_attrs.id }}">
-    <a href="javascript://" target="_self" id="link_{{ final_attrs.id }}" style="display: none;">
-        <img id="image_{{ final_attrs.id }}" class="preview" src="" />
+    <a href="javascript://" target="_self" id="link_{{ final_attrs.id }}" {% if not value %} style="display: none;" {% endif %}>
+        <img id="image_{{ final_attrs.id }}" class="preview" src="{% if value %}{{ MEDIA_URL }}{% thumbnail value 300 200 %}{% endif %}" />
     </a>
     {{ value.path }}
 </p>
 {% endifequal %}
 {% if not self.is_required %}
-    <p class="help mezz-fb-clear" id="clear_{{ final_attrs.id }}" style="display:{% if value %}inline{% else %}none{% endif %}; margin:0 10px;">
+    <p class="help mezz-fb-clear" id="clear_{{ final_attrs.id }}" style="display:{% if value %}block{% else %}none{% endif %};">
         <a href="javascript:FileBrowser.clear('{{ final_attrs.id }}');">{% trans "Clear" %}</a>
     </p>
 {% endif %}

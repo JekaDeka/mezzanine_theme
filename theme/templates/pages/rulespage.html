@@ -1,0 +1,11 @@
+{% extends "pages/richtextpage.html" %}
+{% load mezzanine_tags %}
+
+{% block main %}
+<div class="sixteen columns">
+	<div class="extra-padding content">
+    {{ block.super }}
+  	{{ page.rulespage.content|richtext_filters|safe }}
+	</div>
+</div>
+{% endblock %}

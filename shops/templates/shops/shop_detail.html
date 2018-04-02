@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags accounts_tags pages_tags theme_tags staticfiles %}
+
+{% block meta_title %}{{ shop.shopname }}{% endblock %}
+{% block meta_description %}{% metablock %}
+{{ shop.bio|safe }}
+{% endmetablock %}{% endblock %}
+
+{% block breadcrumbs %}
+
+{% endblock breadcrumbs %}
+
+{% block slider %}
+<div class="container fullwidth-element margin-bottom-35" style="background: url({{ MEDIA_URL }}{% thumbnail shop.background 1290 200 %}); height: 200px;">
+	<img src="{{ MEDIA_URL }}{% thumbnail shop.image 200 200 %}" alt="{{shop.shopname}}" class="shop-image pull-right margin-top-25 margin-right-5 margin-bottom-10" />
+</div>
+{% endblock %}
+
+{% block main %}
+{% if shop.on_vacation %}
+<div class="sixteen columns">
+    <div class="notification error text-center">
+        <p>Магазин на каникулах</p>
+    </div>
+</div>
+<div class="clearfix"></div>
+{% endif %}
+<div class="eleven columns">
+    <br>
+    <h2 class="headline" style="margin-top:-37px; font-size: 35px!important;">{{ shop.shopname }}</h2>
+    <span class="line"></span>
+    <div class="clearfix"></div>
+    {% if shop.bio %}
+        <p>{{ shop.bio|safe }}</p>
+    {% endif %}
+    {% if shop.rules %}
+        <h3 class="headline margin-top-0">Правила магазина</h3>
+        <span class="line"></span>
+        <div class="clearfix"></div>
+        <p>{{ shop.rules|safe }}</p>
+    {% endif %}
+</div>
+<div class="five columns">
+    {# {% get_fields shop starts_with="express" as express_fields %}  #}
+    {# {% if express_fields|any_is_true %} #}
+    <h3 class="headline">Доставка</h3><span class="line"></span>
+    <div class="clearfix"></div>
+    <div class="list-2">
+        <ul>
+            {# {% for fields in express_fields|grouped %}  #}
+                {# {% if fields.0.value %} #}
+                <li> {# {{ fields.0.label }} #}: <span style="white-space: nowrap;">{# {{ fields.1.value|rub_currency }} #}</span> </li>
+                {# {% endif %}  #}
+            {# {% endfor %} #}
+        </ul>
+        <p>{{ shop.express_other }}</p>
+    </div>
+    <div class="clearfix"></div>
+    {# {% endif %}  #}
+
+    {# {% get_fields shop starts_with="payment" as payment_fields %} #}
+    {# {% if payment_fields|any_is_true %} #}
+    <h3 class="headline">Оплата</h3>
+    <span class="line"></span>
+    <div class="clearfix"></div>
+    <div class="list-2">
+        <ul>
+            {# {% for field in payment_fields %}  #}
+                {# {% if field.value == True %} #}<li>{# {{ field.label }} #}</li>{# {% endif %}  #}
+            {# {% endfor %} #}
+        </ul>
+        <p>{{ shop.payment_other }}</p>
+    </div>
+    <div class="clearfix"></div>
+    {# {% endif %} #}
+    <h3 class="headline">Владелец</h3>
+    <span class="line" style="margin-bottom:0px;"></span>
+    <div class="clearfix"></div>
+    <a href="{% url 'profile-detail' shop.user %}"><span> {{ shop.user.profile.get_full_name }}</span></a>
+    <p>{{ shop.user.profile.get_location }}</p>
+    <div class="clearfix"></div>
+
+    <a class="popup-with-zoom-anim button color" href="#small-dialog">Задать вопрос</a>
+    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+        <h2 class="margin-bottom-10">Задайте вопрос магазину</h2>
+        <form action="" method="POST">
+            {% csrf_token %} {{ form.as_p }}
+            <button class="button color pull" type="submit"><i class="fa fa-send black"></i>Отправить вопрос</button>
+        </form>
+    </div>
+</div>
+<div class="clearfix"></div>
+
+<div class="sixteen columns margin-top-25">
+	{# {% include "accounts/includes/shop_widget.html" %} #}
+    <!-- Products -->
+    <div class="widget">
+    <h3 class="headline">Товары</h3><span class="line"></span><div class="clearfix"></div>
+    <div class="sixteen columns products">
+            {% for product in shop.products.all %}
+            <div class="three shop columns custom_column">
+                <figure class="product">
+                    <div class="badges">
+                    {% if product.pre_order %}
+                        <div class="product-example">Для примера</div>
+                    {# {% else %} #}
+                        <!--<div class="product-ready">Готовый вариант</div>-->
+                    {% endif %}
+                    {% if product.on_custom_sale %}
+                        <div class="product-discnt">СКИДКА</div>
+                    {% endif %}
+                    </div>
+                    {% with product.images.all as images %}
+                    <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
+                    <a href="{{ product.get_absolute_url }}">
+                        {% if images %}
+                        <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ images.0 }}"/>
+                            {% if product.images.count != 1 %}
+                            <div class="cover">
+                                    <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ images.1 }}" />
+                            </div>
+                            {% endif %}
+                        {% else %}
+                        <img alt="no-image" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" />
+                        {% endif %}
+                    </a>
+                    <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
+                    </div>
+                    {% endwith %}
+                        <section>
+                            <a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
+                            <a href="{{ product_shop.get_absolute_url }}" class="shopname">{{ product_shop.shopname }}</a>
+                            <!--<span class="product-category">
+                            </span>-->
+                            {% if product.on_custom_sale %}
+                                <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+                            {% else %}
+                            <span class="product-price">{{ product.price }}</span>
+                            {% endif %}
+                        </section>
+                </figure>
+            </div>
+            {% endfor %}
+
+    </div>
+    <div class="clearfix"></div>
+    </div>
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function() {
+	$(".phone").text(function(i, text) {
+		text = text.replace(/(\d{1})(\d{3})(\d{3})(\d{4})/, "$1-$2-$3-$4");
+		return text;
+	});
+});
+</script>
+<script>
+$(function() {
+    $('.a_reply').click(function() {
+        // $('.comment-reply-form').hide();
+        $(this).parent().parent().parent().next().toggle('500');
+        // $(this).find('.comment-reply-form').toggle();
+    });
+});
+</script>
+{% endblock %}

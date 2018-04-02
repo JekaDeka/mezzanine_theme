@@ -1,4 +1,4 @@
-{% extends "admin/base_site.html" %} 
+{% extends "admin/base_site.html" %}
 {% load staticfiles accounts_tags mezzanine_tags theme_tags %}
 {% block extrastyle %}
 {{ block.super }}
@@ -73,13 +73,13 @@
             <div class="panel-body">
                 <ul class="demo-btns">
                     <li>
-                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:theme_orderitem_add' %}"><i class="fa fa-plus"></i> Создать заявку</a>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:ordertable_ordertableitem_add' %}"><i class="fa fa-plus"></i> Создать заявку</a>
                     </li>
                     <li>
-                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:theme_orderitem_changelist' %}"><i class="fa fa-list"></i> Мои заявки</a>
+                        <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:ordertable_ordertableitem_changelist' %}"><i class="fa fa-list"></i> Мои заявки</a>
                     </li>
                     <li>
-                        <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'admin:theme_orderitem_changelist' %}">Отклики</a>
+                        <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'admin:ordertable_ordertableitem_changelist' %}">Отклики</a>
                     </li>
                 </ul>
                 <div class="pull-left">
@@ -99,7 +99,7 @@
             <div class="panel-body">
                 <ul class="demo-btns">
                     <li>
-                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'profile_settings' %}">Настройки профиля</a>
+                        <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'profile-settings' %}">Настройки профиля</a>
                     </li>
                     <li>
                         <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:password_change' %}">Изменить пароль</a>
@@ -138,16 +138,16 @@
                 <p>{{ request.user.profile.get_location }}</p>
                 <ul class="demo-btns">
                 <li>
-                    <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shop_product_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>
+                    <a class="btn btn-sm btn-success btn-raised btn-label" href="{% url 'admin:shops_shopproduct_add' %}"><i class="fa fa-plus"></i> Добавить товар</a>
                 </li>
                 <li>
-                    <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:shop_product_changelist' %}"><i class="fa fa-list"></i> Мои товары</a>
+                    <a class="btn btn-sm btn-inverse btn-raised btn-label" href="{% url 'admin:shops_shopproduct_changelist' %}"><i class="fa fa-list"></i> Мои товары</a>
                 </li>
                 <li>
-                    <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'shop_edit' %}"><i class="fa fa-gears"></i> Настройки</a>
+                    <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'shop-update' request.user.shop.slug %}"><i class="fa fa-gears"></i> Настройки</a>
                 </li>
                 <li>
-                    <a class="btn btn-sm btn-default btn-raised btn-label" href="{% url 'admin:shop_order_changelist' %}"><i class="fa fa-book"></i> Список заказов</a>
+                    <a class="btn btn-sm btn-default btn-raised btn-label" href="#"><i class="fa fa-book"></i> Список заказов</a>
                 </li>
             </ul>
                 <div class="pull-left">
@@ -160,7 +160,7 @@
         </div>
     </div>
     {% endif %}
-    
+
 </div>
 </div>
 {% endblock content %}

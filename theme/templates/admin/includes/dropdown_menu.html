@@ -25,7 +25,7 @@
 						<!--<li class="nav-separator"><span>Главное меню</span></li>-->
 						<li class="nav-separator"><span>Главное меню</span></li>
 						<li>
-							<a class="withripple" href="/admin/"><span class="icon">
+							<a class="withripple" href="{% url 'admin:index' %}"><span class="icon">
 								<i class="material-icons">home</i></span><span>Моя активность</span>
 							</a>
 						</li>
@@ -33,7 +33,7 @@
 						<li class="hasChild">
 							<a class="withripple" href="javascript:;">
 							{% if  app.index == 0 %}
-							<span class="icon"><i class="fa fa-pencil"></i></span> 
+							<span class="icon"><i class="fa fa-pencil"></i></span>
 							{% elif app.index == 1 %}
 							<span class="icon"><i class="material-icons">shopping_cart</i></span>
 							{% elif app.index == 2 %}
@@ -45,7 +45,7 @@
 							{% else %}
 							<span class="icon"><i class="material-icons">apps</i></span>
 							{% endif %}
-							
+
 							<span>{% trans app.name %}</span>
 							</a>
 							<ul class="acc-menu">
@@ -63,4 +63,3 @@
 		</div>
 	</div>
 </div>
-

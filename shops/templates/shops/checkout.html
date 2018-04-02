@@ -1,0 +1,131 @@
+{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles theme_tags crispy_forms_tags %}
+{% block meta_title %}Оформление заказа{% endblock %}
+{% block breadcrumbs_title %}
+<h2>Оформление заказа</h2>
+{% endblock breadcrumbs_title %}
+{% block breadcrumb_element %}
+<li>{{ form.shop.shopname }}</li>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+{% if request.cart.has_items %}
+{% get_shop_items request.cart shop_id=shop_id as items %}
+{% get_shop_data request.cart shop_id=shop_id as shop_data %}
+  <div class="eight columns">
+
+    <!-- Billing Details Content -->
+    <div class="checkout-section active">Контактная информация</div>
+    <div class="checkout-content">
+      <form class="checkout" action="" method="post">
+        {% csrf_token %}
+        {# {{ form|crispy }} #}
+        {% for field in form %}
+          {{ field|as_crispy_field }}
+        {% endfor %}
+        <p>{{ form.shop.payment_other }}</p>
+        <p>{{ form.shop.express_other }}</p>
+      </form>
+      <div class="clearfix"></div>
+    </div>
+    <div class="clearfix"></div>
+  </div>
+  <!-- Billing Details / Enc -->
+
+
+  <!-- Checkout Cart -->
+  <div class="eight columns">
+    <div class="checkout-section cart">{% trans "Your Cart" %}</div>
+    <!-- Cart -->
+    <table class="stacktable small-only">
+      <tbody>
+        {% for item in items %}
+        <tr class="st-space">
+          <td></td>
+          <td></td>
+        </tr>
+        <tr class="st-new-item">
+          <td class="st-key"></td>
+          <td class="st-val st-head-row">
+            {% if item.image %}
+              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title }}">
+            {% endif %}
+          </td>
+        </tr>
+        <tr>
+          <td class="st-key"></td>
+          <td class="st-val"><a href="{{ item.url }}">{{ item.title }}</a></td>
+        </tr>
+        <tr>
+          <td class="st-key">Цена</td>
+          <td class="st-val">{{ item.price|rub_currency }}</td>
+        </tr>
+        <tr>
+          <td class="st-key">Кол-во</td>
+          <td class="st-val">{{ item.quantity }}</td>
+        </tr>
+        <tr>
+          <td class="st-key">Всего</td>
+          <td class="st-val">{{ item.total_price|rub_currency }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <table class="checkout cart-table responsive-table stacktable large-only">
+      <tbody>
+        <tr>
+          <th class="hide-on-mobile">Товар</th>
+          <th></th>
+          <th>Цена</th>
+          <th>Кол-во</th>
+          <th>Всего</th>
+        </tr>
+        {% for item in items %}
+        <tr>
+          <td class="hide-on-mobile">
+            {% if item.image %}
+              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title }}">
+            {% endif %}
+          </td>
+          <td class="cart-title"><a href="{{ item.url }}">{{ item.title }}</a></td>
+          <td>{{ item.price|rub_currency }}</td>
+          <td class="qty-checkout">{{ item.quantity }}</td>
+          <td class="cart-total">{{ item.total_price|rub_currency }}</td>
+        </tr>
+        {% endfor %}
+
+      </tbody>
+    </table>
+
+    <table class="cart-table bottom">
+      <tbody>
+        <tr>
+          <th class="checkout-totals">
+            <div class="checkout-subtotal">
+              {{ shop_data.3|rupluralize:"товар,товара,товаров" }} на сумму: <span>{{ shop_data.4|rub_currency }}</span>
+            </div>
+          </th>
+        </tr>
+      </tbody>
+    </table>
+    <div class="margin-top-10 pull-right">
+      <a href="#" class="button color checkout-button">Оформить заказ</a>
+    </div>
+
+  </div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ block.super }}
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.checkout-button').on('click', function(event) {
+      event.preventDefault();
+      $('.checkout').submit();
+    })
+  });
+</script>
+</script>
+{% endblock %}

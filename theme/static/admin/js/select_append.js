@@ -64,7 +64,6 @@ $(document).ready(function() {
 
     function make_selector_visible(select, animation) {
         var next = $(select).closest('div').nextAll('div').find('select');
-        console.log
         $.each(next, function(i, val) {
             if (is_empty(val) == true) {
                 $(val).hide(animation);

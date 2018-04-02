@@ -3,14 +3,14 @@
 <div id="cart">
 <!-- Button -->
 	<div class="cart-btn">
-		<a href="javascript:void(0);" class="button adc">{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0.00 ₽{% endif %}</a>
+		<a href="javascript:void(0);" class="button adc">{% if request.cart.has_items %}{{ request.cart.total_price }}{% else %}0.00 ₽{% endif %}</a>
 			</div>
 			<div class="cart-list">
 			<div class="arrow"></div>
 			<div class="cart-amount">
-				<span>{% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %}{% trans "in cart" %}</span>
+				<span>{% blocktrans count request.cart.total_quantity as cart_quantity %}1 item{% plural %}{{ cart_quantity }} items{% endblocktrans %} {% trans "in cart" %}</span>
 			</div>
-			
+
 			<ul>
 			{% if request.cart.has_items %}
 				{% for item in request.cart %}
@@ -19,7 +19,7 @@
                         	<a href="{{ item.get_absolute_url }}"><img alt="{{ item.description }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"/></a>
                    		{% endif %}
 						<a href="{{ item.get_absolute_url }}">{{ item.description }}</a>
-						<span>{{ item.quantity }} x {{ item.unit_price|rub_currency }}</span>
+						<span>{{ item.quantity }} x {{ item.unit_price }}</span>
 						<div class="clearfix"></div>
 					</li>
 				{% endfor %}
@@ -27,7 +27,7 @@
 				<li class="empty">{% trans "Your Cart is empty." %}</li>
 			{% endif %}
 			</ul>
-			
+
 			<div class="cart-buttons button">
 				<a href="{% url "shop_cart" %}" class="view-cart" ><span data-hover="View Cart"><span>Корзина</span></span></a>
 				{% if request.cart.total_quantity != 0 %}

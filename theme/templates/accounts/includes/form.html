@@ -1,5 +1,5 @@
 {% load mezzanine_tags staticfiles %}
-<form method="POST" action="{% url 'profile_settings' %}" enctype="multipart/form-data" id="user-profile-form" style="display: none;">
+<form method="POST" action="{% url 'profile-settings' %}" enctype="multipart/form-data" id="user-profile-form" style="display: none;">
     <div class="card-profile">
         {% csrf_token %}
         <div class="image">

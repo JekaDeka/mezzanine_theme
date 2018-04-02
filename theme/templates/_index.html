@@ -1,7 +1,7 @@
-{% extends "base.html" %} 
-{% load pages_tags theme_tags keyword_tags mezzanine_tags i18n staticfiles imagefit blog_tags %} 
+{% extends "base.html" %}
+{% load theme_tags keyword_tags mezzanine_tags i18n staticfiles blog_tags %}
 
-{% block meta_title %}{% trans "Home" %} {% endblock %} 
+{% block meta_title %}{% trans "Home" %} {% endblock %}
 
 
 {% block breadcrumbs %}
@@ -10,26 +10,26 @@
 {% block first_time_user %}
 <div class="container fullwidth-element userpanel">
     <div class="two-third columns alpha omega margin-bottom-10">
-    {% if request.user_shop %}
+    {% if request.user.shop %}
     	<figure>
-            <img src="{% static 'images/edit_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
+            <img src="{% static 'images/edit_shop.jpg' %}" alt="Фон магазина" />
             <figcaption>
                 <h3>Управление магазином</h3>
                 <ul>
                     <li>
-                        <a href="{% url 'admin:shop_product_add' %}" class="button color">Добавить новый товар</a>
+                        <a href="{% url 'product-add' %}" class="button color">Добавить новый товар</a>
                     </li>
                     <li>
-                        <a href="{% url 'shop_edit' %}" class="button color">Настройки магазина</a>
+                        <a href="{% url 'shop-update' request.user.shop.slug %}" class="button color">Настройки магазина</a>
                     </li>
                 </ul>
             </figcaption>
         </figure>
 	{% else %}
    		<figure>
-            <img src="{% static 'images/open_shop.jpg'|resize:"820x400,C" %}" alt="Фон магазина" />
+            <img src="{% static 'images/open_shop.jpg' %}" alt="Фон магазина" />
 			 <figcaption>
-                <a href="{% url 'shop_create' %}">
+                <a href="{% url 'shop-add' %}">
 			        <span>Начните продавать уже сейчас</span>
 			        <h3>Создайте собственный магазин</h3>
 			     </a>
@@ -39,9 +39,9 @@
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
-            <img src="{% static 'images/personal_order.jpg'|resize:"460x195,C" %}" alt="Фон заказа" />
+            <img src="{% static 'images/personal_order.jpg' %}" alt="Фон заказа" />
             <figcaption>
-            <a href="{% url 'admin:theme_orderitem_add' %}">
+            <a href="{% url 'ordertableitem-add' %}">
                     <span>Хочешь индивидуальности?</span>
                     <h3>Сделай личный заказ у мастера</h3>
             </a>
@@ -50,9 +50,9 @@
     </div>
     <div class="one-third columns omega margin-bottom-10">
         <figure>
-            <img src="{% static 'images/write_to_blog.jpg'|resize:"460x195,C" %}" alt="Фон блога" />
+            <img src="{% static 'images/write_to_blog.jpg' %}" alt="Фон блога" />
             <figcaption>
-                <a href="{% url 'admin:blog_blogpost_add' %}">
+                <a href="{% url 'blogpost-add' %}">
                     <span>Открой в себе автора</span>
                     <h3>Сделай запись в Блог</h3>
                 </a>
@@ -112,7 +112,7 @@
     		{% for shop in user_shops %}
     		<div class="six columns alpha margin-bottom-20">
     		<div class="shop-stacked-images">
-    			{% with shop_user_product_set.all|slice:"4" as product %}
+    			{% with shop_product_set.all|slice:"4" as product %}
     			<div class="main pull-left">
     				<a href="{{ product.0.get_absolute_url }}">
     					<img src="{{ MEDIA_URL }}{% thumbnail product.0.image 300 160 %}" alt="{{ product.0.title }}"/>
@@ -138,9 +138,9 @@
     		<div class="clearfix"></div>
     		<div class="shop-info">
     			<a href="{{ shop.get_absolute_url }}">
-	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 100 100 %}" alt="{{shop.shopname}}" class="shop-image pull-left" />
+	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 200 200 %}" alt="{{ shop.shopname }}" class="shop-image pull-left" />
 	    		</a>
-	    		<a href="{{ shop.get_absolute_url }}"><h2>{{shop.shopname}}</h2></a>
+	    		<a href="{{ shop.get_absolute_url }}"><h2>{{ shop.shopname }}</h2></a>
 	    			<span>{{ shop_user_profile.get_location }} </span>
     		</div>
     		</div>
@@ -155,7 +155,7 @@
 			<h3 class="headline">Блог</h3><span class="line"></span><div class="clearfix"></div>
 			<ul class="widget-tabs">
 			{% for recent_post in recent_posts %}
-				<li>			
+				<li>
 			    {% spaceless %}
 			    {% if settings.BLOG_USE_FEATURED_IMAGE %}
 			    <div class="widget-thumb">
@@ -164,7 +164,7 @@
 							<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 74 74 %}" alt="{{ recent_post.title }}"/>
 						{% endif %}
 						</a>
-				</div>  
+				</div>
 				{% endif %}
 				<div class="widget-text">
 				    <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
@@ -174,7 +174,7 @@
 			    {% endspaceless %}
 				</li>
 			{% endfor %}
-			</ul>	
+			</ul>
 		</div>
 		{% endif %}
 
@@ -190,12 +190,12 @@
 				</ul>
 			</nav>
 		</div>
-		{% endif %}	
+		{% endif %}
 
         {% keywords_for blog.blogpost as tags %}
 		{% if tags %}
 			<div class="widget margin-top-10">
-				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>	
+				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>
 				<nav class="tags">
 				{% for tag in tags %}
 				    <a href="{% url "blog_post_list_tag" tag.slug %}" class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
@@ -222,34 +222,34 @@
                 <div class="badges">
                     {% if product.pre_order %}
                     	<div class="product-example">Для примера</div>
-                    {% endif %} 
+                    {% endif %}
                     {% if product.on_custom_sale %}
                     	<div class="product-discnt">СКИДКА</div>
                     {% endif %}
                 </div>
-                {% with product.images.all|slice:"2" as images %}
+                {% with product.images.all as images %}
                 <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
                 <a href="{{ product.get_absolute_url }}">
-                    {% if images %}
+                  {% if images %}
                     <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
-                        {% if product.images.count != 1 %}
-                        <div class="cover">
-                                <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}"/>
-                        </div>
-                        {% endif %}
-                    {% else %}
-                        <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
-                    {% endif %}
+                      {% if product.images.count != 1 %}
+                      <div class="cover">
+                          <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
+                      </div>
+                      {% endif %}
+                  {% else %}
+                    <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
+                  {% endif %}
                 </a>
                 <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
                 </div>
                 {% endwith %}
                     <section>
                         <a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
-                        <a href="{{ product_user_shop.get_absolute_url }}" class="shopname">{{ product_user_shop.shopname }}</a>
+                        <a href="{{ product_shop.get_absolute_url }}" class="shopname">{{ product_shop.shopname }}</a>
                         {% if product.on_custom_sale %}
-                        <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span> {% else %}
-                        <span class="product-price">{{ product.price|rub_currency }}</span> {% endif %}
+                        <span class="product-price-discount">{{ product.unit_price }}<i>{{ product.price }}</i></span> {% else %}
+                        <span class="product-price">{{ product.price }}</span> {% endif %}
                     </section>
             </figure>
         </div>

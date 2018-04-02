@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
+{% block meta_title %}
+{% if object %}
+    Изменение {{ object.title }}
+{% else %}
+    Новый товар
+{% endif %}
+{% endblock %}
+
+
+{% block breadcrumbs_title %}
+<h2>Магазин</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
+<li><a href="{% url 'product-list' %}">Список моих товаров</a></li>
+<li>{% if object %}{{ object }}{% else %}Новый товар{% endif %}</li>
+{% endblock %}
+
+
+{% block main %}
+<div class="sixteen columns">
+  <form method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="ordertableitemimages">
+    {{ productimage|crispy }}
+    </div>
+    <div class="action-bar">
+        <input type="submit" class="button pull-right margin-right-10" value="Сохранить"/>
+        {% if object %}
+            <a href="{% url 'blogpost-delete' object.pk %} " class="button dark pull-right margin-right-5">Удалить</a>
+        {% endif %}
+        <a href="{% url 'product-list' %}" class="button dark pull-right margin-right-5">Назад</a>
+    </div>
+</form>
+</div>
+{% endblock main %}
+{% block extra_js %}
+{{ block.super }}
+<script type="text/javascript">
+  window.__csrf_token = '{{ csrf_token }}';
+  window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
+  window.__filebrowser_url = '{% url "fb_browse" %}';
+</script>
+<script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js " %}"></script>
+<script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
+<script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/mezz/keywords_field.js" %}"></script>
+<script type="text/javascript" src="{% static "mezzanine/tinymce/tinymce.min.js" %}"></script>
+<script type="text/javascript" src="{% static "mezzanine/js/tinymce_setup.js" %}"></script>
+<script type="text/javascript" src="{% static "admin/js/jquery.chained.min.js" %}"></script>
+<script src="{% static "js/jquery.formset.js" %}" type="text/javascript">
+</script>
+<script type="text/javascript" src="{% static "js/jquery.chained.select.js" %}"></script>
+<script type="text/javascript">
+$( document ).ready(function() {
+  $.fn.get_categories("{% url 'get_categories' %}");
+  $('.ordertableitemimages').formset({
+    uiText: {
+      addPrompt: 'Добавить',
+      removePrompt: 'Удалить',
+    },
+    prefix: 'images'
+  });
+});
+</script>
+{% endblock extra_js %}

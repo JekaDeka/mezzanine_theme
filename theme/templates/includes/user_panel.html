@@ -8,9 +8,12 @@
 			</ul>
 		</div>
 	</div>
-{% ifinstalled cartridge.shop %}
+{% ifinstalled shops %}
 <div class="twelve columns">
-	{% include "shop/includes/user_panel.html" %}
+	<div id="cart">
+		{% include "shops/includes/user_panel.html" %}
+	</div>
+	{% search_form "all" %}
 </div>
 {% endifinstalled %}
 
@@ -19,5 +22,3 @@
 	{% include "accounts/includes/user_panel.html" %}
 </div>
 {% endifinstalled %}
-
-

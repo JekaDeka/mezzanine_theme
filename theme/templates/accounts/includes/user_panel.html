@@ -1,13 +1,12 @@
 {% load i18n mezzanine_tags accounts_tags %}
 <div class="additional-menu">
-    <ul>
-    	{% if not request.user.is_authenticated %}
-		<li><a href="{% url "signup" %}?next=/init/">Создать магазин</a></li>
-		<li><a href="{% url "login" %}">Войти</a></li>
-	{% else %}
-			<li><a href="{% url "profile_settings" %}">{{ request.user.email }}</a></li>
-			<li><a href="{% url 'logout' %}?next={{ request.path }}">{% trans "Log out" %}</a></li>
-		{% endif %}
-    </ul>
+  <ul>
+    {% if not request.user.is_authenticated %}
+      <li><a href="{% url 'signup' %}?next={% url 'true_index' %}">Создать магазин</a></li>
+      <li><a href="{% url 'login' %}?next={% url 'true_index' %}">Войти</a></li>
+    {% else %}
+      <li><a href="{% url 'profile-settings' %}"><i class="fa fa-user"></i> {{ request.user.email }}</a></li>
+      <li><a href="{% url 'logout' %}?next={{ request.path }}">{% trans "Log out" %}</a></li>
+    {% endif %}
+  </ul>
 </div>
-

@@ -1,13 +1,14 @@
-function adjust_search_bar() {
-    if ($(window).width() < 752) {
-        var cart_width = $("#cart").width();
-        var div_parent_width = $("#cart").parent().width();
-        $(".top-search input").width(div_parent_width - cart_width - 80);
-
-    } else {
-        $(".top-search input").width('192px')
-    }
-}
+// function adjust_search_bar() {
+//     if ($(window).width() < 752) {
+//         var cart_width = $("#cart").width();
+//         var div_parent_width = $("#cart").parent().width();
+//         $(".top-search input").width(div_parent_width - cart_width - 80);
+//         console.log(cart_width);
+//
+//     } else {
+//         $(".top-search input").width('192px')
+//     }
+// }
 
 $(function() {
     var ul = $('.active-branch').parent(); //curent active ul
@@ -55,10 +56,10 @@ $(function() {
     // }
 
     //adjust search input in header
-    adjust_search_bar();
-    $(window).on('resize', function() {
-        adjust_search_bar();
-    });
+    // adjust_search_bar();
+    // $(window).on('resize', function() {
+    //     adjust_search_bar();
+    // });
 
 
 });

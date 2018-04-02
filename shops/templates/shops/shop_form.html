@@ -1,0 +1,243 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
+
+{% block meta_title %}
+{% if object %} Изменение {{ object.shopname}}
+{% else %}
+    Новый магазин
+{% endif %}
+{% endblock %}
+{% block breadcrumbs_title %}
+<h2>Магазин</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
+<li>{% if object %}{{ object }}{% else %}Создание магазина{% endif %}</li>
+{% endblock %}
+
+
+{% block messages %}
+{% if form.non_field_errors %}
+<div class="container">
+  <div class="sixteen columns">
+    <div class="notification error closeable margin-bottom-10 text-center">
+      <p>{{ form.non_field_errors }}</p>
+      <a class="close"></a>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block slider %}
+<form method="post" enctype="multipart/form-data" id="shop_form">
+	{% csrf_token %}
+	<div class="container fullwidth-element margin-bottom-50">
+		<div class="shop-images">
+			{{ form.background }}
+		</div>
+		<div class="shop-images">
+			{{ form.image }}
+		</div>
+	</div>
+	<div class="clearfix"></div>
+	<div class="container input-full-width">
+		<div class="nine columns alpha">
+			<div>
+				{{ form.shopname.label }} <span>*</span> {{ form.shopname }}
+				<div class="error">
+				{% if form.shopname.errors %}
+					{% for error in form.shopname.errors %}
+						{{ error }}
+					{% endfor %}
+				{% endif %}
+				</div>
+			</div>
+			<div>
+				{{ form.bio.label }}: {{ form.bio }}
+				<p> {{ form.bio.help_text }} </p>
+			</div>
+
+			<h3 class="headline">Правила магазина</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+			<p> {{ form.rules.help_text }}</p>
+			<div>
+				{{ form.rules }}
+			</div>
+		</div>
+		<div class="seven columns omega">
+			<h3 class="headline">Доставка</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+
+			<p>Отметьте возможные варианты доставки ваших товаров. Оставляйте поле со стоимостью пустым, если стоимость будет рассчитана по запросу, 0 - доставка бесплата.</p>
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_point }}
+					{{ form.express_point.label }}:
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+					{{ form.express_point_price }}
+					{{ form.express_point_price.errors }}
+				</div>
+			</div>
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_city }}
+					{{ form.express_city.label }}:
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_city_price }}
+				{{ form.express_city_price.errors }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+					<label class="control control--checkbox">
+					{{ form.express_country }}
+					{{ form.express_country.label }}:
+					<div class="control__indicator"></div>
+					</label>
+				</div>
+				<div class="express_price">
+					{{ form.express_country_price }}
+					{{ form.express_country_price.errors }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_world }}
+				{{ form.express_world.label }}:
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_world_price }}
+				{{ form.express_world_price.errors }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_mail }}
+				{{ form.express_mail.label }}:
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_mail_price }}
+				{{ form.express_mail_price.errors }}
+				</div>
+			</div>
+
+			<div class="express">
+				<div class="express_text">
+				<label class="control control--checkbox">
+				{{ form.express_personal }}
+				{{ form.express_personal.label }}:
+				<div class="control__indicator"></div>
+				</label>
+				</div>
+				<div class="express_price">
+				{{ form.express_personal_price }}
+				</div>
+			</div>
+			<div class="express">
+				{{ form.express_other }}
+				<p>
+					{{form.express_other.help_text}}
+				</p>
+			</div>
+
+			<h3 class="headline">Оплата</h3>
+			<span class="line"></span>
+			<div class="clearfix"></div>
+			<p>Выберите, какими способами покупатель сможет оплатить заказ.</p>
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_personal }}
+				{{ form.payment_personal.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_bank_transfer }}
+				{{ form.payment_bank_transfer.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+
+			<div>
+				<label class="control control--checkbox">
+				{{ form.payment_card_transfer }}
+				{{ form.payment_card_transfer.label }}
+				<div class="control__indicator"></div>
+				</label>
+			</div>
+			<div>
+				{{ form.payment_other }}
+				<p> {{ form.payment_other.help_text }}</p>
+
+			</div>
+		</div>
+		<div class="clearfix"></div>
+		<div class="sixteen columns alpha">
+			<input type="submit" style="float: right;" value="Сохранить" />
+		</div>
+	</div>
+</form>
+{% endblock %}
+
+
+{% block extra_js %}
+{{ block.super }}
+	<script type="text/javascript">
+		window.__csrf_token = '{{ csrf_token }}';
+	    window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
+	    window.__filebrowser_url = '{% url "fb_browse" %}';
+    </script>
+	<script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
+    <script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
+    <script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
+	<script>
+	$(document).ready(function() {
+	    // $(".mask").mask('+0 (000) 000-0000');
+	    $(".express > .express_text input").on("change", function() {
+	        var div_price = $(this).parent().parent().next(".express_price");
+	        var input_price = $(div_price).find('input');
+	        var active = $(this).is(':checked');
+	        if (active) {
+	            $(input_price).attr('readonly', null);
+	        } else {
+	            $(input_price).attr('readonly', 'readonly');
+	            $(input_price).val(null);
+	        }
+	    }).change();
+	});
+	</script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+	{% if form.image.errors %}
+		$(".shop-image").css('background', '#ffd2d2');
+	{% endif %}
+	{% if form.background.errors %}
+		$(".shop-background-image").css('background', '#ffd2d2');
+	{% endif %}
+	});
+	</script>
+{% endblock extra_js %}

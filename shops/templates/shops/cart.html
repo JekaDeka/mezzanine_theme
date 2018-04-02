@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles theme_tags crispy_forms_tags %}
+{% block meta_title %} Корзина {% endblock %}
+{% block breadcrumbs_title %}<h2>Корзина</h2>{% endblock breadcrumbs_title %}
+{% block breadcrumb_element %}<li>{% trans "Your Cart" %}</li>{% endblock %}
+
+{% block main %}
+<div class="container cart">
+		{% if cartitems.forms %}
+		<form method="post" class="cart-form">
+			{{ form }}
+		{% csrf_token %}
+		{{ cartitems.management_form }}
+		{% regroup cartitems|dictsort:"instance.shop_id" by instance.shop_id as item_list %}
+		{% for shop in item_list %}
+		<div class="twelve columns margin-bottom-20">
+			<table class="stacktable small-only">
+			<tbody>
+				{% for form in shop.list %}
+				{% with form.instance as item %}
+				<tr class="st-space">
+					<td></td>
+					<td></td>
+				</tr>
+				<tr class="st-new-item">
+					<td class="st-key"></td>
+					<td class="st-val st-head-row">
+						{{ form.id }}
+						{% if item.image %}
+						<a href="{{ item.get_absolute_url }}">
+							<img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" />
+						</a>
+						{% endif %}
+					</td>
+				</tr>
+				<tr>
+					<td class="st-key">Товар</td>
+					<td class="st-val"><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></td>
+				</tr>
+				<tr>
+					<td class="st-key">Цена</td>
+					<td class="st-val">{{ item.price|rub_currency }}</td>
+				</tr>
+				<tr>
+					<td class="st-key">Кол-во</td>
+					<td class="st-val cart-qty">
+	            <div class="qtyminus"></div>
+						    {{ form.quantity }}
+							<div class="qtyplus"></div>
+					</td>
+				</tr>
+				<tr>
+					<td class="st-key">Total</td>
+					<td class="st-val">$79.00</td>
+				</tr>
+				{% endwith %}
+				{% endfor %}
+			</tbody>
+		</table>
+			<table class="cart-table responsive-table stacktable large-only">
+			    <tbody>
+			        <tr>
+	                <th>Товар</th>
+			            <th></th>
+			            <th>Цена</th>
+			            <th>Кол-во</th>
+			            <th>Итого</th>
+			            <th></th>
+			        </tr>
+	        {% for form in shop.list %}
+	        {% with form.instance as item %}
+	        <tr>
+						<td>
+							{{ form.id }}
+							{% if item.image %}
+							<a href="{{ item.get_absolute_url }}">
+								<img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" />
+							</a>
+							{% endif %}
+						</td>
+						<td class="cart-title">
+							<a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+						</td>
+						<td>{{ item.price|rub_currency }}</td>
+						<td class="cart-qty">
+	            <div class="qtyminus"></div>
+						    {{ form.quantity }}
+							<div class="qtyplus"></div>
+						</td>
+						<td class="cart-total">{{ item.total_price|rub_currency }}</td>
+						<td class="delete"><a href="javascript:void(0);" class="cart-remove"></a>{{ form.DELETE }}</td>
+					</tr>
+	        {% endwith %}
+	        {% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="four columns margin-bottom-20">
+			{% get_shop_data cart shop_id=shop.grouper as shop_data %}
+			<h2 class="headline">{{ shop_data.0 }}</h2><span class="line"></span>
+			<div class="clearfix"></div>
+			<a href="{% url 'shop-view' shop_data.1 %}"><img class="shop-image" src="{{ MEDIA_URL }}{% thumbnail shop_data.2 60 60 %}" alt="{{ shop_data.0 }}"></a>
+			<p>{{ shop_data.3|rupluralize:"товар,товара,товаров" }} на сумму {{ shop_data.4|rub_currency }} <br>
+				<small>без учета доставки</small>
+			</p>
+			<a href="{% url 'shop-checkout' shop_data.1 shop.grouper %}" class="button">Оформить заказ</a>
+
+		</div>
+		<div class="clearfix"></div>
+		{% endfor %}
+    <table class="cart-table bottom">
+      <tbody>
+        <tr>
+          <th>
+            <div class="cart-btns">
+              <a href="#" class="button color cart-btns proceed">Далее</a>
+              <input type="submit" name="update_cart" class="button gray cart-btns" value="Обновнить">
+            </div>
+          </th>
+        </tr>
+      </tbody>
+    </table> 
+	</form>
+	{% else %}
+	<div class="sixteen columns">
+		<section id="not-found">
+          <p>{% trans "Your Cart is empty." %}</p>
+      </section>
+	</div>
+	{% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+ {{ block.super }}
+ <script src="{% static 'js/cart_update.js' %}" type="text/javascript"></script>
+ {% endblock extra_js %}

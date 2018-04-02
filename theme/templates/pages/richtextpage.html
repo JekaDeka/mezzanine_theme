@@ -6,12 +6,10 @@
 {% endblock %}
 
 {% block main %}
-<div class="col-md-9 center">
-	<div class="box" id="text-page">
+<div class="sixteen columns">
+	<div class="extra-padding">
 	{{ block.super }}
-	{% editable page.richtextpage.content %}
 	{{ page.richtextpage.content|richtext_filters|safe }}
-	{% endeditable %}
 	</div>
 </div>
 {% endblock %}

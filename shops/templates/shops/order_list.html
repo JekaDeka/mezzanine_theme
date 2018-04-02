@@ -1,0 +1,29 @@
+{% extends "profiles/profile_settings.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
+
+{% block meta_title %}
+    Изменение данных
+{% endblock %}
+
+{% block breadcrumbs_title %}
+<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
+<li>Мои покупки</li>
+{% endblock breadcrumb_element %}
+{% block main %}
+    <h2>Here are your orders:</h2>
+    <div>
+        <ul>
+            {% for order in object_list %}
+                <li>
+                  {% if for_shop %}
+                    <a href="{% url 'order-update' order.pk %}"> {{ order }}</a>
+                  {% else %}
+                    <a href="{% url 'order-detail' order.pk %}"> {{ order }}</a>
+                  {% endif %}
+                </li>
+            {% empty %}
+                <li>No order yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock %}

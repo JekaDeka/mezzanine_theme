@@ -1,5 +1,5 @@
 {% extends "blog/blog_post_list.html" %}
-{% load mezzanine_tags keyword_tags i18n disqus_tags theme_tags blog_tags %}
+{% load mezzanine_tags keyword_tags i18n disqus_tags theme_tags blog_tags pages_tags %}
 
 {% block meta_title %}{{ blog_post.meta_title }}{% endblock %}
 
@@ -12,13 +12,37 @@
 {{ blog_post.description }}
 {% endmetablock %}{% endblock %}
 
-{% block title %}
-{{ blog_post.title|title }}
+{# {% block title %} #}
+{# {{ blog_post.title|title }} #}
+{# {% endblock %} #}
+
+{# {% block breadcrumb_element %} #}
+{# <li>{{ blog_post.title|title }}</li> #}
+{# {% endblock %} #}
+
+{# {% block titlebar_class %}parallax-titlebar fullwidth-element{% endblock %} #}
+{# {% block titlebar_style %} #}
+{# background-image: linear-gradient( to bottom, rgba(0, 0, 0, 0.1), rgba(0, 0, 0, 0.3)), url({{ MEDIA_URL }}{% thumbnail blog_post.featured_image 1200 200 %}); #}
+{# {% endblock %} #}
+
+{% block breadcrumbs %}
+<section class="parallax-titlebar fullwidth-element" style="">
+{% if blog_post.featured_image %}
+<img src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 1290 200 %}" alt="" />
+{% endif %}
+<div class="parallax-overlay"></div>
+<div class="parallax-content">
+	<h2>{{ blog_post.title|title }}<span>{{ blog_post.user.profile.get_full_name }}</span></h2>
+
+	<nav id="breadcrumbs">
+		<ul>
+			{% page_menu "pages/menus/breadcrumb.html" %}
+		</ul>
+	</nav>
+</div>
+</section>
 {% endblock %}
 
-{% block breadcrumb_element %}
-<li>{{ blog_post.title|title }}</li>
-{% endblock %}
 
 
 {% block main %}
@@ -27,7 +51,7 @@
 		<article class="post single">
 			<section class="post-content">
 			<section class="date">
-			{% with day=blog_post.publish_date|date:"d"  month=blog_post.publish_date|date:"M"  %} 
+			{% with day=blog_post.publish_date|date:"d"  month=blog_post.publish_date|date:"M"  %}
 				<span class="day">{{day}}</span>
 				<span class="month">{{month}}</span>
 			{% endwith %}
@@ -35,11 +59,10 @@
 			{% block blog_post_detail_postedby %}
 				<header class="meta">
 					<h2>{{ blog_post.title|title }}</h2>
-					<span><i class="fa fa-user"></i>{% trans "Posted by" %}: 
+					<span><i class="fa fa-user"></i>{% trans "Posted by" %}:
 					{% with blog_post.user as author %}
 						<a href="{% url 'blog_post_list_author' author %}">{{ author.get_full_name|default:author.username }}</a></span>
 					{% endwith %}
-					{% keywords_for blog_post as tags %}
 					{% if tags %}
 						<span><i class="fa fa-tag"></i>
 								{% for tag in tags %}
@@ -52,15 +75,15 @@
 						{% if settings.COMMENTS_DISQUS_SHORTNAME %}
 						<span><i class="fa fa-comment"></i>(Число)</span>
 						{% endif %}
-					{% endif %} 
-					
+					{% endif %}
+
 				</header>
 			{% endblock %}
 			{% block blog_post_detail_content %}
 				{{ blog_post.content|richtext_filters|safe }}
 			{% endblock %}
 
-	
+
 			<div class="clearfix"></div>
 
 			</section>
@@ -75,3 +98,6 @@
 </div>
 {% endblock %}
 
+{% block extra_js %}
+
+{% endblock %}

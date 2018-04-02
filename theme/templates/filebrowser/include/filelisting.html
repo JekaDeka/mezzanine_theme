@@ -1,10 +1,7 @@
 {% load i18n static fb_tags mezzanine_tags %}
 
-{% if query.pop %}
-<style>
-h1 {margin:-30px 0 15px 0;}
-</style>
-{% endif %}
+{# {% if query.pop %} #}
+{# {% endif %} #}
 
 {% for file in page.object_list|dictsort:"filetype" %}
 <tr class="{% cycle 'row1' 'row2' %}">
@@ -15,7 +12,13 @@ h1 {margin:-30px 0 15px 0;}
     <td class="fb_icon">
         {% selectable file.filetype query.type %}
         {% if selectable %}
-        <a href="javascript://" onclick="FileSubmit('{{ file.path }}', '{{ file.url }}', '{{ MEDIA_URL }}{% ifequal file.filetype 'Image' %}{% thumbnail file.path 60 60 %}{% else %}{{ file.path }}{% endifequal %}', '{{ file.filetype }}');" class="fb_selectlink" title="{% trans 'Select' %}"></a>
+        <a href="javascript://" onclick="FileSubmit(
+        '{{ file.path }}', 
+        '{{ file.url }}', 
+        '{{ MEDIA_URL }}{% ifequal file.filetype 'Image' %}{% if query.height and query.width %}{% thumbnail file.path query.width query.height %}{% else %}{% thumbnail file.path 300 200 %}{% endif %}{% else %}{{ file.path }}{% endifequal %}', 
+        '{{ file.filetype }}', 
+        '{% url "fb_browse" %}?pop=1&amp;type=Image{% if query.height and query.width %}&amp;width={{ query.width }}&amp;height={{ query.height }}{% endif %}');"
+        class="fb_selectlink" title="{% trans 'Select' %}"></a>
         {% else %}
         <img src="{{ settings_var.URL_FILEBROWSER_MEDIA }}img/filebrowser_icon_select_disabled.gif" width="23" height="17" />
         {% endif %}
@@ -81,7 +84,21 @@ h1 {margin:-30px 0 15px 0;}
     {% ifequal file.filetype 'Folder' %}
     <td><b><a href="{% url "fb_browse" %}{% query_string "" "q,dir,p" %}&amp;dir={{ file.path_relative_directory|urlencode }}">{{ file.filename }}</a></b></td>
     {% else %}
-    <td><b><a href="{{ file.url }}" target="_blank">{{ file.filename }}</a></b></td>
+    <td>
+        {% ifequal query.pop '1' %}
+            <a href="javascript://" onclick="FileSubmit('{{ file.path }}', '{{ file.url }}', '{{ MEDIA_URL }}{% ifequal file.filetype 'Image' %}{% thumbnail file.path 300 200 %}{% else %}{{ file.path }}{% endifequal %}', '{{ file.filetype }}', '{% url "fb_browse" %}?pop=1&amp;type=Image');" title="{% trans 'Select' %}">{{ file.filename }}</a>
+        {% endifequal %}
+        {% if query.pop == '2' or query.pop == '5' %}
+            <a href="javascript:FileBrowserDialogue.fileSubmit('{{ file.url|escapejs }}');" title="{% trans 'Select File' %}">{{ file.filename }}</a>
+        {% endif %}
+        {% ifequal query.pop '3' %}
+            <a href="#" onclick="OpenFile(ProtectPath('{{ file.url|escapejs }}'));return false;" title="{% trans 'Select File' %}">{{ file.filename }}</a>
+        {% endifequal %}
+        {% ifequal query.pop '4' %}
+            <a href="#" rel="{{ file.url|escape }}" title="{% trans 'Select File' %}">{{ file.filename }}</a>
+        {% endifequal %}
+<!-- <b><a href="{{ file.url }}" target="_blank">{{ file.filename }}</a></b>-->
+    </td>
     {% endifequal %}
 
     <!-- RENAME -->

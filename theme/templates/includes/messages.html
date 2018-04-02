@@ -1,0 +1,12 @@
+{% if messages %}
+<div class="container">
+	{% for message in messages %}
+		<div class="sixteen columns">
+			<div class="notification closeable {% if message.tags %}{{ message.tags }}{% endif %} margin-bottom-10 text-center">
+				<p>{{ message | safe }}</p>
+				<a class="close"></a>
+			</div>
+		</div>
+	{% endfor %}
+</div>
+{% endif %}

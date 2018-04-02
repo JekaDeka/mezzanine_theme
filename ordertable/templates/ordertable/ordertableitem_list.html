@@ -1,0 +1,94 @@
+{% extends "profiles/profile_settings.html" %} {% load i18n mezzanine_tags pages_tags staticfiles %}
+{% block meta_title %} Список заявок {% endblock %}
+{% block breadcrumbs_title %}
+<h2>Стол заказов</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
+<li>Список моих заявок</li>
+{% endblock %} {% block main %}
+<div class="twelve columns margin-bottom-25">
+  <h2>Осталось доступных заявок: {{ remain }}</h2> {% if remain > 0 %}
+  <a class="button dark" href="{% url 'ordertableitem-add' %}">Добавить новую заявку</a> {% endif %}
+  <a class="button dark" href="{% url 'ordertableitem-list' %}">Получить больше</a>
+</div>
+<div class="twelve columns margin-bottom-25">
+  {% if ordertableitem_list %}
+  <div class="limiter">
+    <div class="container-table100">
+      <div class="wrap-table100">
+        <div class="table">
+          <div class="row header">
+            <div class="cell">
+              Название
+            </div>
+            <div class="cell">
+              Добавлено
+            </div>
+            <div class="cell">
+              Статус
+            </div>
+            <div class="cell">
+              Исполнитель
+            </div>
+            <div class="cell">
+              Действия
+            </div>
+          </div>
+          {% for ordertableitem in ordertableitem_list %}
+          <div class="row">
+            <div class="cell" data-title="Название">
+              <a href="{% url 'order_detail' ordertableitem.pk %}">{{ ordertableitem.title|title }}</a>
+            </div>
+            <div class="cell" data-title="Добавлено">
+              {{ ordertableitem.created }}
+            </div>
+            <div class="cell" data-title="Статус">
+              {% if ordertableitem.active %} открыта {% else %} закрыта {% endif %}
+            </div>
+            <div class="cell" data-title="Исполнитель">
+              {% if ordertableitem.performer %}
+              <a href="#">{{ ordertableitem.performer }}</a> {% else %} не назначен {% endif %}
+            </div>
+            <div class="cell" data-title="Действия">
+              <a href="{% url 'order_detail' ordertableitem.pk %}" class="button"><i class="fa fa-eye"></i></a>
+              <a href="{% url 'ordertableitem-update' ordertableitem.pk %}" class="button"><i class="fa fa-pencil"></i></a>
+              <a href="{% url 'ordertableitem-delete' ordertableitem.pk %}" class="button"><i class="fa fa-times"></i></a>
+            </div>
+
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <section id="not-found">
+    <p>Заявки пока отсутствуют</p>
+  </section>
+  {% endif %}
+</div>
+
+{% if is_paginated %}
+<div class="pagination-container masonry">
+  <nav class="pagination">
+    <ul>
+      {% for i in page_obj.paginator.page_range %} {% if page_obj.number == i %}
+      <li><a href="#" class="current-page">{{ i }}</a></li>
+      {% else %}
+      <li><a href="?page={{ i }}">{{ i }}</a></li>
+      {% endif %} {% endfor %}
+    </ul>
+  </nav>
+  <nav class="pagination-next-prev full-width">
+    <ul>
+      {% if page_obj.has_previous %}
+      <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
+      {% endif %} {% if page_obj.has_next %}
+      <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endif %} {% endblock main %}
