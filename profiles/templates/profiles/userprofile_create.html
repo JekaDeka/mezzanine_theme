@@ -1,4 +1,4 @@
-{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %} 
+{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
 
 {% block meta_title %}
 Новый профиль
@@ -11,7 +11,7 @@
 <div class="sixteen columns margin-bottom-25">
     <!--    <h3 class="headline">Мой профиль</h3><span class="line"></span>
     <div class="clearfix"></div>-->
-    <h2>Добрый день, {{ request.user }}!</h2> 
+    <h2>Добрый день, {{ request.user }}!</h2>
     <p>
         Администрация сайта <a href="{% url 'true_index' %}">Handmaker.top</a> рада, что Вы присоединились к нашему творческом сообществу. Совсем скоро Вы станете владельцем своего собственного магазина, и у Вас появится возможность вести свой персональный блог.
     </p>
@@ -20,6 +20,7 @@
     </p>
     <form method="post">
         {% csrf_token %}
+        {{ form.errors }}
         {{ form.first_name|as_crispy_field }}
         {{ form.last_name|as_crispy_field }}
         <div class="clearfix"></div>
@@ -32,7 +33,7 @@
             {{ form.image.errors }}
         </div>
         <div class="clearfix"></div>
-        <div class="margin-top-20"> 
+        <div class="margin-top-20">
             {{ form.country|as_crispy_field }}
             {{ form.region|as_crispy_field }}
             {{ form.city|as_crispy_field }}
