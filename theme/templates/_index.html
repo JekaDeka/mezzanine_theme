@@ -10,7 +10,7 @@
 {% block first_time_user %}
 <div class="container fullwidth-element userpanel">
     <div class="two-third columns alpha omega margin-bottom-10">
-    {% if request.user.shop %}
+    {% if not request.user %}
     	<figure>
             <img src="{% static 'images/edit_shop.jpg' %}" alt="Фон магазина" />
             <figcaption>
