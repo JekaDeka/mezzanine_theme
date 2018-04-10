@@ -3,69 +3,13 @@
 
 {% block meta_title %}{% trans "Home" %} {% endblock %}
 
-
 {% block breadcrumbs %}
 {% endblock %}
-
-{% block first_time_user %}
-<div class="container fullwidth-element userpanel">
-    <div class="two-third columns alpha omega margin-bottom-10">
-    {% if request.user.shop %}
-    	<figure>
-            <img src="{% static 'images/edit_shop.jpg' %}" alt="Фон магазина" />
-            <figcaption>
-                <h3>Управление магазином</h3>
-                <ul>
-                    <li>
-                        <a href="{% url 'product-add' %}" class="button color">Добавить новый товар</a>
-                    </li>
-                    <li>
-                        <a href="{% url 'shop-update' request.user.shop.slug %}" class="button color">Настройки магазина</a>
-                    </li>
-                </ul>
-            </figcaption>
-        </figure>
-	{% else %}
-   		<figure>
-            <img src="{% static 'images/open_shop.jpg' %}" alt="Фон магазина" />
-			 <figcaption>
-                <a href="{% url 'shop-add' %}">
-			        <span>Начните продавать уже сейчас</span>
-			        <h3>Создайте собственный магазин</h3>
-			     </a>
-            </figcaption>
-        </figure>
-    {% endif %}
-    </div>
-    <div class="one-third columns omega margin-bottom-10">
-        <figure>
-            <img src="{% static 'images/personal_order.jpg' %}" alt="Фон заказа" />
-            <figcaption>
-            <a href="{% url 'ordertableitem-add' %}">
-                    <span>Хочешь индивидуальности?</span>
-                    <h3>Сделай личный заказ у мастера</h3>
-            </a>
-            </figcaption>
-        </figure>
-    </div>
-    <div class="one-third columns omega margin-bottom-10">
-        <figure>
-            <img src="{% static 'images/write_to_blog.jpg' %}" alt="Фон блога" />
-            <figcaption>
-                <a href="{% url 'blogpost-add' %}">
-                    <span>Открой в себе автора</span>
-                    <h3>Сделай запись в Блог</h3>
-                </a>
-            </figcaption>
-        </figure>
-    </div>
-</div>
-{% endblock first_time_user %}
 
 {% block slider %}
 {% get_slideshow as images %}
 {% if images %}
-<div class="container fullwidth-element home-slider margin-bottom-10">
+<div class="container fullwidth-element home-slider margin-bottom-50">
     <div class="bss-slides">
         {% for image in images %}
         <figure class="caption">
@@ -84,8 +28,9 @@
 {% endblock %}
 
 {% block main_containter %}
+
 {% if categories %}
-<div class="container fullwidth-element userpanel">
+<div class="container fullwidth-element userpanel margin-bottom-50">
 {% for category in categories %}
     <div class="main-page-category columns">
         <a href="{{ category.get_absolute_url }}" class="img-caption">
@@ -100,88 +45,130 @@
     </div>
 {% endfor %}
 </div>
+<div class="clearfix"></div>
 {% endif %}
+<div class="parallax-banner fullwidth-element"  data-background="#000" data-opacity="0.45" data-height="200">
+  <a href="{% url 'signup' %}">
+    <img src="{% static "images/search.jpg" %}" alt="" />
+    <div class="parallax-overlay"></div>
+    <div class="parallax-title">Создай магазин <span>и начни продавать</span></div>
+  </a>
+</div>
+
+<div class="container margin-bottom-25">
+
+  {% if best_products %}
+  <!-- best products -->
+  <div class="one-third column">
+    <h3 class="headline">Лучшие товары</h3>
+    <span class="line margin-bottom-0"></span>
+    <div class="clearfix"></div>
+    <ul class="product-list">
+      {% for product in best_products %}
+      <li><a href="{{ product.get_absolute_url }}">
+        {% if product.images.all.0 %}
+          <img src="{{ MEDIA_URL }}{% thumbnail product.images.all.0 90 90 %}" alt="{{ product.title }}" />
+        {% endif %}
+        <div class="product-list-desc">{{ product.title }}<i>{{ product.price|rub_currency }}</i></div>
+      </a></li>
+      {% endfor %}
+      <li>
+        <div class="clearfix"></div>
+      </li>
+    </ul>
+  </div>
+  {% endif %}
+  {% if user_shops %}
+  <!-- best shops -->
+  <div class="one-third column">
+    <h3 class="headline">Лучшие магазины</h3>
+    <span class="line margin-bottom-0"></span>
+    <div class="clearfix"></div>
+    <ul class="product-list top-rated">
+      {% for shop in user_shops %}
+      <li><a href="{{ shop.get_absolute_url }}">
+        <img src="{{ MEDIA_URL }}{% thumbnail shop.image 90 90 %}" alt="{{ shop.shopname }}" />
+        <div class="product-list-desc with-rating">{{ shop.shopname }}
+          <div class="rating four-stars">
+            <div class="star-rating"></div>
+            <div class="star-bg"></div>
+          </div>
+        </div>
+      </a></li>
+      {% endfor %}
+      <li>
+        <div class="clearfix"></div>
+      </li>
+    </ul>
+  </div>
+  {% endif %}
+
+  <!--Best masters -->
+  <div class="one-third column">
+    <h3 class="headline">Лучшие мастера</h3>
+    <span class="line margin-bottom-0"></span>
+    <div class="clearfix"></div>
+
+
+    <ul class="product-list discount">
+      {% for master in masters %}
+      <li><a href="{{ master.get_absolute_url }}">
+				<img src="{{ MEDIA_URL }}{% thumbnail master.image 90 90 %}" alt="{{ master.get_full_name }}" />
+				<div class="product-list-desc"><i><b>{{ master.get_full_name }}</b></i>{{ master.get_location }}</div>
+			</a></li>
+      {% endfor %}
+      <li>
+        <div class="clearfix"></div>
+      </li>
+    </ul>
+  </div>
+</div>
+<div class="clearfix"></div>
 {% endblock %}
 
 {% block extra_content %}
 <div class="container">
-    <div class="twelve columns">
-    	<div class="widget">
-        <h3 class="headline">Лучшие магазины</h3><span class="line"></span><div class="clearfix"></div>
-    	{% if user_shops %}
-    		{% for shop in user_shops %}
-    		<div class="six columns alpha margin-bottom-20">
-    		<div class="shop-stacked-images">
-    			{% with shop_product_set.all|slice:"4" as product %}
-    			<div class="main pull-left">
-    				<a href="{{ product.0.get_absolute_url }}">
-    					<img src="{{ MEDIA_URL }}{% thumbnail product.0.image 300 160 %}" alt="{{ product.0.title }}"/>
-    				</a>
-    			</div>
-    			<div class="small pull-left">
-    				<a href="{{ product.1.get_absolute_url }}">
-    					<img src="{{ MEDIA_URL }}{% thumbnail product.1.image 120 50 %}" alt="{{ product.1.title }}"/>
-    				</a>
-    			</div>
-    			<div class="small pull-left">
-    				<a href="{{ product.2.get_absolute_url }}">
-    					<img src="{{ MEDIA_URL }}{% thumbnail product.2.image 120 50 %}" alt="{{ product.2.title }}"/>
-    				</a>
-    			</div>
-    			<div class="small pull-left">
-    				<a href="{{ product.3.get_absolute_url }}">
-    					<img src="{{ MEDIA_URL }}{% thumbnail product.3.image 120 50 %}" alt="{{ product.3.title }}"/>
-    				</a>
-    			</div>
-    			{% endwith %}
-    		</div>
-    		<div class="clearfix"></div>
-    		<div class="shop-info">
-    			<a href="{{ shop.get_absolute_url }}">
-	    			<img src="{{ MEDIA_URL }}{% thumbnail shop.image 200 200 %}" alt="{{ shop.shopname }}" class="shop-image pull-left" />
-	    		</a>
-	    		<a href="{{ shop.get_absolute_url }}"><h2>{{ shop.shopname }}</h2></a>
-	    			<span>{{ shop_user_profile.get_location }} </span>
-    		</div>
-    		</div>
-    	{% endfor %}
-    	{% endif %}
-    	</div>
-    </div>
-    <div class="four columns">
-        {% blog_recent_posts 4 as recent_posts %}
-		{% if recent_posts %}
-		<div class="widget margin-top-30">
-			<h3 class="headline">Блог</h3><span class="line"></span><div class="clearfix"></div>
-			<ul class="widget-tabs">
-			{% for recent_post in recent_posts %}
-				<li>
-			    {% spaceless %}
-			    {% if settings.BLOG_USE_FEATURED_IMAGE %}
-			    <div class="widget-thumb">
-						<a href="{{ recent_post.get_absolute_url }}">
-						{% if recent_post.featured_image %}
-							<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 74 74 %}" alt="{{ recent_post.title }}"/>
-						{% endif %}
-						</a>
-				</div>
-				{% endif %}
-				<div class="widget-text">
-				    <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
-				    <span>{{ recent_post.publish_date|date }} </span>
-			    </div>
-				<div class="clearfix"></div>
-			    {% endspaceless %}
-				</li>
-			{% endfor %}
-			</ul>
-		</div>
-		{% endif %}
+  <div class="ten columns">
+    <h3 class="headline">Записи в Блоге</h3><span class="line margin-bottom-3-"></span>
+    <div class="clearfix"></div>
+    {% if blog_posts %}
+      <div id="masonry-wrapper">
+        {% for blog_post in blog_posts %}
+        <div class="five columns masonry-item {% cycle 'alpha' 'omega' %}">
+          <article class="from-the-blog">
+            {% if blog_post.featured_image %}
+            <figure class="from-the-blog-image">
+              <a href="{{ blog_post.get_absolute_url }}"><img src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 350 250 %}" alt="" /></a>
+              <div class="hover-icon"></div>
+            </figure>
+            {% endif %}
+            <section class="from-the-blog-content {% if not blog_post.featured_image %}no-img{% endif %}">
+              <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title }}</h5></a>
+              <i>{{ blog_post.user }}, {{ blog_post.publish_date|date:"d M Y" }}</i>
+              <span>
+                {% if blog_post.preview_content %}
+      						{{ blog_post.preview_content|safe|truncatewords_html:55 }}
+      					{% else %}
+      						{{ blog_post.description_from_content|safe }}
+      					{% endif %}
+              </span>
+              <a href="{{ blog_post.get_absolute_url }}" class="button gray">Подробнее</a>
+            </section>
+          </article>
+        </div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-	{% blog_categories as categories %}
+  </div>
+  <div class="six columns">
+    <h3 class="headline">Категории</h3><span class="line margin-bottom-3-"></span>
+    <div class="clearfix"></div>
+
+
+    {% blog_categories as categories %}
 		{% if categories %}
-		<div class="widget margin-top-10">
-			<h3 class="headline">{% trans "Categories" %}</h3><span class="line"></span><div class="clearfix"></div>
+		<div class="margin-bottom-25">
 			<nav class="categories">
 				<ul>
 				{% for category in categories %}
@@ -192,70 +179,108 @@
 		</div>
 		{% endif %}
 
-        {% keywords_for blog.blogpost as tags %}
+    <!-- Tabs Navigation -->
+    <ul class="tabs-nav">
+      <li class="active"><a href="#tab1">Недавние</a></li>
+      <li><a href="#tab2">Популярное</a></li>
+      <li><a href="#tab3">Комментарии</a></li>
+    </ul>
+
+    <!-- Tabs Content -->
+    <div class="tabs-container">
+      <div class="tab-content" id="tab1" style="display: block;">
+        {% if recent_posts %}
+          <div class="widget margin-top-0">
+            <ul class="widget-tabs">
+              {% for recent_post in recent_posts %}
+              <li>
+                {% spaceless %}
+                {% if recent_post.featured_image %}
+                <div class="widget-thumb">
+                  <a href="{{ recent_post.get_absolute_url }}">
+                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
+                	</a>
+                </div>
+                {% endif %}
+                <div class="widget-text">
+                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
+                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
+                </div>
+                <div class="clearfix"></div>
+                {% endspaceless %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+      </div>
+      <div class="tab-content" id="tab2" style="display: none;">
+        {% if popular_posts %}
+          <div class="widget margin-top-0">
+            <ul class="widget-tabs">
+              {% for recent_post in popular_posts %}
+              <li>
+                {% spaceless %}
+                {% if recent_post.featured_image %}
+                <div class="widget-thumb">
+                  <a href="{{ recent_post.get_absolute_url }}">
+                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
+                	</a>
+                </div>
+                {% endif %}
+                <div class="widget-text">
+                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
+                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
+                </div>
+                <div class="clearfix"></div>
+                {% endspaceless %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+      </div>
+      <div class="tab-content" id="tab3" style="display: none;">
+        {% if comments %}
+          <div class="widget margin-top-0">
+            <ul class="widget-tabs">
+              {% for recent_post in comments %}
+              <li>
+                {% spaceless %}
+                {% if recent_post.featured_image %}
+                <div class="widget-thumb">
+                  <a href="{{ recent_post.get_absolute_url }}">
+                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
+                	</a>
+                </div>
+                {% endif %}
+                <div class="widget-text">
+                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
+                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
+                </div>
+                <div class="clearfix"></div>
+                {% endspaceless %}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+
+    <br>
+  </div>
+  <div class="six columns">
+    {% keywords_for blog.blogpost as tags %}
 		{% if tags %}
-			<div class="widget margin-top-10">
 				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>
 				<nav class="tags">
 				{% for tag in tags %}
 				    <a href="{% url "blog_post_list_tag" tag.slug %}" class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
 				{% endfor %}
 				</nav>
-			</div>
 		{% endif %}
-    </div>
+  </div>
 </div>
-
-{% if featured_products %}
-<div class="container">
-	<div class="sixteen columns">
-	    <div class="widget">
-	        <h2 class="headline">Лучшие новые товары</h2>
-	        <span class="line"></span>
-	        <div class="clearfix"></div>
-	    </div>
-	</div>
-    <div class="sixteen columns products margin-bottom-20">
-        {% for product in featured_products %}
-        <div class="three shop columns custom_column">
-            <figure class="product">
-                <div class="badges">
-                    {% if product.pre_order %}
-                    	<div class="product-example">Для примера</div>
-                    {% endif %}
-                    {% if product.on_custom_sale %}
-                    	<div class="product-discnt">СКИДКА</div>
-                    {% endif %}
-                </div>
-                {% with product.images.all as images %}
-                <div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
-                <a href="{{ product.get_absolute_url }}">
-                  {% if images %}
-                    <img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
-                      {% if product.images.count != 1 %}
-                      <div class="cover">
-                          <img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
-                      </div>
-                      {% endif %}
-                  {% else %}
-                    <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
-                  {% endif %}
-                </a>
-                <a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
-                </div>
-                {% endwith %}
-                    <section>
-                        <a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
-                        <a href="{{ product_shop.get_absolute_url }}" class="shopname">{{ product_shop.shopname }}</a>
-                        {% if product.on_custom_sale %}
-                        <span class="product-price-discount">{{ product.unit_price }}<i>{{ product.price }}</i></span> {% else %}
-                        <span class="product-price">{{ product.price }}</span> {% endif %}
-                    </section>
-            </figure>
-        </div>
-        {% endfor %}
-        <div class="clearfix"></div>
-    </div>
-</div>
-{% endif %}
+<div class="clearfix"></div>
 {% endblock %}

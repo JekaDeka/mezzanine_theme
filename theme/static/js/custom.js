@@ -134,11 +134,11 @@
     //     entrySizeOffset: 0,
     //     allEntryAtOnce: "off"
     // });
-    // $(".parallax-banner").pureparallax({
-    //     overlayBackgroundColor: '#000',
-    //     overlayOpacity: '0.45',
-    //     timeout: 200
-    // });
+    $(".parallax-banner").pureparallax({
+        overlayBackgroundColor: '#000',
+        overlayOpacity: '0.45',
+        timeout: 0
+    });
     // $(".parallax-titlebar").pureparallax({
     //     timeout: 0
     // });

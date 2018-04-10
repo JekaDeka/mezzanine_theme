@@ -5832,8 +5832,9 @@ ul.product-list li {
     display: inline-block;
     background-color: #ffecb7;
     padding: 3px 5px;
-    margin: 0 0 0 4px;
-    line-height: 18px;
+    /* margin: 0 0 0 4px; */
+    /* line-height: 18px; */
+    font-size: 17px;
 }
 
 #footer {

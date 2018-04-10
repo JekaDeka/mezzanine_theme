@@ -26,7 +26,7 @@ from cartridge.shop.models import Category, Product, ProductVariation
 from cartridge.shop.utils import recalculate_cart, sign
 from cartridge.shop.forms import AddProductForm
 
-# from profiles.models import UserProfile
+from profiles.models import UserProfile
 # from ordertable.models import OrderTableItem, OrderTableItemCategory, OrderTableItemRequest
 from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage
 
@@ -82,12 +82,24 @@ def true_index(request):
     # created__range=[startdate,
     # enddate]).filter(status=2).order_by('-created')[:7]
 
-    featured_products = ShopProduct.objects.filter(
-        shop__on_vacation=False).order_by('-date_added').prefetch_related('images')[:10]
-    user_shops = UserShop.objects.filter(on_vacation=False)
+    best_products = ShopProduct.objects.filter(
+        shop__on_vacation=False).order_by('-date_added').prefetch_related('images')[:4]
+    user_shops = UserShop.objects.filter(on_vacation=False)[:4]
+    masters = UserProfile.objects.filter(status=1).select_related('country', 'city')[:4] ### мастера
+
+    blog_posts = BlogPost.objects.published(for_user=request.user).select_related('user')[:4]
+    recent_posts = blog_posts[:3]
+    popular_posts = recent_posts
+    comments = recent_posts
+
     context = {
-        'featured_products': featured_products,
+        'best_products': best_products,
         'user_shops': user_shops,
+        'masters': masters,
+        'blog_posts': blog_posts,
+        'recent_posts': recent_posts,
+        'popular_posts': popular_posts,
+        'comments': comments,
         'categories': categories,
     }
     return render(request, '_index.html', context)
