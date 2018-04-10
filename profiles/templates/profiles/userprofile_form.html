@@ -15,7 +15,7 @@
         {% csrf_token %}
         {{ form.first_name|as_crispy_field }}
         {{ form.last_name|as_crispy_field }}
-        {{ form.status|as_crispy_field }}
+        {# {{ form.status|as_crispy_field }} #}
         <div class="clearfix"></div>
         <div class="shop-images custom-field margin-top-15">
             <label for="id_{{form.image.name}}" class="form-control-label  requiredField">
