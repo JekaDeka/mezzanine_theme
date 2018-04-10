@@ -85,7 +85,7 @@ def true_index(request):
     best_products = ShopProduct.objects.filter(
         shop__on_vacation=False).order_by('-date_added').prefetch_related('images')[:4]
     user_shops = UserShop.objects.filter(on_vacation=False)[:4]
-    masters = UserProfile.objects.filter(status=1).select_related('country', 'city')[:4] ### мастера
+    masters = UserProfile.objects.select_related('country', 'city')[:4] ### мастера
 
     blog_posts = BlogPost.objects.published(for_user=request.user).select_related('user')[:4]
     recent_posts = blog_posts[:3]
