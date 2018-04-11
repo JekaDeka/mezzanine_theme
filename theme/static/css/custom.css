@@ -1510,11 +1510,11 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
 }
 
 @media only screen and (max-width: 767px) {
-  /* .custom_column {
+  .custom_column {
     margin-left: 3px !important;
     margin-right: 3px !important;
     width: 144px !important
-  } */
+  }
   /* .object-list.columns.masonry-item {
     width: 200px;
     margin-left: 5px;
@@ -1606,11 +1606,11 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
   /* .container.fullwidth-element.userpanel {
     width: 420px
   } */
-  /* .custom_column {
+  .custom_column {
     margin-left: 5px !important;
     margin-right: 5px !important;
     width: 200px !important
-  } */
+  }
   /* .top-search input { */
     /* width: 195px */
   /* } */
