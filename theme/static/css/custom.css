@@ -1392,7 +1392,7 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
 }
 
 .main-page-category.columns {
-  width: 250px;
+  width: 232px;
   /*height: 250px;*/
   margin-right: 0px;
   margin-bottom: 10px;
@@ -1428,7 +1428,7 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
     margin: 0px 7px;
   }
   .main-page-category.columns {
-    width: 196px;
+    width: 184px;
     /*height: 196px;*/
   }
   /* .object-list.columns.masonry-item {
@@ -1496,6 +1496,9 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
   }
   .main-page-category.columns:nth-child(3n+1) {
     margin-left: 0px;
+  }
+  .main-page-category.columns:last-child {
+    display: none;
   }
   .main-page-category.columns {
     width: 246px;

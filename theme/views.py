@@ -87,10 +87,10 @@ def true_index(request):
     user_shops = UserShop.objects.filter(on_vacation=False)[:4]
     masters = UserProfile.objects.select_related('country', 'city')[:4] ### мастера
 
-    blog_posts = BlogPost.objects.published(for_user=request.user).select_related('user')[:4]
-    recent_posts = blog_posts[:3]
-    popular_posts = recent_posts
-    comments = recent_posts
+    blog_posts = BlogPost.objects.published(for_user=request.user).select_related('user')[:8]
+    recent_posts = blog_posts[:4]
+    popular_posts = blog_posts[4:]
+    comments = None
 
     context = {
         'best_products': best_products,
