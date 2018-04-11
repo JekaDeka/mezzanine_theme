@@ -2,12 +2,12 @@
 
 <!-- LOADING -->
 {% load i18n static fb_tags fb_pagination %}
-
 <!-- STYLESHEETS -->
 {% block stylesheets %}
-    {{ block.super }}
-    <link rel="stylesheet" type="text/css" href="{% static "grappelli/css/changelist.css" %}" />
-    <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/filebrowser.css" />
+<meta http-equiv="Content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.10/css/all.css" integrity="sha384-+d0P83n9kaQMCwj8F4RJB66tzIwOKmrdb46+porD/OvrJ+37WqIM7UoBtwHO6Nlg" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/theme_filebrowser.css" />
 {% endblock %}
 
 <!-- JAVASCRIPTS -->
@@ -31,16 +31,8 @@
 {% ifequal query.pop '5' %} <!-- TinyMCE 4 -->
 <script language="javascript" type="text/javascript" src="{{ settings_var.URL_FILEBROWSER_MEDIA }}js/FB_TinyMCE4.js"></script>
 {% endifequal %}
-
 {{ media }}
-
 <script type="text/javascript" src="{% static "grappelli/js/admin/Changelist.js" %}"></script>
-
-{% if not actions_on_top and not actions_on_bottom %}
-<style>
-    #changelist table thead th:first-child { width: inherit; }
-</style>
-{% endif %}
 {% endblock %}
 
 {% block rtl_styles %}
@@ -48,43 +40,61 @@
 <link rel="stylesheet" type="text/css" href="{{ settings_var.URL_FILEBROWSER_MEDIA }}css/rtl.css" />
 {% endblock %}
 
-<!-- COLTYPE/BODYCLASS -->
-{% block coltype %}app-content box-shadow-z0{% endblock %}
-{% block bodyclass %}change-list filebrowser{% if query.pop %} popup{% endif %}{% endblock %}
+{% block bodyclass %}{% if query.pop %} popup{% endif %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block breadcrumbs %}{% endblock %}
 
-{% block content_title %}<h1>{% include "filebrowser/include/breadcrumbs.html" %}</h1>{% endblock %}
-{% block breadcrumbs %}<div class="breadcrumbs"></div>{% endblock %}
-{% block header %}{% endblock %}
-
-<!-- CONTENT -->
 {% block content %}
-<div id="content-main">
-    {% block object-tools %}
-    <ul class="object-tools">
-        <li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}">{% trans "New Folder" %}</a></li>
-        <li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}" class="focus">{% trans "Upload" %}</a></li>
-    </ul>
-    {% endblock %}
-    <div class="module filtered" id="changelist">
-        <div class="changelist-content">
-            <div class="result-list-container">
-                {% if results_var.results_current %}
-                <div class="result-list">
-                    <table cellspacing="0">
-                        {% include "filebrowser/include/tableheader.html" %}
-                        <tbody>
-                        {% include "filebrowser/include/filelisting.html" %}
-                        </tbody>
-                    </table>
+    <div id="app_wrapper">
+        <section id="content_outer_wrapper" class="file-manager">
+            <div id="content_wrapper">
+                <div id="header_wrapper">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <header id="header">
+                                    <h1>handmaker.top</h1>
+                                    <ol class="breadcrumb">
+                                      {% if breadcrumbs or breadcrumbs_title %}
+                                          <li><a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}">{% trans 'Media Library' %}</a></li>
+                                      {% else %}
+                                          <li class="active"> {% trans 'Media Library' %} </li>
+                                      {% endif %}
+                                      {% for item in breadcrumbs %}
+                                          {% if not forloop.last %}
+                                              <li><a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}&amp;dir={{ item.1 }}">{{ item.0 }}</a></li>
+                                          {% else %}
+                                              {% if breadcrumbs_title %}
+                                                  <li><a href="{% url "fb_browse" %}{% query_string "" "dir,filename,p" %}&amp;dir={{ item.1 }}">{{ item.0 }}</a></li>
+                                              {% else %}
+                                                  <li class="active">{{ item.0 }}</li>
+                                              {% endif %}
+                                          {% endif %}
+                                      {% endfor %}
+                                      {% if breadcrumbs_title %}<li class="active"> {{ breadcrumbs_title }} </li>{% endif %}
+                                      </ol>
+                                </header>
+                            </div>
+                        </div>
+                    </div>
+                  <ul class="card-actions icons lg alt-actions right-top">
+                    <li><a href="{% url "fb_mkdir" %}{% query_string '' 'p' %}"><i class="fas fa-folder-open"></i></a></li>
+                    <li><a href="{% url "fb_upload" %}{% query_string '' 'p' %}"><i class="fas fa-upload"></i></a></li>
+                  </ul>
                 </div>
-                {% endif %}
-                {% pagination %}
+                <div id="content" class="container-fluid">
+                    <div class="content-body">
+                        <section class="m-t-30">
+                          {% if results_var.results_current %}
+                          <ul class="folders">
+                            {% include "filebrowser/include/filelisting.html" %}
+                          </ul>
+                          {% endif %}
+                          {% pagination %}
+                        </section>
+                    </div>
+                </div>
             </div>
-        </div>
-        <div id="changelist-filter">
-            {% include "filebrowser/include/toolbar.html" %}
-            
-        </div>
+        </section>
     </div>
-</div>
 {% endblock %}
