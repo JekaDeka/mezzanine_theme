@@ -85,7 +85,7 @@
     {% endspaceless %}
 
     {% block breadcrumbs %}
-    <div class="titlebar">
+    <div class="titlebar {% block breadcrumbs_class %}{% endblock %}">
       <div class="container">
         <div class="sixteen columns">
           {% block breadcrumbs_title %}
@@ -115,15 +115,15 @@
       {% block rightsidebar %}{% endblock %}
     </div>
     {% endblock %}
-    {% endspaceless %}
+
 
     {% block extra_content %}
     {% endblock %}
-
+    {% endspaceless %}
     {% endautoescape %}
 
     {% block footer %}
-    <div id="footer" class="margin-top-30">
+    <div id="footer">
       <div class="container">
         <div class="four columns">
           <div class="footer-widget widget_text">
@@ -169,6 +169,7 @@
           <a href="{% url 'true_index' %}">handmaker.top</a></div>
       </div>
     </div>
+    <div id="topper" style="display: block;"><a href="#"></a></div>
   </div>
   {% endblock %} {% compress js %}
   <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>

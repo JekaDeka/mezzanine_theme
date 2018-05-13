@@ -162,7 +162,9 @@
 						<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
 					{% endif %}
 				</a>
-				<a href="{% url 'get_cart' %}" product-id="{{ product.id }}" class="product-button"><i class="fa fa-shopping-cart"></i></i>В корзину</a>
+				<a href="#" product-id="{{ product.id }}" class="product-button">
+					<i class="fa fa-shopping-cart"></i></i>В корзину
+				</a>
 				</div>
 				{% endwith %}
 					<section>

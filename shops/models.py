@@ -30,7 +30,7 @@ class UserShop(models.Model):
         verbose_name_plural = _("Все магазины")
 
     user = models.OneToOneField(
-        "auth.User", related_name="shop", verbose_name="Владелец")
+        "auth.User", related_name="shop", verbose_name="Владелец", on_delete=models.CASCADE)
     image = FileField(upload_to=upload_to("shops.UserShop.image", "shops"),
                       verbose_name=_("Обложка магазина"), format="Image", max_length=255, blank=False, default="",
                       help_text="Загрузите логотип магазина.")
@@ -49,48 +49,15 @@ class UserShop(models.Model):
                         Какие техники, материалы вы используете для своих изделий, каких принципов придерживаетесь при создании своего бренда. \
                         Ваш рассказ должен быть интересным, лаконичным, информативным и убедительным. Можете упомянуть любимую цитату или вдохновляющую идею. \
                         Не стоит злоупотреблять смайликами и прочими символами.")
-    express_point = models.BooleanField(
-        default=False, verbose_name=("Получение в вашем пункте выдачи"))
-    express_point_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                              validators=[MinValueValidator(0)])
-    express_city = models.BooleanField(
-        default=False, verbose_name=("Курьером по г. Москва"))
-    express_city_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                             validators=[MinValueValidator(0)])
-    express_country = models.BooleanField(default=False, verbose_name=(
-        "Курьером по стране (Российская Федерация)"))
-    express_country_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                                help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                                validators=[MinValueValidator(0)])
-    express_world = models.BooleanField(
-        default=False, verbose_name=("Курьером по миру"))
-    express_world_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                              help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                              validators=[MinValueValidator(0)])
-    express_mail = models.BooleanField(
-        default=False, verbose_name=("Почта России"))
-    express_mail_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                             help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                             validators=[MinValueValidator(0)])
-    express_personal = models.BooleanField(
-        default=False, verbose_name=("Личная встреча"))
-    express_personal_price = models.DecimalField(_("Цена доставки"), max_digits=8, decimal_places=0, default='', blank=True, null=True,
-                                                 help_text="Оставляйте поле пустым, если стоимость будет рассчитана по запросу.",
-                                                 validators=[MinValueValidator(0)])
 
-    express_other = RichTextField(default="", blank=True,
+
+    delivery_options = models.ManyToManyField('UserShopDelivery', through='UserShopDeliveryOption')
+    delivery_other = RichTextField(default="", blank=True,
                                   verbose_name=(
                                       "Дополнительная информация о доставке"),
                                   help_text="Адреса, по которым покупатель сможет забрать товар самостоятельно. Любые другие нюансы и условия по доставке.")
 
-    payment_personal = models.BooleanField(
-        default=False, verbose_name=("Наличными при получении"))
-    payment_bank_transfer = models.BooleanField(
-        default=False, verbose_name=("Банковский перевод"))
-    payment_card_transfer = models.BooleanField(
-        default=False, verbose_name=("Банковская карта"))
+    payment_options = models.ManyToManyField('UserShopPayment', verbose_name=_("Способы оплаты"), help_text="")
 
     payment_other = RichTextField(default="", blank=True,
                                   verbose_name=(
@@ -99,7 +66,7 @@ class UserShop(models.Model):
 
     rules = RichTextField(default="", blank=True,
                           verbose_name=(
-                              "Дополнительная информация об оплате"),
+                              "Правила возврата и обмена"),
                           help_text="Обозначьте условия возврата товаров. В течение какого времени после получения товара покупатель может обратиться? \
                           Если вы не принимаете возвраты или обмены, чётко укажите на это, чтобы избежать споров в случае желания покупателя отказаться от покупки.")
 
@@ -149,7 +116,7 @@ class UserShop(models.Model):
         super(UserShop, self).save(*args, **kwargs)
 
     def get_products_count(self):
-        return ShopProduct.objects.annotate(product_count=models.Count("id")).filter(shop=self.id)
+        return ShopProduct.objects.filter(shop=self.id).count()
 
     def get_last_product(self):
         return ShopProduct.objects.filter(shop=self.id).last()
@@ -166,15 +133,36 @@ class UserShop(models.Model):
         return str(self.shopname)
 
 
-class UserShopDeliveryOption(models.Model):
-    shop = models.ForeignKey(
-        UserShop, related_name="deliveryoptions", verbose_name=_("Магазин"))
-    active = models.BooleanField(default=False)
-    label = models.CharField(_("Вид доставки"), max_length=255, null=False)
-    price = models.PositiveIntegerField(_("Цена"), null=True)
+class UserShopPayment(models.Model):
+    class Meta:
+        verbose_name = "Способ оплаты"
+        verbose_name_plural = _("Способы оплаты")
+    label = models.CharField(_("Способ доставки"), max_length=255, null=False)
 
     def __str__(self):              # __unicode__ on Python 2
         return self.label
+
+class UserShopDelivery(models.Model):
+    class Meta:
+        verbose_name = "Способ доставки"
+        verbose_name_plural = _("Способы доставки")
+    label = models.CharField(_("Способ доставки"), max_length=255, null=False)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return self.label
+
+class UserShopDeliveryOption(models.Model):
+    class Meta:
+        verbose_name = "Способ доставки магазина"
+        verbose_name_plural = _("Способы доставки магазина")
+        # auto_created = False
+
+    shop = models.ForeignKey(UserShop, on_delete=models.CASCADE)
+    delivery = models.ForeignKey(UserShopDelivery, on_delete=models.CASCADE)
+    price = models.PositiveIntegerField(_("Цена"), default=0)
+
+    def __str__(self):              # __unicode__ on Python 2
+        return "%s, %s" % (self.shop, self.delivery)
 
 
 class ShopProduct(models.Model):
@@ -197,12 +185,12 @@ class ShopProduct(models.Model):
     material = models.CharField(_("Материал"), max_length=255, blank=True, default="",
                                 help_text="В точности как на бирке")
     description = RichTextField(
-        default="", verbose_name=("Подробное описание"),
+        default="", verbose_name=("Описание"),
         help_text="Как можно более подробно опишите товар.")
     condition = models.CharField(
         _("Состояние"),
         choices=settings.PRODUCT_STATUS_TYPE_CHOICES,
-        max_length=255,
+        max_length=15,
         blank=False,
         default=settings.PRODUCT_STATUS_TYPE_CHOICES[0][0], help_text="Готовая работа - работа уже ждет покупателя. Под заказ - Вы можете выполнить точно такую же работу, но потребуется некоторое время. Для примера - повторить работу точь-в-точь невозможно.")
 
@@ -342,7 +330,7 @@ class Order(models.Model):
 
     class Meta:
         verbose_name = "Заказ"
-        verbose_name_plural = _("Все заказы")
+        verbose_name_plural = _("Заказы")
         ordering = ("-id",)
 
     def __str__(self):

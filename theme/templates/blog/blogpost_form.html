@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "profiles/profile_settings.html" %}
 {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
 {% block meta_title %}
 {% if object %}
@@ -7,42 +7,102 @@
     Новая запись
 {% endif %}
 {% endblock %}
+
 {% block breadcrumbs_title %}
 <h2>Блог</h2>
 {% endblock breadcrumbs_title %}
+
 {% block breadcrumb_element %}
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
 <li><a href="{% url 'blogpost-list' %}">Список моих записей</a></li>
-<li>{% if object %}{{ object }}{% else %}Новая запись в блог{% endif %}</li>
+<li>{% if object %}{{ object }}{% else %}Новая запись{% endif %}</li>
 {% endblock %}
 
 
-{% block main %}
-<div class="sixteen columns">
-  <form method="post">
-    {% csrf_token %}
-    {{ form|crispy }}
-    <div class="action-bar">
-        <a href="{% url 'blogpost-list' %}" class="button dark">Назад</a>
-        {% if object %}
-            <a href="{% url 'blogpost-delete' object.pk %} " class="button dark">Удалить</a>
-        {% endif %}
-        <input type="submit" class="button" value="Сохранить"/>
+{% block extra_content %}
+<form method="post" class="input-no-background">
+  {% csrf_token %}
+  <div class="flat-background">
+    <div class="container">
+      <div class="sixteen columns">
+        <div class="formset-images">
+          <div class="header">
+            <h1>{% if object %}{{ object }}{% else %}Новая запись{% endif %} <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению</a></h1>
+          </div>
+          <p> Фотографии — это самая важная часть в вашем будущем магазине. Покупатели не смогут потрогать, примерить или рассмотреть поближе ваши товары. Всё, что у них есть, — это изображения вашей вещи. Помните об этом, когда отбираете фотографии для магазина. </p>
+          <div class="">
+            {{ form.featured_image }}
+          </div>
+          <div class="clearfix"></div>
+          <p>
+            Размер фотографии не должен быть меньше 600 пикселей по меньшей стороне и 1500 по большей.
+            <br>
+            Рекомендованные пропорции — 3:2.
+            <br>
+            Фотографии должны быть в формате jpeg или jpg со степенью сжатия изображения 75–80
+            <br>
+            <a href="#">Посмотреть требования к фотографиям</a>
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
+  <div class="container margin-top-50 margin-bottom-50">
+    <div class="sixteen columns">
+        <div class="ten columns alpha margin-top-15 margin-bottom-15">
+            {{ form.title|as_crispy_field }}
+        </div>
+        <div class="six columns omega margin-top-15 margin-bottom-15">
+            {{ form.allow_comments|as_crispy_field }}
+        </div>
+
+        <div class="sixteen columns alpha margin-top-15 margin-bottom-15">
+            {{ form.preview_content|as_crispy_field }}
+        </div>
+
+        <div class="sixteen columns alpha margin-top-15 margin-bottom-15">
+            {{ form.content|as_crispy_field }}
+        </div>
+        <div class="eight columns alpha margin-top-15 margin-bottom-15">
+            {# <div id="div_id_categories" class="form-group"> #}
+              {# {% for checkbox in form.categories %} #}
+                  {# <label class="label-default control control--checkbox"> #}
+                  {# {{ checkbox.tag }} {{ checkbox.choice_label }} #}
+                  {# <div class="control__indicator"></div> #}
+                  {# </label> #}
+              {# {% endfor %} #}
+            {# </div> #}
+            {{ form.categories|as_crispy_field }}
+        </div>
+        <div class="eight columns omega margin-top-15 margin-bottom-15">
+            {{ form.keywords|as_crispy_field }}
+        </div>
+    </div>
+    <div class="sixteen columns">
+      <input type="submit" class="button pull-right" value="{% if object %}Сохранить запись{% else %}Добавить запись{% endif %}"/>
+    </div>
+  </div>
 </form>
-</div>
-{% endblock main %}
-{% block extra_js %} {{ block.super }}
-<script type="text/javascript">
-  window.__csrf_token = '{{ csrf_token }}';
-  window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
-  window.__filebrowser_url = '{% url "fb_browse" %}';
-</script>
-<script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
-<script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
-<script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
-<!--<script type="text/javascript" src="{% static "filebrowser/js/FB_TinyMCE.js" %}"></script>-->
+
+
+
+{# <div class="sixteen columns"> #}
+  {# <form method="post"> #}
+    {# {% csrf_token %} #}
+    {# {{ form|crispy }} #}
+    {# <div class="action-bar"> #}
+        {# <a href="{% url 'blogpost-list' %}" class="button dark">Назад</a> #}
+        {# {% if object %} #}
+            {# <a href="{% url 'blogpost-delete' object.pk %} " class="button dark">Удалить</a> #}
+        {# {% endif %} #}
+        {# <input type="submit" class="button" value="Сохранить"/> #}
+    {# </div> #}
+{# </form> #}
+{# </div> #}
+{% endblock %}
+{% block extra_js %}
+{{ block.super }}
 <script type="text/javascript" src="{% static "admin/js/mezz/keywords_field.js" %}"></script>
 <script type="text/javascript" src="{% static "mezzanine/tinymce/tinymce.min.js" %}"></script>
 <script type="text/javascript" src="{% static "mezzanine/js/tinymce_setup.js" %}"></script>
-{% endblock extra_js %}
+{% endblock %}

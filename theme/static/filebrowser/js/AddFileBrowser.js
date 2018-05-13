@@ -30,6 +30,11 @@ var FileBrowser = {
     clear: function(id) {
         jQuery('#help_'+id+', #clear_'+id).hide();
         jQuery('#'+id).val('');
+        jQuery('#background_'+id).text('+');
+        jQuery('#background_'+id).css('background-image', 'url()');
+        jQuery('#background_'+id).css('border', '1px dashed #a4a4a4');
+        var checkbox_id = id.replace('file', 'DELETE');
+        jQuery('#' + checkbox_id).prop('checked', true);
     }
 };
 

@@ -47,7 +47,8 @@ jQuery(function($) {
             return true;
         }
         var button = $(this);
-        var fields = $.makeArray($('.keywords-field').prev('input[type=text]'));
+        // var fields = $.makeArray($('.keywords-field').prev('input[type=text]'));
+        var fields = $.makeArray($('#id_keywords_1'));
         var submitKeywords = function() {
             var field = fields.shift();
             var keywords = {text_keywords: field.value};

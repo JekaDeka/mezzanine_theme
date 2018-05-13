@@ -3035,6 +3035,13 @@ a.button.color:hover {
     padding: 25px 0;
 }
 
+.titlebar.profile {
+  background-color: #fff;
+  border-top: 2px solid #e9e9e9;
+  border-bottom: 2px solid #e9e9e9;
+  margin: 0;
+}
+
 .titlebar h2 {
     font-size: 24px;
     font-weight: 700;
@@ -3141,7 +3148,7 @@ a.button.color:hover {
     right: 0;
 }
 
-#backtotop {
+#topper {
     position: fixed;
     right: 0;
     display: none;
@@ -3149,7 +3156,7 @@ a.button.color:hover {
     margin: 0 20px 0 0;
 }
 
-#backtotop a {
+#topper a {
     text-decoration: none;
     border: 0 none;
     display: block;
@@ -3164,7 +3171,7 @@ a.button.color:hover {
     transition: all 0.2s ease-in-out;
 }
 
-#backtotop a:after {
+#topper a:after {
     content: "";
     font-family: "FontAwesome";
     position: relative;
@@ -3173,7 +3180,7 @@ a.button.color:hover {
     left: 15px;
 }
 
-#backtotop a:hover {
+#topper a:hover {
     background-color: #808080;
 }
 
@@ -3850,7 +3857,7 @@ blockquote {
 
 .content-box {
     padding: 20px 20px;
-    margin: 0 0 20px 0;
+    /* margin: 0 0 20px 0; */
     text-align: center;
     cursor: pointer;
 }
@@ -3866,11 +3873,12 @@ blockquote {
     transition: all 0.2s ease-in-out;
 }
 
+.content-box ul li,
 .content-box p {
-    margin: 0;
+    margin: 5px;
     color: #fff;
 }
-
+.content-box h2,
 .content-box h3 {
     line-height: 26px;
     padding-bottom: 2px;
@@ -3905,7 +3913,7 @@ blockquote {
 .box-icon-wrap {
     text-align: center;
     margin: 0 auto;
-    padding: 15px 0 20px 0;
+    /* padding: 15px 0 20px 0; */
     max-height: 120px;
 }
 

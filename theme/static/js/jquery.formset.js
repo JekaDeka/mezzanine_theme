@@ -165,7 +165,7 @@
             if (hasChildElements(row)) {
                 row.addClass(options.formCssClass);
                 if (row.is(':visible')) {
-                    insertDeleteLink(row);
+                    // insertDeleteLink(row);
                     applyExtraClasses(row, i);
                 }
             }
@@ -198,7 +198,7 @@
                         }
                     }
                 });
-                insertDeleteLink(template);
+                // insertDeleteLink(template);
             } else {
                 // Otherwise, use the last form in the formset; this works much better if you've got
                 // extra (>= 1) forms (thnaks to justhamade for pointing this out):

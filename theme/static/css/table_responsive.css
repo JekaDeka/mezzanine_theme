@@ -23,7 +23,7 @@
   margin: 0;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 480px) {
   .table {
     display: block;
   }
@@ -34,7 +34,7 @@
   background: #fff;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 480px) {
   .row {
     display: block;
   }
@@ -62,7 +62,7 @@
   display: table-cell;
 }
 
-@media screen and (max-width: 767px) {
+@media screen and (max-width: 480px) {
   .cell {
     display: block;
   }
@@ -113,7 +113,7 @@
   background-color: #f8f8f8;
 }
 
-@media (max-width: 767px) {
+@media (max-width: 480px) {
   .row {
     border-bottom: 1px solid #f2f2f2;
     padding-bottom: 15px;

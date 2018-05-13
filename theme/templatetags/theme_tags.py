@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from future.builtins import str
 from datetime import datetime
 from decimal import Decimal
-
+from django import forms
 from collections import defaultdict
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.storage import default_storage
@@ -30,6 +30,7 @@ from django.db.models import Count, Q
 from django.contrib.auth.models import User
 from mezzanine.blog.models import BlogPost, BlogCategory
 from theme.models import Slider, SliderItem, RulesPage
+from shops.forms import ShopForm
 from cartridge.shop.models import Category, Product, ProductImage
 from mezzanine.pages.models import Page
 from mezzanine.generic.models import Keyword
@@ -796,10 +797,30 @@ def get_shop_data(obj, shop_id=None):
 @register.assignment_tag
 def get_shop_items(obj, shop_id=None):
     return obj.get_shop_items(int(shop_id))
-# @register.filter
-# def get_item_quantity(obj, arg):
-#     return obj.total_quantity_for_shop(arg)
-#
-# @register.filter
-# def get_item_total_price(obj, arg):
-#     return obj.total_price_for_shop(arg)
+
+
+@register.simple_tag
+def get_verbose_field_name(instance, field_name):
+    """
+    Returns verbose_name for a field.
+    """
+    return instance._meta.get_field(field_name).verbose_name.title()
+
+@register.filter
+@stringfilter
+def add_spaces(value):
+    values = value.split(',')
+    return ", ".join(values)
+
+
+@register.filter
+def user_select_field(form, option):
+    """
+    returns UserShop delivery price field
+    """
+    key = 'delivery_option_%s_price' % str(option)
+    if key not in form.fields.keys():
+        return None
+    #here i use BoundField:
+    boundField = forms.forms.BoundField(form, form.fields[key], key)
+    return boundField

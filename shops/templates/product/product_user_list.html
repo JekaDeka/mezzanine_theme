@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles %}
+{% extends "profiles/profile_settings.html" %}
+{% load i18n mezzanine_tags pages_tags staticfiles %}
 {% block meta_title %}
 Список товаров
 {% endblock %}
@@ -10,16 +11,20 @@
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
 <li>Список моих товаров</li>
 {% endblock %}
-{% block main %}
-<div class="sixteen columns margin-bottom-25">
-    <h2>Осталось доступных товаров: {{ remain }}</h2>
-    {% if remain > 0 %}
-        <a class="button dark" href="{% url 'product-add' %}">Добавить новый товар</a>
-    {% endif %}
-    <a class="button dark" href="{% url 'product-list' %}">Получить больше</a>
-</div>
-<hr>
-<div class="clearfix"></div>
+
+{% block extra_content %}
+<div class="flat-background">
+	<div class="flat-row">
+		<div class="container">
+      <div class="sixteen columns margin-bottom-10">
+          <h2>Осталось доступных записей: {{ remain }}</h2>
+          {% if remain > 0 %}
+              <a class="button dark" href="{% url 'blogpost-add' %}">Добавить запись в блог</a>
+          {% endif %}
+          <a class="button dark" href="{% url 'blogpost-list' %}">Получить больше</a>
+      </div>
+      <hr>
+      <div class="clearfix"></div>
 {% if product_list %}
 <div id="masonry-wrapper">
     {% for product in product_list %}
@@ -64,6 +69,7 @@
     <p>Товары пока отсутствуют</p>
 </section>
 {% endif %}
+
     {% if is_paginated %}
         <div class="pagination-container masonry">
             <nav class="pagination">
@@ -89,4 +95,4 @@
             </nav>
         </div>
     {% endif %}
-{% endblock main %}
+{% endblock %}

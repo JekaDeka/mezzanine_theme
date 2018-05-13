@@ -21,13 +21,59 @@
 
 
 {% block main %}
-<div class="sixteen columns">
-  <form method="post">
+  <form method="post" class="input-no-background">
     {% csrf_token %}
-    {{ form|crispy }}
     <div class="ordertableitemimages">
-    {{ ordertableitemimage|crispy }}
+    {{ ordertableitemimage }}
     </div>
+
+    <div class="ten columns">
+      <div class="ten columns alpha margin-top-15 margin-bottom-15">
+          {{ form.title|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+
+      <div class="six columns alpha margin-top-15 margin-bottom-15">
+          {{ form.color_suggest|as_crispy_field }}
+      </div>
+      <div class="four columns omega margin-top-15 margin-bottom-15">
+          {{ form.price|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+      <div class="six columns alpha margin-top-15 margin-bottom-15">
+          {{ form.size_suggest|as_crispy_field }}
+      </div>
+      <div class="four columns omega margin-top-15 margin-bottom-15">
+          {{ form.count|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+
+      <div class="five columns alpha margin-top-15 margin-bottom-15">
+          {{ form.ended|as_crispy_field }}
+      </div>
+      <div class="five columns omega margin-top-15 margin-bottom-15">
+          {{ form.categories|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+
+      <div class="ten columns omega margin-top-15 margin-bottom-15">
+          {{ form.lock_in_region|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+
+      <div class="ten columns alpha margin-top-15 margin-bottom-15">
+          {{ form.description|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
+
+    </div>
+
+
     <div class="action-bar">
         <input type="submit" class="button pull-right margin-right-10" value="Сохранить"/>
         {% if object %}
@@ -36,7 +82,6 @@
         <a href="{% url 'ordertableitem-list' %}" class="button dark pull-right margin-right-5">Назад</a>
     </div>
 </form>
-</div>
 {% endblock main %}
 {% block extra_js %}
  {{ block.super }}
@@ -65,5 +110,4 @@
     });
   });
 </script>
-
 {% endblock extra_js %}

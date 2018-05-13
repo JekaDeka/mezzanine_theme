@@ -78,7 +78,7 @@ urlpatterns = [
     # url(r'^profile/(?P<pk>[0-9]+)/delete/$', views.ShopDelete.as_view(), name='shop-delete'),
 
     url(r'^search/all/$', views.SearchAll.as_view(), name='search-all'),
-
+    url(r'^search/keywords/all/$', views.get_keywords, name='get-keywords-all'),
 
     # url('^shop/(?P<slug>[\w\-]+)/$',
     #     views.ShopDetailView.as_view(), name='shop-view'),

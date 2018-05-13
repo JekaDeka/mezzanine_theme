@@ -1,22 +1,29 @@
 from django.shortcuts import render
 from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView, TemplateView
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_text
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
+from django.core import paginator
 from django.core.urlresolvers import reverse, reverse_lazy
-from django.http import Http404
+from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.db import transaction
+from django.db.models import Avg, Count
 from django.shortcuts import redirect
 
-from profiles.models import UserProfile
+from profiles.models import UserProfile, MasterReview
 from profiles.forms import UserProfileForm
 
+from shops.models import Order
 
 from mezzanine.utils.views import paginate
 from mezzanine.conf import settings
+
+###
+import pymorphy2
 
 
 def change_password(request):
@@ -43,11 +50,70 @@ class ProfileSettings(TemplateView):
     # def get_queryset(self):
     #     return User.objects.filter(pk=self.request.user.pk).values('shop__id', 'profile__first_name')
 
-    # def get_context_data(self, **kwargs):
-    #     data = super(ProfileSettings, self).get_context_data(**kwargs)
-    #     user = User.objects.values('shop__id', 'shop__slug', 'profile__first_name', 'email').get(pk=self.request.user.pk)
-    #     data['user'] = user
-    #     return data
+    def get_context_data(self, **kwargs):
+        data = super(ProfileSettings, self).get_context_data(**kwargs)
+        # user = User.objects.values('shop__id', 'shop__slug', 'profile__first_name', 'email').get(pk=self.request.user.pk)
+        user = User.objects.select_related(
+            "shop",
+            "profile",
+            "profile__country",
+            "profile__city").get(pk=self.request.user.pk)
+        data['user'] = user
+
+        if user.profile.status == 1:
+            ### if user is master ###
+            reviews = MasterReview.objects.filter(master=self.request.user).values_list(
+                'mastery', 'punctuality', 'responsibility', 'avg_rating')
+            data['reviews'] = reviews.aggregate(mastery=Avg('mastery'), punctuality=Avg(
+                'punctuality'), responsibility=Avg('responsibility'), avg_rating=Avg('avg_rating'))
+            data['reviews_count'] = reviews.count()
+
+        ### get shop data
+        try:
+            shop = user.shop
+            orders = Order.objects.filter(shop=shop).values('status')
+            orders_status_count = orders.order_by(
+                'status').annotate(total=Count('status'))
+            orders_data = dict()
+
+            morph = pymorphy2.MorphAnalyzer()
+            for key, value in settings.SHOP_ORDER_STATUS_CHOICES:
+                label = morph.parse(value)[0]
+                if key != 2:
+                    label = label.inflect({'gent', 'plur'})
+                orders_data[key] = {'label': label.word, 'total': 0 }
+
+            for order in orders_status_count:
+                orders_data[order['status']]['total'] = order['total']
+            data['orders'] = orders_data
+            data['orders_count'] = orders.count()
+        except Exception as e:
+            pass
+
+
+        ### get order table data
+        try:
+            ordertableitems = user.orders_as_author.values('pk', 'created', 'title')
+            ordertablitems_count = ordertableitems.count()
+            data['ordertablitems'] = ordertableitems[:5]
+            data['ordertablitems_count'] = ordertablitems_count
+            data['ordertablitems_remain'] = user.profile.allow_ordertable_count - ordertablitems_count
+        except Exception as e:
+            pass
+
+        ### get blog_post data
+        try:
+            blogposts = user.blogposts.values('pk', 'title', 'publish_date')
+            blogposts_count = blogposts.count()
+            data['blogposts'] = blogposts[:5]
+            data['blogposts_count'] = blogposts_count
+            data['blogposts_remain'] = user.profile.allow_blogpost_count - blogposts_count
+
+            pass
+        except Exception as e:
+            raise
+
+        return data
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -96,7 +162,7 @@ class ProfileCreate(CreateView):
         except Exception as e:
             pass
         else:
-            return redirect(reverse_lazy('profile-update', args=[request.user.pk]))
+            return redirect(reverse_lazy('profile-update'))
 
         return super(ProfileCreate, self).dispatch(request, *args, **kwargs)
 
@@ -122,6 +188,25 @@ class ProfileUpdate(UpdateView):
         return super(ProfileUpdate, self).form_valid(form)
 
 
+@login_required
+def profile_status_toggle(request):
+    try:
+        profile = request.user.profile
+        if profile.status == 0:
+            profile.status = 1
+            messages.success(
+                request, 'Вы успешно стали мастером.')
+        profile.save()
+    except Exception as e:
+        messages.error(
+            request, e)
+
+    if request.META['HTTP_REFERER']:
+        return HttpResponseRedirect(request.META['HTTP_REFERER'])
+    else:
+        return HttpResponseRedirect('/')
+
+
 class ProfileDetailView(DetailView):
     model = User
     slug_field = 'username'
@@ -129,7 +214,7 @@ class ProfileDetailView(DetailView):
     queryset = User.objects.select_related(
         "profile",
         "profile__country",
-        "profile__city")
+        "profile__city").prefetch_related('master_reviews', 'blogposts', 'blogposts__keywords')
 
     def get_object(self, queryset=None):
         obj = super(ProfileDetailView, self).get_object(queryset=queryset)
@@ -139,10 +224,23 @@ class ProfileDetailView(DetailView):
             raise Http404
         return obj
 
+    def get_context_data(self, **kwargs):
+        context = super(ProfileDetailView, self).get_context_data(**kwargs)
+        reviews = self.queryset.filter(pk=self.object.pk).values(
+            'master_reviews__mastery',
+            'master_reviews__punctuality',
+            'master_reviews__responsibility',
+            'master_reviews__avg_rating'
+        ).aggregate(
+            Avg('master_reviews__mastery'),
+            Avg('master_reviews__punctuality'),
+            Avg('master_reviews__responsibility'),
+            Avg('master_reviews__avg_rating'),
+            Count('master_reviews')
+        )
 
-    # def get_context_data(self, **kwargs):
-    #     context = super(ProfileDetailView, self).get_context_data(**kwargs)
-    #     return context
+        context["reviews"] = reviews
+        return context
 
     # def get_queryset(self):
     #     return User.objects.filter(username=self.slug)

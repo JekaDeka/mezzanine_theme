@@ -9,7 +9,7 @@
 <h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
 <li>Изменение данных</li>
 {% endblock breadcrumb_element %}
-{% block main %}
+{% block extra_content %}
 <div class="twelve columns margin-bottom-25">
     <form method="post">
         {% csrf_token %}
@@ -54,7 +54,10 @@
         </div>
     </form>
 </div>
-{% endblock %} {% block extra_js %} {{ block.super }}
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
 <script type="text/javascript">
 $(function() {
     $(".mask").mask('+0 (000) 000 0000');

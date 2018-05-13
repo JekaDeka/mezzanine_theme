@@ -4,15 +4,18 @@ from django.utils.decorators import method_decorator
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
-from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.template.loader import get_template, render_to_string
 from django.shortcuts import redirect
 from django.core import serializers
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
 
-from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage, Cart, Order
-from shops.forms import ProductForm, ProductImageForm, UserShopDeliveryOptionFormSet, ShopForm, UserShopDeliveryOptionForm, ProductImageFormSet, AddProductForm, CartItemForm, CartItemFormSet, OrderForm
+from shops.models import UserShop, UserShopDelivery, UserShopDeliveryOption, \
+    ShopProduct, ShopProductImage, Cart, Order
+from shops.forms import ProductForm, ProductImageForm, ShopForm, ProductImageFormSet, \
+    AddProductForm, CartItemForm, CartItemFormSet, OrderForm
+# UserShopDeliveryOptionFormSet
 from shops.utils import Map, recalculate_cart
 
 from cartridge.shop.utils import recalculate_cart, sign
@@ -356,22 +359,29 @@ class ShopDeliveryOptionCreate(CreateView):
     # def get_context_data(self, **kwargs):
     #     data = super(ShopDeliveryOptionCreate, self).get_context_data(**kwargs)
     #     if self.request.POST:
-    #         data['deliveryoption'] = UserShopDeliveryOptionFormSet(self.request.POST)
+    #         data['deliveryoption'] = UserShopDeliveryOptionFormSet(
+    #             self.request.POST, instance=self.objects)
     #     else:
-    #         data['deliveryoption'] = UserShopDeliveryOptionFormSet()
+    #         data['deliveryoption'] = UserShopDeliveryOptionFormSet(
+    #             instance=self.object)
     #     return data
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        # deliveryoption = context['deliveryoption']
         with transaction.atomic():
             self.object = form.save(commit=False)
             self.object.user = self.request.user
             self.object.save()
-            messages.success(self.request, self.success_message)
-            # if deliveryoption.is_valid():
-            #     deliveryoption.instance = self.object
-            #     deliveryoption.save()
+
+            for (delivery_id, price) in form.get_delivery_options():
+                if not price:
+                    price = 0
+                delivery = UserShopDelivery.objects.get(id=delivery_id)
+                delivery_data = {'shop': self.object,
+                                 'delivery': delivery, 'price': price}
+                delivery_option, created = UserShopDeliveryOption.objects.update_or_create(
+                    shop=self.object, delivery=delivery, defaults=delivery_data)
+
+        messages.success(self.request, self.success_message)
         return super(ShopDeliveryOptionCreate, self).form_valid(form)
 
 
@@ -387,16 +397,25 @@ class ShopUpdate(UpdateView):
 class ShopDeliveryOptionUpdate(UpdateView):
     model = UserShop
     form_class = ShopForm
-    # fields = ["background", "image", "shopname", "bio", "rules",
-    #           "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other"]
     success_url = reverse_lazy('profile-settings')
     template_name = "shops/shop_form.html"
     success_message = "Магазин успешно обновлен"
+
+    # def get_form_kwargs(self, **kwargs):
+    #     form_kwargs = super(ShopDeliveryOptionUpdate,
+    #                         self).get_form_kwargs(**kwargs)
+    #     form_kwargs["deliveries"] = UserShopDelivery.objects.all()
+    #     return form_kwargs
+
     # def get_context_data(self, **kwargs):
     #     data = super(ShopDeliveryOptionUpdate, self).get_context_data(**kwargs)
     #     if self.request.POST:
     #         data['deliveryoption'] = UserShopDeliveryOptionFormSet(self.request.POST, instance=self.object)
     #     else:
+    #         # opts = self.object.deliveryoptions.all().values('type')
+    #         # tmp = default_delivery_option[:]
+    #         # for opt in opts:
+    #         #     tmp[:] = [d for d in tmp if d.get('type') != opt['type']]
     #         data['deliveryoption'] = UserShopDeliveryOptionFormSet(instance=self.object)
     #     return data
 
@@ -408,16 +427,40 @@ class ShopDeliveryOptionUpdate(UpdateView):
         return obj
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        # deliveryoption = context['deliveryoption']
-        with transaction.atomic():
-            self.object = form.save(commit=False)
-            self.object.user = self.request.user
-            self.object.save()
-            messages.success(self.request, self.success_message)
-            # if deliveryoption.is_valid():
-            #     deliveryoption.instance = self.object
-            #     deliveryoption.save()
+
+        ### delete unused deliveries ###
+        UserShopDeliveryOption.objects.filter(shop=self.object).exclude(
+            id__in=form.get_delivery_options_id()).delete()
+
+        for (delivery_id, price) in form.get_delivery_options():
+            if not price:
+                price = 0
+            delivery = UserShopDelivery.objects.get(id=delivery_id)
+            delivery_data = {'shop': self.object,
+                             'delivery': delivery, 'price': price}
+            delivery_option, created = UserShopDeliveryOption.objects.update_or_create(
+                shop=self.object, delivery=delivery, defaults=delivery_data)
+
+        # context = self.get_context_data()
+        # # productimage = context['productimage']
+        # # with transaction.atomic():
+        # self.object = form.save(commit=False)
+        # self.object.save()
+        #
+        # # print(form.cleaned_data.get('delivery_options'))
+        # delivery_options = form.cleaned_data.get('delivery_options')
+        # # delivery_options = UserShopDeliveryOption.objects.filter(shop=self.object)
+        # # print(delivery_options)
+        # for delivery in delivery_options:
+        #     price = form.cleaned_data.get(
+        #         'delivery_option_%s_price' % delivery.id)
+        #     delivery_data = {'shop': self.object, 'delivery': delivery, 'price': price}
+        #     obj, created = UserShopDeliveryOption.objects.update_or_create(
+        #         shop=self.object, delivery=delivery, defaults=delivery_data)
+        #     # obj.price = price
+        #     # obj.save()
+
+        messages.success(self.request, self.success_message)
         return super(ShopDeliveryOptionUpdate, self).form_valid(form)
 
 

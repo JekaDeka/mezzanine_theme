@@ -1,10 +1,12 @@
 {% load mezzanine_tags i18n %}
-<input id="{{ final_attrs.id }}" type="text" class="vFileBrowseField {{ final_attrs.class }}" name="{{ final_attrs.name }}" value="{{ value }}" />
+<input id="{{ final_attrs.id }}" type="text" class="vFileBrowseField {{ final_attrs.class }}" name="{{ final_attrs.name }}" value="{{ value }}"
+style="display: none;" />
 <a href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}&amp;width=200&amp;height=200');" class="shop-image">
+  Добавить логотип
 </a>
 {% ifequal value.filetype "Image" %}
 <p class="help shop-image-preview" id="help_{{ final_attrs.id }}">
-    <a href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}&amp;width=200&amp;height=200');" target="_blank" id="link_{{ final_attrs.id }}"> 
+    <a href="javascript:FileBrowser.show('{{ final_attrs.id }}', '{% url "fb_browse" %}?pop=1{% if final_attrs.directory %}&amp;dir={{ final_attrs.directory }}{% endif %}{% if final_attrs.format %}&amp;type={{ final_attrs.format }}{% endif %}&amp;width=200&amp;height=200');" target="_blank" id="link_{{ final_attrs.id }}">
         <img id="image_{{ final_attrs.id }}" src="{{ MEDIA_URL }}{% thumbnail value.name 200 200 %}" class="shop-image-preview-image" />
     </a>
 </p>

@@ -607,12 +607,12 @@
     var scrollSpeed = 400;
     jQuery(window).scroll(function() {
       if (jQuery(window).scrollTop() >= pxShow) {
-        jQuery("#backtotop").fadeIn(fadeInTime);
+        jQuery("#topper").fadeIn(fadeInTime);
       } else {
-        jQuery("#backtotop").fadeOut(fadeOutTime);
+        jQuery("#topper").fadeOut(fadeOutTime);
       }
     });
-    jQuery('#backtotop a').click(function() {
+    jQuery('#topper a').click(function() {
       jQuery('html, body').animate({
         scrollTop: 0
       }, scrollSpeed);
@@ -672,67 +672,67 @@
     //         $("#contactform input, #contactform textarea").removeClass('error');
     //         $("#result").slideUp();
     //     });
-    function getCookie(name) {
-      var cookieValue = null;
-      if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-          var cookie = jQuery.trim(cookies[i]);
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) == (name + '=')) {
-            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-            break;
-          }
-        }
-      }
-      return cookieValue;
-    }
-    var csrftoken = getCookie('csrftoken');
-
-    function csrfSafeMethod(method) {
-      // these HTTP methods do not require CSRF protection
-      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
-    $.ajaxSetup({
-      beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-          xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-      }
-    });
-    $('.product-button').click(function(event) {
-      event.preventDefault();
-      var data = $(this);
-      $.ajax({
-        url: $(data).attr('href'),
-        type: "POST",
-        data: {
-          'product_id': $(this).attr('product-id')
-        },
-        beforeSend: function(xhr, settings) {
-          if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-          }
-          $('.cart-btn').hide();
-          $('.loader').show();
-        },
-        success: function(data) {
-          if (data.error == true) {
-            $('.cart-btn').show();
-            $('.loader').hide();
-          } else {
-            $('.loader').hide();
-            $('.cart-draw').html(data);
-          }
-        },
-        error: function(data) {
-          $('.cart-btn').show();
-          $('.loader').hide();
-        }
-      });
-      $(this).addClass('added');
-      $(this).text('В корзине');
-    });
+    // function getCookie(name) {
+    //   var cookieValue = null;
+    //   if (document.cookie && document.cookie != '') {
+    //     var cookies = document.cookie.split(';');
+    //     for (var i = 0; i < cookies.length; i++) {
+    //       var cookie = jQuery.trim(cookies[i]);
+    //       // Does this cookie string begin with the name we want?
+    //       if (cookie.substring(0, name.length + 1) == (name + '=')) {
+    //         cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+    //         break;
+    //       }
+    //     }
+    //   }
+    //   return cookieValue;
+    // }
+    // var csrftoken = getCookie('csrftoken');
+    //
+    // function csrfSafeMethod(method) {
+    //   // these HTTP methods do not require CSRF protection
+    //   return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    // }
+    // $.ajaxSetup({
+    //   beforeSend: function(xhr, settings) {
+    //     if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+    //       xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    //     }
+    //   }
+    // });
+    // $('.product-button').click(function(event) {
+    //   event.preventDefault();
+    //   var data = $(this);
+    //   $.ajax({
+    //     url: $(data).attr('href'),
+    //     type: "POST",
+    //     data: {
+    //       'product_id': $(this).attr('product-id')
+    //     },
+    //     beforeSend: function(xhr, settings) {
+    //       if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+    //         xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    //       }
+    //       $('.cart-btn').hide();
+    //       $('.loader').show();
+    //     },
+    //     success: function(data) {
+    //       if (data.error == true) {
+    //         $('.cart-btn').show();
+    //         $('.loader').hide();
+    //       } else {
+    //         $('.loader').hide();
+    //         $('.cart-draw').html(data);
+    //       }
+    //     },
+    //     error: function(data) {
+    //       $('.cart-btn').show();
+    //       $('.loader').hide();
+    //     }
+    //   });
+    //   $(this).addClass('added');
+    //   $(this).text('В корзине');
+    // });
 
   });
 })(this.jQuery);

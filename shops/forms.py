@@ -2,12 +2,22 @@ from django import forms
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
-from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage, Cart, CartItem, Order
-from cartridge.shop.models import Category
+from django.utils.safestring import mark_safe
+from django.utils.html import format_html
+from django.forms.utils import flatatt
 from django.forms.models import inlineformset_factory
+from django.forms.forms import BoundField
+
+
+from shops.models import UserShop, ShopProduct, ShopProductImage, Cart, CartItem, Order, \
+    UserShopDelivery, UserShopDeliveryOption
+from cartridge.shop.models import Category
+
+from mezzanine.generic.models import Keyword
+from mezzanine.generic.forms import KeywordsWidget
 from theme.forms import DataGroupModelChoiceField
 
-
+from itertools import groupby
 from filebrowser_safe.fields import FileBrowseWidget
 
 from crispy_forms.helper import FormHelper
@@ -48,6 +58,23 @@ class ShopImageField(FileBrowseWidget):
         return render_to_string("shops/image_field.html", dict(locals(), MEDIA_URL=settings.MEDIA_URL))
 
 
+class ProductImageField(FileBrowseWidget):
+
+    def __init__(self, attrs=None):
+        self.format = 'image'
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ""
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        final_attrs['format'] = self.format
+        return render_to_string("product/image_field.html", dict(locals(), MEDIA_URL=settings.MEDIA_URL))
+
+
 class AddProductForm(forms.Form):
     quantity = forms.IntegerField(label="Количество", min_value=1)
     product_id = forms.CharField(required=False, widget=forms.HiddenInput())
@@ -82,90 +109,76 @@ class AddProductForm(forms.Form):
 
 
 class ShopForm(forms.ModelForm):
-    error_css_class = 'class-error'
-    required_css_class = 'class-required'
+    deliveries = UserShopDelivery.objects.all()
 
     class Meta:
         model = UserShop
-        fields = ("background", "image", "shopname",
-                  "bio", "rules",
-                  "express_point", "express_point_price",
-                  "express_city", "express_city_price",
-                  "express_country", "express_country_price",
-                  "express_world", "express_world_price",
-                  "express_mail", "express_mail_price",
-                  "express_personal", "express_personal_price", "express_other",
-                  "payment_personal", "payment_bank_transfer", "payment_card_transfer", "payment_other")
+        exclude = ("user", "delivery_options")
+
         widgets = {
-            'shopname': forms.TextInput(attrs={'class': 'form-control'}),
             'background': ShopBackgroundField(attrs={'class': ''}),
             'image': ShopImageField(attrs={'class': ''}),
-            'express_point_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_city_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_country_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_world_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_mail_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_personal_price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена', 'readonly': 'readonly'}),
-            'express_other': forms.Textarea(attrs={'placeholder': 'Дополнительная информация о доставке', 'rows': '5'}),
-            'payment_other': forms.Textarea(attrs={'placeholder': 'Дополнительная информация об оплате', 'rows': '5'}),
-            'bio': forms.Textarea(attrs={'placeholder': 'Описание магазина'}),
-            'rules': forms.Textarea(attrs={'placeholder': 'Правила магазина'}),
+            # 'delivery_options':  forms.CheckboxSelectMultiple(),
+            'delivery_other': forms.Textarea(attrs={'rows': '1'}),
+            'payment_options':  forms.CheckboxSelectMultiple(),
+            'payment_other': forms.Textarea(attrs={'rows': '1'}),
+            'bio': forms.Textarea(attrs={'rows': '1'}),
+            'rules': forms.Textarea(attrs={'rows': '1'}),
         }
 
-    def clean(self):
-        cleaned_data = super(ShopForm, self).clean()
-        express_empty = True
-        payment_empty = True
-        for field in cleaned_data.items():
-            fname = field[0]
-            fvalue = field[1]
-            if fname.endswith('_price') and fvalue != None:
-                express_empty = False
-            if fname.startswith('payment') and fvalue != False and not fname.endswith('_other'):
-                payment_empty = False
-        if express_empty:
-            raise forms.ValidationError(
-                _('Заполните хотя бы один способ доставки'))
-        if payment_empty:
-            raise forms.ValidationError(
-                _('Заполните хотя бы один способ оплаты'))
-        return cleaned_data
+    def __init__(self, *args, **kwargs):
+        super(ShopForm, self).__init__(*args, **kwargs)
+        self.fields['background'].label = ""
+        self.fields['background'].help_text = ""
+        self.fields['image'].label = ""
+        self.fields['image'].help_text = ""
+        self.fields['payment_options'].label = ""
 
-    # def clean_file(self):
-    #     file = self.cleaned_data['file']
-    #     try:
-    #         if file:
-    #             file_type = file.content_type.split('/')[0]
-    #             if len(file.name.split('.')) == 1:
-    #                 raise forms.ValidationError(
-    #                     _('File type is not supported'))
+        initial_options = UserShopDeliveryOption.objects.filter(
+            shop=self.instance).values_list('delivery', 'price')
+        for delivery in self.deliveries:
+            status = False
+            price = None
+            initial_option = initial_options.filter(delivery=delivery)
+            if initial_option:
+                status = True
+                # if user didn't set the price it saves as 0
+                if initial_option[0][1]:
+                    price = initial_option[0][1]
 
-    #             if file_type in settings.TASK_UPLOAD_FILE_TYPES:
-    #                 if file._size > settings.TASK_UPLOAD_FILE_MAX_SIZE:
-    #                     raise forms.ValidationError(_('Please keep filesize under %s. Current filesize %s') % (
-    #                         filesizeformat(settings.TASK_UPLOAD_FILE_MAX_SIZE), filesizeformat(file._size)))
-    #             else:
-    #                 raise forms.ValidationError(
-    #                     _('File type is not supported'))
-    #     except:
-    #         pass
+            self.fields['tmp_delivery_status_%s' % delivery.id] = forms.BooleanField(
+                label=delivery.label, required=False, initial=status)
+            self.fields['tmp_delivery_price_%s' % delivery.id] = forms.IntegerField(
+                label="Цена", required=False, initial=price)
 
-    #     return file
+    def render_delivery_options(self):
+        for name in self.fields:
+            if name.startswith('tmp_'):
+                field = self.fields[name]
+                yield BoundField(self, field, name)
 
-    # def __init__(self, *args, **kwargs):
-    #     super(ShopForm, self).__init__(*args, **kwargs)
-    #     self.fields['background'].widget.attrs.update({'class': 'background'})
-        # adding css classes to widgets without define the fields:
-        # for field in self.fields:
-        #     self.fields[field].widget.attrs['class'] = 'some-class other-class'
+    def get_delivery_options(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('tmp_delivery_status_') and value == True:
+                delivery_id = name.rpartition('_')[-1]
+                price = self.cleaned_data['tmp_delivery_price_%s' %
+                                          delivery_id]
+                yield (delivery_id, price)
 
-    # def as_div(self):
-    #     return self._html_output(
-    #         normal_row=u'<div%(html_class_attr)s>%(label)s %(field)s %(help_text)s %(errors)s</div>',
-    #         error_row=u'<div class="error">%s</div>',
-    #         row_ender='</div>',
-    #         help_text_html=u'<div class="hefp-text">%s</div>',
-    #         errors_on_separate_row=False)
+    def get_delivery_options_id(self):
+        for name, value in self.cleaned_data.items():
+            if name.startswith('tmp_delivery_status_') and value == True:
+                delivery_id = name.rpartition('_')[-1]
+                yield delivery_id
+
+    # def clean(self):
+    #     cleaned_data = super(ShopForm, self).clean()
+    #     options = filter(lambda k: 'tmp_delivery_status_' in k, cleaned_data)
+    #     print(options)
+    #     raise forms.ValidationError({'tmp_delivery_status_2': ["", ],
+    #                                  'tmp_delivery_price_2': ["Заполните хотя бы одно поле", ]},
+    #                                 code='invalid')
+
 
 
 class UserShopDeliveryOptionForm(forms.ModelForm):
@@ -173,14 +186,27 @@ class UserShopDeliveryOptionForm(forms.ModelForm):
     class Meta:
         model = UserShopDeliveryOption
         fields = '__all__'
-        widgets = {
-            'label': forms.TextInput(attrs={'placeholder': 'Способ доставки'}),
-            'price': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Цена'}),
-        }
+
+
+class ThemeKeywordsWidget(KeywordsWidget):
+    """docstring for ThemeKeywordsWidget."""
+
+    def format_output(self, rendered_widgets):
+        """
+        Wraps the output HTML with a list of all available ``Keyword``
+        instances that can be clicked on to toggle a keyword.
+        """
+        rendered = super(KeywordsWidget, self).format_output(rendered_widgets)
+        # links = ""
+        # for keyword in Keyword.objects.all().order_by("title"):
+        #     # prefix = "+" if str(keyword.id) not in self._ids else "-"
+        #     prefix = ""
+        #     links += ("<option value='%s%s'>" % (prefix, str(keyword)))
+        # rendered += mark_safe("<datalist id='tag-list'>%s</datalist>" % links)
+        return rendered
 
 
 class ProductForm(forms.ModelForm):
-    """docstring for ProuctForm"""
     categories = DataGroupModelChoiceField(
         queryset=Category.objects.all().order_by('id'),
         label="Категория")
@@ -190,32 +216,36 @@ class ProductForm(forms.ModelForm):
         fields = [
             'title',
             'pre_order',
-            'categories',
+            # 'categories',
             'price',
             'material',
-            # 'categories',
             'condition',
             'keywords',
             'description',
         ]
-        # widgets = {
-        #     'categories': forms.HiddenInput(),
-        # }
+        widgets = {
+            'material': forms.TextInput(attrs={'multiple': 'multiple'}),
+        }
         # exclude = ['author', 'performer']
 
     def __init__(self, *args, **kwargs):
         super(ProductForm, self).__init__(*args, **kwargs)
-        self.helper = FormHelper(self)
+        self.fields['keywords'].label = "Теги"
+        self.fields['keywords'].help_text = "Введите значения через запятую"
+        # self.fields['description'].label = ""
+        self.fields['keywords'].widget = ThemeKeywordsWidget(
+            attrs={'multiple': 'multiple'})
+        # self.helper = FormHelper(self)
         # self.helper.template = 'theme_form/whole_uni_form.html'
-        self.helper.include_media = False
-        self.helper.layout.append(
-            ButtonHolder(
-                HTML("""
-                <a class="button dark" href="{% url 'product-list' %}">Назад</a>
-                """),
-                Submit('submit', 'Сохранить', css_class='button abc'),
-            ),
-        )
+        # self.helper.include_media = False
+        # self.helper.layout.append(
+        #     ButtonHolder(
+        #         HTML("""
+        #         <a class="button dark" href="{% url 'product-list' %}">Назад</a>
+        #         """),
+        #         Submit('submit', 'Сохранить', css_class='button abc'),
+        #     ),
+        # )
 
 
 class ProductImageForm(forms.ModelForm):
@@ -223,6 +253,9 @@ class ProductImageForm(forms.ModelForm):
     class Meta:
         model = ShopProductImage
         fields = ['file']
+        widgets = {
+            'file': ProductImageField(),
+        }
         # exclude = ['description', ]
 
 
@@ -286,19 +319,20 @@ class OrderForm(forms.ModelForm):
             self.fields['user_region'].initial = self.user.profile.region
 
 
-
-
 CartItemFormSet = inlineformset_factory(Cart, CartItem, form=CartItemForm,
                                         can_delete=True, extra=0)
-UserShopDeliveryOptionFormSet = inlineformset_factory(
-    UserShop,
-    UserShopDeliveryOption,
-    form=UserShopDeliveryOptionForm,
-    can_delete=True,
-    extra=1)
+
+
+# UserShopDeliveryOptionFormSet = inlineformset_factory(
+#     UserShop,
+#     UserShop.delivery_options.through,
+#     form=UserShopDeliveryOptionForm,
+#     can_delete=False,
+#     extra=1)
+
 ProductImageFormSet = inlineformset_factory(
     ShopProduct,
     ShopProductImage,
     form=ProductImageForm,
     can_delete=True,
-    extra=1)
+    extra=6, max_num=6)

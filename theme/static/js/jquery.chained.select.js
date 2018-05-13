@@ -41,7 +41,7 @@
 
   function render_select(array, index, selected_options) {
     var html = '';
-    html += '<div class="form-group"> \
+    html += '<div class="form-group margin-bottom-15"> \
         <select class="form-control" id="select' + (index + 1) + '" name="select' + (index + 1) + '"';
     var options = '';
     var show = false;
@@ -62,7 +62,7 @@
     }
     html += '>\n';
     html += options;
-    html += '</select></div>';
+    html += '</select><span class="highlight"></span><span class="bar"></span></div>';
     return html;
   }
 
@@ -99,7 +99,7 @@
       var selected_options = get_selected_values();
       $("#id_categories").val(selected_options);
       make_selector_visible($(this), 250);
-    });
+    }).trigger('click');
   }
 
   $.fn.get_categories = function(url) {
@@ -113,7 +113,6 @@
         }).get()
         make_selectors(data, selected_options);
         init_events();
-
       }
     });
   }

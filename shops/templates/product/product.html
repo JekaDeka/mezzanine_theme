@@ -138,7 +138,7 @@
 						<th>Материал</th>
 						<td>
 						{% if product.material %}
-							{{ product.material|title }}
+							{{ product.material|add_spaces }}
 						{% else %}
 							Не указан
 						{% endif %}</td>

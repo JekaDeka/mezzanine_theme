@@ -9,6 +9,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.template.loader import get_template, render_to_string
+from django.core import serializers
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
@@ -28,7 +29,7 @@ from cartridge.shop.forms import AddProductForm
 
 from profiles.models import UserProfile
 # from ordertable.models import OrderTableItem, OrderTableItemCategory, OrderTableItemRequest
-from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage
+from shops.models import UserShop, ShopProduct, ShopProductImage
 
 from theme.forms import ContactForm, MessageForm, OrderMessageForm, BlogPostForm
 
@@ -55,7 +56,9 @@ from PIL import Image
 User = get_user_model()
 
 
-
+def get_keywords(request):
+    data = list(Keyword.objects.values('title'))
+    return JsonResponse(data, safe=False)  # or JsonResponse({'data': data})
 
 # def promote_user(request, template="accounts/account_signup.html",
 #                  extra_context=None):
@@ -96,7 +99,7 @@ def true_index(request):
         'best_products': best_products,
         'user_shops': user_shops,
         'masters': masters,
-        'blog_posts': blog_posts,
+        'blog_posts': recent_posts,
         'recent_posts': recent_posts,
         'popular_posts': popular_posts,
         'comments': comments,

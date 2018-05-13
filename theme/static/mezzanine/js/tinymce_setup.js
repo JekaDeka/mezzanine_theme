@@ -64,18 +64,41 @@ jQuery(function($) {
 
         tinyMCE.init({
             selector: "textarea.mceEditor",
-            height: '500px',
+            height: '700px',
             language: language_codes[window.__language_code] || 'ru',
             plugins: [
                 "advlist autolink lists link image charmap print preview anchor",
                 "searchreplace visualblocks code",
-                "insertdatetime media table contextmenu paste"
+                "insertdatetime media table contextmenu paste fullscreen"
+            ],
+            link_list: window.__link_list_url,
+            relative_urls: false,
+            convert_urls: false,
+            menubar: "edit insert view format",
+            statusbar: true,
+            toolbar: ("insertfile undo redo | styleselect | bold italic | " +
+                      "alignleft aligncenter alignright alignjustify | " +
+                      "bullist numlist outdent indent | link image table | " +
+                      "code"),
+            file_browser_callback: custom_file_browser,
+            content_css: window.__tinymce_css,
+            valid_elements: "*[*]"  // Don't strip anything since this is handled by bleach.
+        });
+
+        tinyMCE.init({
+            selector: "textarea.small_editor",
+            height: '250px',
+            language: language_codes[window.__language_code] || 'ru',
+            plugins: [
+                "advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks code",
+                "insertdatetime media table contextmenu paste fullscreen"
             ],
             link_list: window.__link_list_url,
             relative_urls: false,
             convert_urls: false,
             menubar: false,
-            statusbar: false,
+            statusbar: true,
             toolbar: ("insertfile undo redo | styleselect | bold italic | " +
                       "alignleft aligncenter alignright alignjustify | " +
                       "bullist numlist outdent indent | link image table | " +

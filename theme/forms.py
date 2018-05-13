@@ -17,11 +17,12 @@ from django.forms.utils import flatatt, to_current_timezone
 from django.forms.models import inlineformset_factory
 from django.forms.formsets import BaseFormSet
 from django.utils.datastructures import MultiValueDict
-
+from django.template.loader import render_to_string
 
 from mezzanine.conf import settings
 from mezzanine.accounts.forms import ProfileForm
 from mezzanine.utils.static import static_lazy as static
+from mezzanine.generic.forms import KeywordsWidget
 from mezzanine.blog.models import BlogPost
 from mezzanine.core.models import CONTENT_STATUS_DRAFT
 
@@ -34,6 +35,7 @@ from cartridge.shop.utils import (make_choices, set_locale, set_shipping,
 # from profiles.models import UserProfile, Region, City
 from ordertable.models import OrderTableItem, OrderTableItemImage
 # from shops.models import UserShop, UserShopDeliveryOption, ShopProduct, ShopProductImage
+from filebrowser_safe.fields import FileBrowseWidget
 
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, HTML
@@ -224,6 +226,27 @@ class ThemeCheckboxInput(forms.CheckboxInput):
             final_attrs['value'] = force_text(value)
         return format_html('<input{} />', flatatt(final_attrs))
 
+class BlogPostImageField(FileBrowseWidget):
+
+    def __init__(self, attrs=None):
+        self.format = 'image'
+        if attrs is not None:
+            self.attrs = attrs.copy()
+        else:
+            self.attrs = {}
+
+    def render(self, name, value, attrs=None):
+        if value is None:
+            value = ""
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+        final_attrs['format'] = self.format
+        return render_to_string("blog/blogpost_image_field.html", dict(locals(), MEDIA_URL=settings.MEDIA_URL))
+
+class BlogPostKeywordsWidget(KeywordsWidget):
+    """docstring for ThemeKeywordsWidget."""
+
+    def format_output(self, rendered_widgets):
+        return super(KeywordsWidget, self).format_output(rendered_widgets)
 
 class BlogPostForm(forms.ModelForm):
     """docstring for BlogPostForm"""
@@ -231,12 +254,19 @@ class BlogPostForm(forms.ModelForm):
         model = BlogPost
         fields = ['title', 'featured_image', 'preview_content', 'content', 'allow_comments', 'categories', 'keywords']
         widgets = {
-            # 'allow_comments': ThemeCheckboxInput(),
+            'featured_image': BlogPostImageField(),
+            'preview_content': forms.Textarea(attrs={'class': 'small_editor', 'placeholder': 'Имя', }),
             'categories': forms.CheckboxSelectMultiple(),
         }
 
-    # def __init__(self, *args, **kwargs):
-    #     super(BlogPostForm, self).__init__(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(BlogPostForm, self).__init__(*args, **kwargs)
+        self.fields['preview_content'].label = ""
+        self.fields['content'].label = ""
+        self.fields['content'].help_text = "Основной текст статьи"
+        self.fields['keywords'].label = "Теги"
+        self.fields['keywords'].help_text = "Введите значения через запятую"
+        self.fields['keywords'].widget = BlogPostKeywordsWidget(attrs={'multiple': 'multiple'})
     #     self.helper = FormHelper(self)
     #     self.helper.template = 'theme_form/whole_uni_form.html'
     #     self.helper.include_media = False
