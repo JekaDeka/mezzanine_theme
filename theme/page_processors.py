@@ -124,7 +124,7 @@ def category_processor(request, page):
                         settings.MAX_PAGING_LINKS)
     products.sort_by = sort_by
 
-    sub_categories = page.category.children.published()
+    sub_categories = Category.objects.filter(parent=page).select_related('parent')
     # child_categories = Category.objects.published(
     #     for_user=request.user).filter(id__in=sub_categories).select_related('parent')
     return {"true_products": products,
