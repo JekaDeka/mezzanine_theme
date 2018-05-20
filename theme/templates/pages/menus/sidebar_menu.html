@@ -9,7 +9,7 @@
         {% if branch_level != 0 %}
         {% if page.in_menu and page.content_model == 'category' %}
             <li class="{% if page.is_current_or_ascendant %} active-branch {% endif %}">
-              <a style="display: inline-block;"href="{{ page.get_absolute_url }}" class="{% if branch_level == 0 or page.is_current_or_ascendant %} active {% endif %}">{{ page.title }}</a>
+              <a style="display: inline-block;"href="{{ page.get_absolute_url }}" class="{% if branch_level == 0 or page.is_current_or_ascendant %} active {% endif %}">{{ page.title|capfirst }}</a>
               {% if page.has_children_in_menu %}
                 <span class="open_nav fa-caret-down"></span>
               {% endif %}

@@ -1,5 +1,5 @@
 {% extends "blog/blog_post_list.html" %}
-{% load mezzanine_tags keyword_tags i18n disqus_tags theme_tags blog_tags pages_tags %}
+{% load mezzanine_tags keyword_tags i18n comment_tags theme_tags blog_tags pages_tags %}
 
 {% block meta_title %}{{ blog_post.meta_title }}{% endblock %}
 
@@ -32,8 +32,11 @@
 {% endif %}
 <div class="parallax-overlay"></div>
 <div class="parallax-content">
-	<h2>{{ blog_post.title|title }}<span>{{ blog_post.user.profile.get_full_name }}</span></h2>
-
+	<h2>{{ blog_post.title|capfirst }}
+		<span>
+			{{ blog_post.user.profile.get_full_name }}
+		</span>
+	</h2>
 	<nav id="breadcrumbs">
 		<ul>
 			{% page_menu "pages/menus/breadcrumb.html" %}
@@ -51,48 +54,36 @@
 		<article class="post single">
 			<section class="post-content">
 			<section class="date">
-			{% with day=blog_post.publish_date|date:"d"  month=blog_post.publish_date|date:"M"  %}
-				<span class="day">{{day}}</span>
-				<span class="month">{{month}}</span>
-			{% endwith %}
+				<span class="day">{{ blog_post.publish_date|date:"d" }}</span>
+				<span class="month">{{ blog_post.publish_date|date:"E" }}</span>
 			</section>
-			{% block blog_post_detail_postedby %}
 				<header class="meta">
-					<h2>{{ blog_post.title|title }}</h2>
-					<span><i class="fa fa-user"></i>{% trans "Posted by" %}:
-					{% with blog_post.user as author %}
-						<a href="{% url 'blog_post_list_author' author %}">{{ author.get_full_name|default:author.username }}</a></span>
-					{% endwith %}
-					{% if tags %}
+					<h2>{{ blog_post.title|capfirst }}</h2>
+					<span><i class="fa fa-user"></i>
+						<a href="{{ blog_post.user.profile.get_absolute_url }}">
+						{{ blog_post.user.profile.get_full_name }}</a></span>
+						{% with tags=blog_post.keywords.all %}
+						{% if tags %}
 						<span><i class="fa fa-tag"></i>
-								{% for tag in tags %}
-								{% if not forloop.first %}, {% endif %}
-								<a href="{% url "blog_post_list_tag" tag.slug %}">{{ tag }}</a>
-							{% endfor %}
+							{% for tag in tags %}
+							 <a href="{% url "blogpost-list-tag" tag.keyword.slug %}" class="tag">{{ tag }}</a>
+							 {% if not forloop.last %}, {% endif %}
+							 {% endfor %}
 						</span>
-					{% endif %}
-					{% if blog_post.allow_comments %}
-						{% if settings.COMMENTS_DISQUS_SHORTNAME %}
-						<span><i class="fa fa-comment"></i>(Число)</span>
 						{% endif %}
-					{% endif %}
-
+						{% endwith %}
+						{% if blog_post.allow_comments %}
+						<span><i class="fa fa-comment"></i>
+							<a href="#comment">{{ blog_post.comments_count|rupluralize:"комментарий,комментария,комментариев" }}</a>
+						</span>
+						{% endif %}
 				</header>
-			{% endblock %}
-			{% block blog_post_detail_content %}
 				{{ blog_post.content|richtext_filters|safe }}
-			{% endblock %}
-
-
 			<div class="clearfix"></div>
-
 			</section>
-
 		</article>
 		{% if blog_post.allow_comments %}
-			{% if settings.COMMENTS_DISQUS_SHORTNAME %}
-				{% include "generic/includes/disqus_comments.html" %}
-			{% endif %}
+				{# {% comments_for blog_post %} #}
 		{% endif %}
 	</div>
 </div>

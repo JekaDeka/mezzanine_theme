@@ -174,8 +174,13 @@ class OrderTableItemList(ListView):
     context_object_name = "ordertableitem_list"
 
     def get_queryset(self):
-        return OrderTableItem.objects.filter(author=self.request.user).prefetch_related(
-            'images').select_related('categories')
+        return OrderTableItem.objects.filter(
+            author=self.request.user
+            ).prefetch_related(
+                'order_requests','images'
+                ).select_related(
+                    'categories', 'performer', 'performer__profile'
+                    )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -354,7 +359,8 @@ class OrderTableIncomeRequestList(ListView):
     def get_context_data(self, **kwargs):
         data = super(OrderTableIncomeRequestList,
                      self).get_context_data(**kwargs)
-        data['ordertableitems'] = self.request.user.orders_as_author.all().prefetch_related('images')
+        data['ordertableitems'] = self.request.user.orders_as_author.all(
+        ).prefetch_related('images')
         return data
 
 

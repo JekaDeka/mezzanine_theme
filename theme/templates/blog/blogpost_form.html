@@ -2,7 +2,7 @@
 {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
 {% block meta_title %}
 {% if object %}
-    Изменение {{ object.title }}
+    Изменение {{ object.title|capfirst }}
 {% else %}
     Новая запись
 {% endif %}
@@ -15,7 +15,7 @@
 {% block breadcrumb_element %}
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
 <li><a href="{% url 'blogpost-list' %}">Список моих записей</a></li>
-<li>{% if object %}{{ object }}{% else %}Новая запись{% endif %}</li>
+<li>{% if object %}{{ object.title|capfirst }}{% else %}Новая запись{% endif %}</li>
 {% endblock %}
 
 
@@ -27,7 +27,7 @@
       <div class="sixteen columns">
         <div class="formset-images">
           <div class="header">
-            <h1>{% if object %}{{ object }}{% else %}Новая запись{% endif %} <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению</a></h1>
+            <h1>{% if object %}{{ object.title|capfirst }}{% else %}Новая запись{% endif %} <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению</a></h1>
           </div>
           <p> Фотографии — это самая важная часть в вашем будущем магазине. Покупатели не смогут потрогать, примерить или рассмотреть поближе ваши товары. Всё, что у них есть, — это изображения вашей вещи. Помните об этом, когда отбираете фотографии для магазина. </p>
           <div class="">

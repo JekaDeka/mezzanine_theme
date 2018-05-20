@@ -19,6 +19,10 @@ urlpatterns = [
     # url(r"^shop/cart/$", cart_views.cart, name="shop_cart"),
     # url(r"^shop/checkout/$", cart_views.checkout_steps, name="shop_checkout"),
     url(r"^shop/", include("cartridge.shop.urls")),
+    url("^tag/(?P<tag>.*)/$",
+        views.BlogPostGlobalList.as_view(), name="blogpost-list-tag"),
+    url("^category/(?P<category>.*)/$",
+        views.BlogPostGlobalList.as_view(), name="blogpost-list-category"),
 
 
     # url(r"^ordertable/(?P<pk>[0-9]+)/$",

@@ -11,8 +11,9 @@ class OrderTableImageInline(admin.TabularInline):
 @admin.register(OrderTableItem)
 class OrderTableAdmin(admin.ModelAdmin):
     view_on_site = True
-    list_display = ('title', 'created', 'price', 'ended',
+    list_display = ('title', 'available', 'created', 'price', 'ended',
                     'get_performer', 'view_on_site')
+    list_editable = ('available',)
     form = OrderTableAdminForm
     inlines = [OrderTableImageInline, ]
 

@@ -15,7 +15,7 @@
     <li>
         {% if page.has_children_in_menu %}
         <div class="cd-dropdown-wrapper">
-            <a class="cd-dropdown-trigger" href="#{{branch_level}}">{{ page.title }}</a>
+            <a class="cd-dropdown-trigger" href="#{{branch_level}}">{{ page.title|capfirst }}</a>
                 <nav class="cd-dropdown">
                     <h2>Меню</h2>
                         <a href="#{{branch_level}}" class="cd-close">Закрыть</a>
@@ -23,7 +23,7 @@
                 </nav>
         </div>
         {% else %}
-        <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        <a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
         {% endif %}
     </li>
     {% endif %}
@@ -35,11 +35,11 @@
     {% for page in page_branch %}
         {% if page.in_menu %}
             <li class="{% if page.has_children_in_menu %}has-children{% endif %}">
-                <a href="{{ page.get_absolute_url }}"> {{ page.title }} </a>
-                {% if page.has_children_in_menu %} 
+                <a href="{{ page.get_absolute_url }}"> {{ page.title|capfirst }} </a>
+                {% if page.has_children_in_menu %}
                 <ul class="cd-secondary-dropdown is-hidden">
                     <li class="go-back"><a href="#{{branch_level}}">Меню</a></li>
-                    <li class="see-all"><a href="{{ page.get_absolute_url }}">{{ page.title }} полностью </a></li>
+                    <li class="see-all"><a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }} полностью </a></li>
                     {% if page.has_children_in_menu %}
                         {% page_menu page %}
                     {% endif %}
@@ -48,22 +48,23 @@
             </li>
         {% endif %}
     {% endfor %}
+    <li><a href="/catalog/"> Каталог полностью </a></li>
 </ul>
 {% else %}
     {% for page in page_branch %}
     {% if page.in_menu %}
         {% if page.has_children_in_menu %}
         <li class="has-children">
-            <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+            <a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
             <ul class="is-hidden">
-                <li class="go-back"><a href="#{{branch_level}}">{{ page.parent.title }}</a></li>
+                <li class="go-back"><a href="#{{branch_level}}">{{ page.parent.title|capfirst }}</a></li>
             {% page_menu page %}
             </ul>
         </li>
         {% else %}
-            <li class="empty-children"><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+            <li class="empty-children"><a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a></li>
         {% endif %}
-        
+
     {% endif %}
     {% endfor %}
 

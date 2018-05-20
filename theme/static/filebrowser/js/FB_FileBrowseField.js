@@ -1,7 +1,7 @@
 function FileSubmit(FilePath, FileURL, ThumbURL, FileType, BrowseUrl) {
 
     // var input_id=window.name.split("___").join(".");
-    var input_id=window.name.replace(/____/g,'-').split("___").join(".");
+    var input_id = window.name.replace(/____/g, '-').split("___").join(".");
     var preview_id = 'image_' + input_id;
     var link_id = 'link_' + input_id;
     var help_id = 'help_' + input_id;
@@ -20,12 +20,12 @@ function FileSubmit(FilePath, FileURL, ThumbURL, FileType, BrowseUrl) {
     // enable the clear "button"
     jQuery(clear).css("display", "inline");
     if (link !== null) {
-    // link is not null in case of default image field
+        // link is not null in case of default image field
         if (ThumbURL && FileType !== "") {
             // selected file is an image and thumbnail is available:
             // display the preview-image (thumbnail)
             // link the preview-image to the original image
-            link.setAttribute("href", "javascript:FileBrowser.show('" + input_id + "', '"+ BrowseUrl + "');");
+            link.setAttribute("href", "javascript:FileBrowser.show('" + input_id + "', '" + BrowseUrl + "');");
             link.setAttribute("target", "_blank");
             link.setAttribute("style", "");
             preview.setAttribute("src", ThumbURL);
@@ -38,12 +38,19 @@ function FileSubmit(FilePath, FileURL, ThumbURL, FileType, BrowseUrl) {
             preview.setAttribute("src", "");
             help.setAttribute("style", "display:none");
         }
-    }
-    else {
-        background.style.backgroundImage = "url('" + ThumbURL +"')";
+    } else {
+        background.style.backgroundImage = "url('" + ThumbURL + "')";
         background.style.border = 'none';
         background.innerHTML = '&nbsp;';
+        // if select new file uncheck delete checkbox
+        // we have id as   ".... -file "
+        // and if of delete checbox as "..... -DELETE"
+        var res = input_id.split("-");
+        res[res.length - 1] = "DELETE";
+        var delete_input_id = res.join('-');
+        opener.document.getElementById(delete_input_id).checked = false;;
+
+        
     }
     this.close();
 }
-

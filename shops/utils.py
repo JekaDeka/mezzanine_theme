@@ -1,38 +1,56 @@
 from mezzanine.conf import settings
 from shops.models import Cart
+#
+# class Map(dict):
+#     """
+#     Example:
+#     m = Map({'first_name': 'Eduardo'}, last_name='Pool', age=24, sports=['Soccer'])
+#     """
+#     def __init__(self, *args, **kwargs):
+#         super(Map, self).__init__(*args, **kwargs)
+#         for arg in args:
+#             if isinstance(arg, dict):
+#                 for k, v in arg.items():
+#                     self[k] = v
+#
+#         if kwargs:
+#             for k, v in kwargs.items():
+#                 self[k] = v
+#
+#     def __getattr__(self, attr):
+#         return self.get(attr)
+#
+#     def __setattr__(self, key, value):
+#         self.__setitem__(key, value)
+#
+#     def __setitem__(self, key, value):
+#         super(Map, self).__setitem__(key, value)
+#         self.__dict__.update({key: value})
+#
+#     def __delattr__(self, item):
+#         self.__delitem__(item)
+#
+#     def __delitem__(self, key):
+#         super(Map, self).__delitem__(key)
+#         del self.__dict__[key]
 
-class Map(dict):
-    """
-    Example:
-    m = Map({'first_name': 'Eduardo'}, last_name='Pool', age=24, sports=['Soccer'])
-    """
-    def __init__(self, *args, **kwargs):
-        super(Map, self).__init__(*args, **kwargs)
-        for arg in args:
-            if isinstance(arg, dict):
-                for k, v in arg.items():
-                    self[k] = v
 
-        if kwargs:
-            for k, v in kwargs.items():
-                self[k] = v
+def bind_cart(request):
+    session_cart_id = request.session.get('cart_id', None)
+    # print('bind: ', session_cart_id)
+    # Если не совпадает, удалить старое, задать новое???
 
-    def __getattr__(self, attr):
-        return self.get(attr)
+    if not session_cart_id:
+        user = None
+        if request.user.is_authenticated():
+            user = request.user
+        cart = Cart.objects.create(user=user)
+        # print('bind_cart:', cart)
+        # print('bind_cart_id', cart.pk)
+        request.session['cart_id'] = cart.pk
+        return cart
 
-    def __setattr__(self, key, value):
-        self.__setitem__(key, value)
-
-    def __setitem__(self, key, value):
-        super(Map, self).__setitem__(key, value)
-        self.__dict__.update({key: value})
-
-    def __delattr__(self, item):
-        self.__delitem__(item)
-
-    def __delitem__(self, key):
-        super(Map, self).__delitem__(key)
-        del self.__dict__[key]
+    return Cart.objects.get_from_request(request)
 
 
 def recalculate_cart(request):
@@ -40,8 +58,11 @@ def recalculate_cart(request):
     Updates an existing discount code, shipping, and tax when the
     cart is modified.
     """
+    # print("in recalculate: cart: ", request.cart)
+    # print("in session: cart: ", request.session.get('cart'))
+    # print('equal? ', request.session.get('cart') != request.cart.pk)
 
     # Rebind the cart to request since it's been modified.
     if request.session.get('cart') != request.cart.pk:
         request.session['cart'] = request.cart.pk
-    request.cart = Cart.objects.from_request(request)
+    request.cart = Cart.objects.get_from_request(request)

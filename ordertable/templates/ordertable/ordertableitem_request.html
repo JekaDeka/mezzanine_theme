@@ -16,7 +16,7 @@
                     {% if ordertableitem.images.all.0 %}
                     <figure class="from-the-blog-image">
                         <a href="{{ ordertableitem.get_absolute_url }}">
-                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail ordertableitem.images.all.0 300 200 %}" alt="{{ ordertableitem.title }}" />
+                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail ordertableitem.images.all.0 300 200 %}" alt="{{ ordertableitem.title|capfirst }}" />
                         </a>
                         <div class="hover-icon"></div>
                     </figure>
@@ -31,7 +31,7 @@
                     {% endif %}
                 {% endif %}
                 <section class="from-the-blog-content">
-                    <a href="{{ ordertableitem.get_absolute_url }}"><h5>{{ ordertableitem.title|title }}</h5></a>
+                    <a href="{{ ordertableitem.get_absolute_url }}"><h5>{{ ordertableitem.title|capfirst }}</h5></a>
                     {% if ordertableitem.preview_content %}
                         {{ ordertableitem.preview_content|safe|truncatewords_html:55 }}
                     {% else %}

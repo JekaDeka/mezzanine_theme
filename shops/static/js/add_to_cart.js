@@ -1,28 +1,32 @@
 $(document).ready(function() {
-  $('.tmp').on('submit', function(event) {
-    event.preventDefault();
-    var form = $(this);
-    $.ajax({
-      method: "POST",
-      url: $(form).attr('action'),
-      data: $(form).serialize(),
-      beforeSend: function() {
-        $('.cart-btn').hide();
-        $('.loader').show();
-      },
-      success: function(data) {
-        if (data.error == true) {
-          $('.cart-btn').show();
-          $('.loader').hide();
-        } else {
-          $('.loader').hide();
-          $('.cart-draw').html(data);
-        }
-      },
-      error: function(data) {
-        $('.cart-btn').show();
-        $('.loader').hide();
-      }
-    });
+  $(".add-to-cart").on('click touch', function() {
+    if (!$(this).is('.added')) {
+      event.preventDefault();
+      var button = $(this);
+      var form = $(this).parent('.add-to-cart-form');
+      var data = $(form).serialize();
+      // if ($("input#id_quantity").val() > 0) {
+        $.ajax({
+          method: "POST",
+          url: $(form).attr('action'),
+          data: data,
+          success: function(data) {
+            if (data.error == true) {
+              console.log(data.error_message);
+            } else {
+              $(button).addClass("added");
+              $(button).text('Добавлено');
+
+              $('.cart-draw').html(data);
+              $('.cart-btn>span').hide();
+              $('.cart-btn>span').fadeIn(300);
+            }
+          },
+          error: function(data) {
+            console.log('error-level-2');
+          }
+        });
+      // }
+    }
   });
 });

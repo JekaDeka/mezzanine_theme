@@ -31,16 +31,10 @@ class ShopMiddleware(SSLRedirect):
     Adds cart and wishlist attributes to the current request.
     """
     def process_request(self, request):
-        # if request.user.id:
-        #     request.user = User.objects.select_related('shop', 'profile', 'profile__region').get(id=request.user.id)
-        # pass
-        # try:
-        #     User.objects.select_related('shop', 'profile', 'profile__region').get(id=request.user.id)
-        # except Exception as e:
-        #     pass
-
         request.cart = Cart.objects.get_from_request(request)
-        # wishlist = request.COOKIES.get("wishlist", "").split(",")
-        # if not wishlist[0]:
-        #     wishlist = []
-        # request.wishlist = wishlist
+        # print("Middleware, cart: ", request.cart)
+        # print("Middleware, cart_id: ", request.cart.pk)
+        # request.session['cart'] = request.cart.id
+        # print(request.cart.id)
+        # print(request.session['cart'])
+        # request.cart = Cart.objects.from_request(request)

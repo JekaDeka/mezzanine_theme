@@ -10,7 +10,7 @@
     {% endif %}
     {% if page.in_menu %}
     <li class="{% if page.is_current_or_ascendant %}active{% endif %}{% if forloop.last %} last{% endif %}">
-        <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+        <a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
     </li>
     {% endif %}
     {% endfor %}

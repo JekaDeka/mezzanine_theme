@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load mezzanine_tags keyword_tags i18n disqus_tags theme_tags blog_tags %}
 
-{% block meta_title %}{{ order.title }}{% endblock %}
+{% block meta_title %}{{ order.title|capfirst }}{% endblock %}
 
 
 {% block meta_description %}{% metablock %}
@@ -9,15 +9,15 @@
 {% endmetablock %}{% endblock %}
 
 {% block title %}
-{{ order.title|title }}
+{{ order.title|capfirst }}
 {% endblock %}
 
 {% block breadcrumbs_title %}
-	<h2>{{ order.title }}</h2>
+	<h2>{{ order.title|capfirst }}</h2>
 {% endblock breadcrumbs_title %}
 
 {% block breadcrumb_element %}
-<li>{{ order.title|title }}</li>
+<li>{{ order.title|capfirst }}</li>
 {% endblock %}
 
 {% block leftsidebar %}
@@ -31,7 +31,7 @@
 		<div class="slider-padding">
 			<div id="product-slider" class="royalSlider rsDefault">
 				{% for image in order.images.all %}
-				<a href="{{ MEDIA_URL }}{% thumbnail image 0 0 True 80 %}" class="mfp-gallery" title="{{ order.title|title }}">
+				<a href="{{ MEDIA_URL }}{% thumbnail image 0 0 True 80 %}" class="mfp-gallery" title="{{ order.title|capfirst }}">
 					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image 410 410 True 80 %}"
 					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image 96 96 True 80 %}" alt="{{ image.description }}" />
 				</a>
@@ -89,7 +89,7 @@
 							<i class="fa fa-rub" aria-hidden="true"></i> Бюджет
 						</th>
 						<td>
-							{{ order.price|rub_currency }}
+							{{ order.price }}
 						</td>
 					</tr>
 					<tr>

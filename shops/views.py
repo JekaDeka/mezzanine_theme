@@ -7,23 +7,21 @@ from django.core.mail import EmailMessage
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.template.loader import get_template, render_to_string
 from django.shortcuts import redirect
-from django.core import serializers
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
+from django.db.models import Avg, Count
 
 from shops.models import UserShop, UserShopDelivery, UserShopDeliveryOption, \
     ShopProduct, ShopProductImage, Cart, Order
 from shops.forms import ProductForm, ProductImageForm, ShopForm, ProductImageFormSet, \
-    AddProductForm, CartItemForm, CartItemFormSet, OrderForm
-# UserShopDeliveryOptionFormSet
-from shops.utils import Map, recalculate_cart
+    AddProductForm, CartItemForm, CartItemFormSet, OrderForm, ProductReviewForm
+from shops.utils import recalculate_cart, bind_cart
 
-from cartridge.shop.utils import recalculate_cart, sign
-
-from mezzanine.utils.views import paginate
-from mezzanine.conf import settings
-
+# from cartridge.shop.utils import recalculate_cart, sign
+# from mezzanine.utils.views import paginate
+# from django.core import serializers
 from theme.forms import MessageForm
+from mezzanine.conf import settings
 
 
 class AjaxableResponseMixin(object):
@@ -179,6 +177,7 @@ class ProductList(ListView):
     model = ShopProduct
     template_name = "product/product_user_list.html"
     context_object_name = "product_list"
+    paginate_by = 10
 
     def get_queryset(self):
         return ShopProduct.objects.filter(shop__id=self.request.user.shop.id)
@@ -319,13 +318,59 @@ class ProductDetailView(DetailView):
     model = ShopProduct
     template_name = "product/product.html"
     context_object_name = 'product'
-    queryset = ShopProduct.objects.prefetch_related(
-        'keywords__keyword', 'images').select_related("shop__user__profile", "shop__user__profile__country", "shop__user__profile__city")
+    def get_queryset(self):
+        qs = super(ProductDetailView, self).get_queryset()
+        qs = qs.prefetch_related(
+                'keywords__keyword',
+                'images').select_related(
+                    "shop__user__profile",
+                    "shop__user__profile__city",
+                    "shop__user__profile__country"
+                    )
+
+        return qs
 
     def get_context_data(self, **kwargs):
         data = super(ProductDetailView, self).get_context_data(**kwargs)
-        data['form'] = AddProductForm(product=self.object)
+        data['add_to_cart_form'] = AddProductForm(product=self.object)
+        data['review_form'] = ProductReviewForm(product=self.object)
+        reviews = self.object.product_reviews.filter(approved=True).select_related(
+            'author__profile',
+            ).values(
+                'created_at',
+                'rating',
+                'content',
+                'author__profile__image',
+                'author__profile__first_name',
+                'author__profile__last_name',
+            )
+        data['reviews'] = reviews[:5]
         return data
+
+    def post(self, request, *args, **kwargs):
+        form = ProductReviewForm(request.POST)
+        product = self.get_object()
+        if form.is_valid() and product.shop != self.request.user.shop:
+            review = form.save(commit=False)
+            review.author = self.request.user
+            review.product = product
+            try:
+                review.save()
+            except Exception as e:
+                 messages.error(request, "Вы уже оставили отзыв для этого товара.")
+            else:
+                messages.success(request, "Отзыв успешно добавлен. Как только модератор проверит его, \
+                                 мы отобразим его на сайте.")
+        else:
+            messages.error(request, "Нельзя оставить отзыв на собственынй товар.")
+        return HttpResponseRedirect(product.get_absolute_url())
+
+    def get_object(self, queryset=None):
+        obj = super(ProductDetailView, self).get_object(queryset=queryset)
+        if not self.request.user.is_superuser:
+            if not obj.available:
+                raise Http404()
+        return obj
 
 
 class ShopList(ListView):
@@ -531,20 +576,44 @@ class ShopDetailView(DetailView):
 def get_cart(request):
     if request.is_ajax():
         cart = Cart.objects.get_from_request(request)
-        quantity = int(request.POST.get('quantity', 1))
-        shop_name = request.POST.get('shop_name', None)
-        product = ShopProduct.objects.get(
-            id=request.POST.get('product_id', None))
-        # product = Map()
-        # for key, value in request.POST.items():
-        #     product[key]=value
-        if cart and product:
-            cart.add_item(product, quantity, shop_name)
-        html = render_to_string('shops/includes/user_panel.html',
-                                {'request': request, 'MEDIA_URL': settings.MEDIA_URL})
-        return HttpResponse(html)
-    return JsonResponse({})
+        if not cart.pk:
+            print('lets_bind')
+            cart = bind_cart(request)
 
+
+        quantity = int(request.POST.get('quantity', 0))
+        data = {
+            'error': True if quantity < 1 else False
+        }
+        if data['error']:
+            data['error_message'] = 'No quantity provided'
+        try:
+            product = ShopProduct.objects.get(id=request.POST.get('product_id'))
+        except ShopProduct.DoesNotExist:
+            product = None
+            data.update({'error': True, 'error_message': 'No product found'})
+        except Exception:
+            data.update({'error': True, 'error_message': '500'})
+
+
+        if cart and product and not data['error']:
+            print('seems fine, try to add')
+            cart.add_item(product, quantity)
+            recalculate_cart(request)
+            html = render_to_string('shops/includes/user_panel.html',
+                                    {'request': request, 'MEDIA_URL': settings.MEDIA_URL})
+            return HttpResponse(html)
+    return JsonResponse(data)
+
+
+def cart_update(request):
+    if request.is_ajax():
+        html = render_to_string('includes/cart_response.html',
+            {'request': request, 'MEDIA_URL': settings.MEDIA_URL})
+        return HttpResponse(html)
+
+    data = {}
+    return JsonResponse(data)
 
 # class CartView(DetailView):
 #     template_name = "shops/cart.html"
@@ -581,6 +650,7 @@ class CartView(UpdateView):
                 self.request.POST, instance=self.object)
         else:
             data['cartitems'] = CartItemFormSet(instance=self.object)
+        data['shops'] = UserShop.objects.filter(id__in=self.object.get_shops_id_list()).values('id', 'shopname', 'slug', 'image')
         return data
 
     def form_valid(self, form):
@@ -590,51 +660,15 @@ class CartView(UpdateView):
             if cartitems.is_valid():
                 cartitems.save()
                 messages.success(self.request, self.success_message)
-        return super(CartView, self).form_valid(form)
-
-    # def get_queryset(self):
-    #     return Cart.objects.filter(user=self.request.user)
-
-    # def post(self, request, *args, **kwargs):
-    #     form = MessageForm(data=request.POST)
-    #     if form.is_valid():
-    #         message = request.POST.get('message', '')
-    #         first_name = request.POST.get('first_name', '')
-    #         email = request.POST.get('email', '')
-    #         template = get_template('email/shop_message_send.html')
-    #         context = {
-    #             'request': request,
-    #             'shop': self.get_object(),
-    #             'profile': self.get_object().user.profile,
-    #             'first_name': first_name,
-    #             'email': email,
-    #             'message': message,
-    #         }
-    #         content = template.render(context)
-    #
-    #         email = EmailMessage(
-    #             "Вашему магазину задали вопрос handmaker.top",
-    #             content,
-    #             settings.EMAIL_HOST_USER,
-    #             [self.get_object().user.email],
-    #             headers={'Reply-To': email}
-    #         )
-    #         email.content_subtype = 'html'
-    #         email.send(fail_silently=True)
-    #         messages.success(request, "Ваше сообщение успешно отправлено")
-    #     else:
-    #         messages.error(request, "Проверьте правильность введенных данных")
-    #     return HttpResponseRedirect(self.get_object().get_absolute_url())
-
-    # def get_context_data(self, **kwargs):
-    #     data = super(ShopDetailView, self).get_context_data(**kwargs)
-    #     if self.request.POST:
-    #         data['form'] = MessageForm(self.request.POST)
-    #     else:
-    #         data['form'] = MessageForm()
-    #     return data
+        ###
+        ### We don't have to save the cart instance because cart manager handle it already
+        ###
+        return redirect(self.success_url)
 
 
+
+
+### if shop has no orders
 class CheckoutProcess(CreateView):
     model = Order
     form_class = OrderForm

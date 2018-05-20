@@ -43,24 +43,6 @@
           {% block navbar_dropdown_menu %} {% page_menu "pages/menus/dropdown.html" %} {% endblock %}
         </div>
       </div>
-      {# {% if request.user.is_staff %} #}
-      {# <div id="style-switcher"> #}
-        {# <h2><a href="{% url 'admin:index' %}">Панель управления</a></h2> #}
-        {# <a href="{% url 'admin:index' %}" id="settings"><i class="fa fa-cog fa-2x" aria-hidden="true"></i></a> #}
-        {# <a id="open-switcher"><i class="arrow right"></i> </a> #}
-        {# <div> #}
-          {# <ul> #}
-            {# {% if request.user.profile %} #}
-            {# <li><a href="{% url 'blogpost-list' %}">Мой Блог</a></li> #}
-            {# <li><a href="{% url 'ordertableitem-list' %}">Мой стол заказов</a></li> #}
-            {# {% endif %} #}
-            {# {% if request.user_shop %} #}
-            {# <li><a href="{% url 'product-list' %}">Мои товары</a></li> #}
-            {# {% endif %} #}
-          {# </ul> #}
-        {# </div> #}
-      {# </div> #}
-      {# {% endif %} #}
     </div>
     {% endblock %}
     {% block header %}
@@ -89,7 +71,8 @@
       <div class="container">
         <div class="sixteen columns">
           {% block breadcrumbs_title %}
-          <h2>{{ page.title|title }}</h2> {% endblock breadcrumbs_title %}
+          <h2>{{ page.title|capfirst }}</h2>
+          {% endblock breadcrumbs_title %}
           <nav id="breadcrumbs">
             <ul>
               {% block breadcumbs_menu %} {% page_menu "pages/menus/breadcrumb.html" %} {% endblock %} {% block breadcrumb_element %} {% endblock %}
@@ -109,7 +92,7 @@
 
     {% spaceless %}
     {% block main_containter %}
-    <div class="container">
+    <div class="{% block main_containter_class %}container{% endblock %}">
       {% block leftsidebar %}{% endblock %}
       {% block main %}{% endblock %}
       {% block rightsidebar %}{% endblock %}
@@ -141,7 +124,7 @@
           <ul class="footer-links">
             {% page_rules_menu as page_rules %}
             {% for page in page_rules %}
-              <li><a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+              <li><a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a></li>
             {% endfor %}
           </ul>
         </div>
@@ -171,7 +154,8 @@
     </div>
     <div id="topper" style="display: block;"><a href="#"></a></div>
   </div>
-  {% endblock %} {% compress js %}
+  {% endblock %}
+  {% compress js %}
   <script src="{% static 'js/jquery-1.11.0.min.js' %}"></script>
   <script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
   <script src="{% static 'js/hoverIntent.js' %}"></script>
@@ -195,7 +179,11 @@
   <script src="{% static 'js/mask.js' %}"></script>
   <script src="{% static 'js/jquery.menu-aim.js' %}"></script>
   <script src="{% static 'js/main.js' %}"></script>
-  {% block extra_js %} {% endblock %} {% block footer_js %} {% endblock %} {% endcompress %}
+  {% block extra_js %}
+  {% endblock %}
+  {% block footer_js %}
+  {% endblock %}
+  {% endcompress %}
 </body>
 
 </html>

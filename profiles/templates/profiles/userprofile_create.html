@@ -5,55 +5,88 @@
 {% endblock %}
 
 {% block breadcrumbs_title %}
-<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
+<h2>Личный кабинет</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
 <li>{{ request.user.email }}</li>
-{% endblock breadcrumb_element %} {% block main %}
-<div class="sixteen columns margin-bottom-25">
-    <!--    <h3 class="headline">Мой профиль</h3><span class="line"></span>
-    <div class="clearfix"></div>-->
-    <h2>Добрый день, {{ request.user }}!</h2>
-    <p>
-        Администрация сайта <a href="{% url 'true_index' %}">Handmaker.top</a> рада, что Вы присоединились к нашему творческом сообществу. Совсем скоро Вы станете владельцем своего собственного магазина, и у Вас появится возможность вести свой персональный блог.
-    </p>
-    <p>
+{% endblock breadcrumb_element %}
+
+
+{% block main_containter %}
+<div class="container fullwidth-element row-shadow">
+  <div class="container">
+    <div class="sixteen columns margin-bottom-50">
+      <h2>Добрый день!</h2>
+      <p>
+        Администрация сайта <a href="{% url 'true_index' %}">Handmaker.top</a> рада, что Вы присоединились к нашему творческом сообществу. Совсем скоро Вы станете владельцем своего собственного магазина, и у Вас появится возможность вести свой персональный
+        блог.
+      </p>
+      <p>
         Для того, чтоб в полной мере воспользоваться всеми полезными функциями нашего сайта Вам необходимо заполнить данные ниже. Чем более полно Вы заполните свои данные, тем больше о Вас узнают Ваши потенциальные покупатели.
-    </p>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.errors }}
-        {{ form.first_name|as_crispy_field }}
-        {{ form.last_name|as_crispy_field }}
-        <div class="clearfix"></div>
-        <div class="shop-images custom-field">
-            <label for="id_{{form.image.name}}" class="form-control-label  requiredField">
-                {{form.image.label}}
-                <span class="asteriskField">*</span>
-            </label>
-            {{ form.image }}
-            {{ form.image.errors }}
-        </div>
-        <div class="clearfix"></div>
-        <div class="margin-top-20">
-            {{ form.country|as_crispy_field }}
-            {{ form.region|as_crispy_field }}
-            {{ form.city|as_crispy_field }}
-            {{ form.phone|as_crispy_field }}
-        </div>
-        <div class="clearfix"></div>
-        <div class="custom-field">
-            <label for="id_{{form.bio.name}}" class="form-control-label ">
-                {{ form.bio.label }}
-            </label>
-            <div>
-                {{ form.bio }}
-            </div>
-        </div>
-        <div class="margin-top-15">
-            <input type="submit" class="button pull-right margin-right-10" value="Сохранить"/>
-        </div>
-    </form>
+      </p>
+    </div>
+  </div>
 </div>
-{% endblock %} {% block extra_js %} {{ block.super }}
+<form method="post" enctype="multipart/form-data" class="input-no-background">
+    {% csrf_token %}
+    <div class="flat-background">
+    	<div class="flat-row padding-top-50">
+    		<div class="container fullwidth-element">
+            <div class="shop-images">
+        			{{ form.background }}
+        		</div>
+        		<div class="shop-images">
+        			{{ form.image }}
+        		</div>
+        </div>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="ten columns">
+        <div class="four columns alpha margin-top-20 margin-bottom-15">
+          {{ form.first_name|as_crispy_field }}
+        </div>
+        <div class="four columns omega margin-top-20 margin-bottom-15">
+          {{ form.last_name|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.country|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.region|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.city|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="four columns alpha margin-top-20 margin-bottom-15">
+          {{ form.phone|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="seven columns alpha margin-top-20 margin-bottom-15">
+          {{ form.bio|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="six columns sticky margin-top-50">
+          <div class="action-bar">
+            <div class="save">
+              <input type="submit" class="button" value="Сохранить профиль"/>
+            </div>
+          </div>
+      </div>
+    </div>
+</form>
+<div class="margin-top-50"></div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
 <script type="text/javascript">
 $(function() {
     $(".mask").mask('+0 (000) 000 0000');
@@ -62,12 +95,34 @@ $(function() {
 <script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
 <script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
 <script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
-    <script type="text/javascript">
-        window.__csrf_token = '{{ csrf_token }}';
-        window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
-        window.__filebrowser_url = '{% url "fb_browse" %}';
-    </script>
-    <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
-    <script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
-    <script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
+<script type="text/javascript">
+  window.__csrf_token = '{{ csrf_token }}';
+  window.__filebrowser_url = '{% url "fb_browse" %}';
+</script>
+<script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
+<script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
+<script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
+<script type="text/javascript" src="{% static "js/jquery.ns-autogrow.min.js" %}"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('.input-no-background input, .input-no-background textarea').bind('change', function () {
+      if ($(this).val() != "") {
+        $(this).addClass("has-content");
+      } else {
+        $(this).removeClass("has-content");
+      }
+    }).trigger('change');
+		$('textarea').autogrow({vertical: true, horizontal: false});
+      {% if form.image.errors %}
+      var el = $(".shop-image");
+      $(el).css('border-color', '#ef2929');
+      $(el).css('color', '#ef2929');
+      {% endif %}
+      {% if form.background.errors %}
+      var el = $(".shop-background-image");
+      $(el).css('border-color', '#ef2929');
+      $(el).css('color', '#ef2929');
+      {% endif %}
+  });
+</script>
 {% endblock extra_js %}

@@ -1,238 +1,264 @@
 {% extends "base.html" %}
-{% load staticfiles mezzanine_tags theme_tags rating_tags i18n pages_tags %}
+{% load staticfiles mezzanine_tags theme_tags pages_tags crispy_forms_tags %}
 
-{% block meta_title %}
-{{ product.title }}
+{% block meta_title %} {{ product.title|capfirst }} {% endblock %}
+{% block meta_keywords %}
+{% metablock %}
+{% for keyword in product.keywords.all %}
+	{% if not forloop.first %}, {% endif %} {{ keyword }}
+{% endfor %}
+{% endmetablock %}
+{% endblock %}
+{% block meta_description %}
+{% metablock %}
+{{ product.description }}
+{% endmetablock %}
 {% endblock %}
 
-{% block meta_keywords %}{% metablock %}
-{% for keyword in product.keywords.all %}
-	{% if not forloop.first %}, {% endif %}
-	{{ keyword }}
-{% endfor %}
-{% endmetablock %}{% endblock %}
-
-{% block meta_description %}{% metablock %}
-{{ product.description }}
-{% endmetablock %}{% endblock %}
-
-
 {% block breadcrumbs_title %}
-	<h2>{{ product.title }}</h2>
+<h2>{{ product.title|capfirst }}</h2>
 {% endblock breadcrumbs_title %}
 
 {% block breadcrumb_element %}
 {% for category in product.get_categories %}
-	<li><a href="{{category.get_absolute_url}}">{{ category.title }}</a></li>
+	<li><a href="{{category.get_absolute_url}}">{{ category.title|capfirst }}</a></li>
 {% endfor %}
-<li>{{ product.title }}</li>
+<li>{{ product.title|capfirst }}</li>
 {% endblock %}
 
-{% block leftsidebar %}
-{% if product.images.all %}
-	<div class="seven columns">
-		<div class="slider-padding">
-			<div id="product-slider" class="royalSlider rsDefault">
-			{% for image in product.images.all %}
-				<a href="{{ MEDIA_URL }}{% thumbnail image.file 0 0 True 80 %}" class="mfp-gallery" title="{{product.title}}">
-					<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 485 485 True 80 %}"
-					data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ image.description }}" alt="{{ product.title }}" />
-				</a>
-			 {% endfor %}
-			 </div>
-			 <div class="clearfix"></div>
-		</div>
-	</div>
-{% endif %}
-{% endblock %}
-
-
-{% block main %}
-<div class="{% if product.images.all %}nine {% else %} fourteen {% endif %}columns">
-	<div class="product-page">
-
-	<!-- Headline -->
-		<section class="title">
-			<h2>{{ product }}</h2>
-			{% if product.pre_order %}
-				<div class="product-example">Для примера</div>
-			{% endif %}
-			{% if product.on_custom_sale %}
-				<span class="product-price-discount">{{ product.price }}<i>{{ product.price|rub_currency }}</i></span>
-			{% else %}
-				<span class="product-price">{{ product.price|rub_currency }}</span>
-			{% endif %}
-		</section>
-		<section>
-			<p class="margin-reset">
-				{% if product.description %}
-					{{ product.description|richtext_filters|safe }}
-				{% else %}
-					Описание товара отсутствует
-				{% endif %}
-			</p>
-			{% if not on_vacation %}
-				<section>
-					<form class="tmp" action="{% url 'get_cart' %}" method="post">
-						{% csrf_token %}
-						{{ form }}
-						<a href="{% url 'shop-cart' %}" class="button color">Купить сейчас</a>
-						<button type="submit">Добавить в корзину</button>
-					</form>
-				<div class="clearfix"></div>
-				</section>
-			{% else %}
-				<p class="error-msg">{% trans "This product is currently unavailable." %}</p>
-			{% endif %}
-		<div class="clearfix"></div>
-
-		{% if product.keywords.all %}
-			<div class="widget margin-top-0">
-				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>
-				<nav class="tags">
-					{% for tag in product.keywords.all %}
-					    <a href="/search/?q={{tag}}" class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
-					{% endfor %}
-				</nav>
+{% block main_containter %}
+<div class="row-tmp">
+	<div class="container fullwidth-element row-shadow">
+		<div class="container">
+			{% with images=product.images.all %} {% if images %}
+			<div class="eight columns">
+				<div class="slider-padding">
+					<div id="product-slider" class="royalSlider rsDefault">
+						{% for image in images %}
+						<a href="{{ MEDIA_URL }}{% thumbnail image.file 800 0 True 80 %}" class="mfp-gallery" title="{{product.title}}">
+						<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 450 450 True 80 %}"
+						data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ product.title|capfirst }}" />
+					</a> {% endfor %}
+					</div>
+					<div class="clearfix"></div>
+				</div>
 			</div>
-		{% endif %}
-		<div class="widget margin-top-10">
-			<h3 class="headline">Информация о магазине</h3><span class="line"></span><div class="clearfix"></div>
-			{% if product.shop.on_vacation %}
-				<div class="product-example red">Магазин на каникулах</div>
 			{% endif %}
-			<a href="{{ product.shop.get_absolute_url }}">
-				<img src="{{ MEDIA_URL }}{% thumbnail product.shop.image 200 200 %}" class="pull-left margin-right-5" alt="{{ product.shop.shopname }}" />
-				<h2>{{ product.shop.shopname }}</h2>
-			</a>
-			<p><i class="fa fa-map-marker"></i> <strong>{{ product.shop.user.profile.get_location }}</strong><p>
+
+			<div class="{% if images %}eight{% else %}sixteen{% endif %} columns">
+				{% endwith %}
+				<div class="product-page">
+					<section class="title">
+						<h2>{{ product.title|capfirst }}</h2>
+						<span class="product-price">{{ product.price|rub_currency }}</span>
+						{% include "includes/star_widget.html" with value=product.reviews_average %}
+						<br>
+						<span class="reviews-counter">{{ product.reviews_count|rupluralize:"отзыв,отзыва,отзывов" }}</span>
+						<div class="clearfix"></div>
+					</section>
+
+					<section>
+						<p class="margin-reset">
+							{% if product.description %} {{ product.description }} {% else %} Описание отсутствует. {% endif %}
+						</p>
+					</section>
+
+					<section class="linking">
+						<form class="add-to-cart-form" action="{% url 'get_cart' %}" method="post">
+							{{ add_to_cart_form }}
+							<a href="{% url 'shop-cart' %}" class="button adc add-to-cart">В корзину</a>
+						</form>
+
+
+						<div class="clearfix"></div>
+					</section>
+
+					{% with tags=product.keywords.all %}
+					{% if tags %}
+					<div class="widget margin-top-10">
+						<h3 class="headline">Теги</h3><span class="line"></span>
+						<div class="clearfix"></div>
+						<nav class="tags">
+							{% for tag in tags %}
+								<a href="/{{ tag.keyword.slug }}" class="tag">{{ tag }}</a>
+							{% endfor %}
+						</nav>
+					</div>
+					{% endif %}
+					{% endwith %}
+
+					<div class="widget margin-top-10 margin-bottom-10">
+						<h3 class="headline">Магазин</h3><span class="line"></span>
+						<div class="clearfix"></div>
+						<div class="widget-content">
+							<div class="image-content pull-left">
+								<a href="{{ product.shop.get_absolute_url }}">
+							<img src="{{ MEDIA_URL}}{% thumbnail product.shop.image 100 100 %}" alt="{{ product.shop.shopname }}" class="shop-image">
+						</a>
+							</div>
+							<div class="text-content pull-left">
+								<h2><a href="{{ product.shop.get_absolute_url }}">
+							{{ product.shop.shopname }}
+						</a></h2>
+								<span>{{ product.shop.user.profile.get_location }}</span>
+							</div>
+
+							<div class="clearfix"></div>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
-	</section>
+
+		<div class="container">
+			<div class="sixteen columns">
+				<!-- Tabs Navigation -->
+				<ul class="tabs-nav">
+					<li class="active"><a href="#tab1">Характеристики</a></li>
+					<li><a href="#tab2">Доставка и оплата</a></li>
+					{% if product.shop.rules %}
+					<li><a href="#tab3">Правила возврата и обмена</a></li>
+					{% endif %}
+					<li><a href="#tab4">Отзывы <span class="tab-reviews">({{ product.reviews_count }})</span></a></li>
+				</ul>
+
+				<!-- Tabs Content -->
+				<div class="tabs-container margin-bottom-20">
+
+					<div class="tab-content" id="tab1">
+						<table class="basic-table">
+							<tr>
+								<th>Материал</th>
+								<td>{{ product.material|not_none|add_spaces }}</td>
+							</tr>
+
+							<tr>
+								<th>Размер</th>
+								<td>{{ product.size|not_none }}</td>
+							</tr>
+
+							<tr>
+								<th>Состояние</th>
+								<td>
+									{% if product.condition == 1 %} Представлена полностью готовая работа {% endif %}
+									{% if product.condition == 2 %} Представлена работа под заказ. Для ее выполнения потребуется время {% endif %}
+									{% if product.condition == 3 %} Работа представлена для примера. Повторить работу точь-в-точь невозможно {% endif %}
+								</td>
+							</tr>
+						</table>
+					</div>
+
+					<div class="tab-content" id="tab2">
+						{% with payments=product.shop.payment_options.all %}
+						<div class="eight columns alpha">
+							{% if payments %}
+							<h4 class="headline">Оплата</h4><span class="line"></span>
+							<div class="clearfix"></div>
+							<ul class="list-4 color">
+								{% for payment in payments %}
+									<li>{{ payment }}</li>
+								{% endfor %}
+							</ul>
+							{% endif %}
+							{% if product.shop.payment_other %}
+							<p> {{ product.shop.payment_other }} </p>
+							{% endif %}
+						</div>
+						{% endwith %}
+						{% with deliveries=product.shop.get_delivery_options %}
+						<div class="eight columns omega">
+							{% if deliveries %}
+							<h4 class="headline">Доставка</h4><span class="line"></span>
+							<div class="clearfix"></div>
+							<ul class="list-4 color">
+								{% for delivery in deliveries %}
+									<li>{{ delivery.label }}: {{ delivery.usershopdeliveryoption__price|rub_currency }}</li>
+								{% endfor %}
+							</ul>
+							{% endif %}
+							{% if product.shop.delivery_other %}
+							<p> {{ product.shop.delivery_other }} </p>
+							{% endif %}
+						</div>
+						{% endwith %}
+					</div>
+					{% if product.shop.rules %}
+					<div class="tab-content" id="tab3">
+						<p>{{ product.shop.rules }}</p>
+					</div>
+					{% endif %}
+
+					<div class="tab-content" id="tab4">
+						<section class="comments">
+							{% if reviews %}
+								<ul>
+								{% for review in reviews %}
+									<li>
+										<div class="avatar">
+											{% if review.author__profile__image %}
+												<img src="{{ MEDIA_URL }}{% thumbnail review.author__profile__image 70 70 %}" alt="">
+											{% else %}
+												<img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="">
+											{% endif %}
+										</div>
+										<div class="comment-content">
+											<div class="arrow-comment"></div>
+											<div class="comment-by">
+												<strong>{{ review.author__profile__first_name }} {{ review.author__profile__last_name }}</strong>
+												<span class="date"> {{ review.created_at|date:"d E Y" }} </span>
+												<div>
+													{% include "includes/star_widget.html" with value=review.rating %}
+												</div>
+											</div>
+											<p> {{ review.content }} </p>
+										</div>
+									</li>
+								{% endfor %}
+							</ul>
+							{% else %}
+							<p class="margin-bottom-10">Отзывов ещё нет — ваш может стать первым.</p>
+							{% endif %}
+							{% if request.user.is_authenticated %}
+							<a href="#small-dialog" class="popup-with-zoom-anim button color {% if not reviews %}margin-left-0{% endif %}">Добавить отзыв</a>
+
+							<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+								<h3 class="headline">Добавить отзыв</h3><span class="line margin-bottom-25"></span>
+								<div class="clearfix"></div>
+
+								<!-- Form -->
+								<form id="add-comment" class="add-comment" action="" method="POST">
+									{% csrf_token %}
+									{{ review_form }}
+									<input type="submit" class="button" value="Добавить отзыв"/>
+									<div class="clearfix"></div>
+								</form>
+							</div>
+							{% endif %}
+					</section>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 {% endblock %}
 
 {% block extra_content %}
-<div class="container">
-	<div class="sixteen columns margin-top-5">
-			<!-- Tabs Navigation -->
-			<ul class="tabs-nav">
-				<li class="active"><a href="#tab2">Характеристики</a></li>
-
-				{# {% get_fields product.shop starts_with="express" as express_fields %} #}
-    			{# {% if express_fields|any_is_true %} #}
-					<li><a href="#tab4">Доставка</a></li>
-				{# {% endif %} #}
-				{# {% if product.shop.rules %} #}
-					<li><a href="#tab5">Правила магазина</a></li>
-				{# {% endif %} #}
-
-				<li><a href="#tab3">Отзывы <span class="tab-reviews"></span></a></li>
-			</ul>
-
-			<!-- Tabs Content -->
-			<div class="tabs-container">
-				<div class="tab-content" id="tab2">
-					<table class="basic-table">
-					<tr>
-						<th>Материал</th>
-						<td>
-						{% if product.material %}
-							{{ product.material|add_spaces }}
-						{% else %}
-							Не указан
-						{% endif %}</td>
-					</tr>
-					<tr>
-						<th>Состояние</th>
-						<td>{{ product.condition }}</td>
-					</tr>
-
-					</table>
-				</div>
-				<div class="tab-content" id="tab3">
-					{% if settings.COMMENTS_DISQUS_SHORTNAME %}
-						{# {% include "generic/includes/disqus_comments.html" %} #}
-					{% endif %}
-				</div>
-				{% if express_fields %}
-				<div class="tab-content list-1" id="tab4">
-			        <ul>
-			            {% for fields in express_fields|grouped %}
-			                {% if fields.0.value %}
-			                <li> {{ fields.0.label }}: <span style="white-space: nowrap;">{{ fields.1.value|rub_currency }}</span> </li>
-			                {% endif %}
-			            {% endfor %}
-			        </ul>
-			        <p>{{ product.shop.express_other }}</p>
-			    </div>
-				{% endif %}
-				<div class="tab-content" id="tab5">
-				<p>{{ product.shop.rules|safe }}</p>
-				</div>
-
-			</div>
-	</div>
-</div>
-<!-- Related Products -->
-<div class="container margin-top-5">
-
-	<!-- Products -->
-	<span class="line margin-bottom-0"></span>
-	<div class="sixteen columns products">
-            {% for product in product.user.product_set.all|slice:"5" %}
-			<div class="three shop columns custom_column">
-				<figure class="product">
-					<div class="badges">
-					{% if product.pre_order %}
-						<div class="product-example">Для примера</div>
-					{# {% else %} #}
-						<!--<div class="product-ready">Готовый вариант</div>-->
-					{% endif %}
-					{% if product.on_custom_sale %}
-						<div class="product-discnt">СКИДКА</div>
-					{% endif %}
-					</div>
-					{% with product.images.all as images %}
-					<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
-					<a href="{{ product.get_absolute_url }}">
-						{% if images %}
-						<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}">
-							{% if product.image.count != 1 %}
-							<div class="cover">
-									<img alt="" src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}">
-							</div>
-							{% endif %}
-						{% else %}
-						<img alt="" src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}">
-						{% endif %}
-					</a>
-					<a href="{{ product.get_absolute_url }}" class="product-button"><i class="fa fa-share"></i>Подробнее</a>
-					</div>
-					{% endwith %}
-					<a href="{{ product.get_absolute_url }}">
-						<section>
-							<h5>{{ product.title|title|truncatechars:34 }}</h5>
-							<a href="{{ product.shop.get_absolute_url }}" class="shopname">{{ product.shop.shopname }}</a>
-							<!--<span class="product-category">
-							</span>-->
-							{% if product.on_custom_sale %}
-								<span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
-							{% else %}
-							<span class="product-price">{{ product.price|rub_currency }}</span>
-							{% endif %}
-						</section>
-					</a>
-				</figure>
-			</div>
-			{% endfor %}
-
-	</div>
+<div class="flat-background">
+	<div class="flat-row">
+		<div class="margin-top-25"></div>
+		{% include "includes/additional_products.html" with related_products=product.shop.get_related_products limited=True %}
+	<div class="margin-top-10"></div>
 </div>
 {% endblock %}
 
+
+
 {% block extra_js %}
 {{ block.super }}
-<script type="text/javascript" src="{% static "js/add_to_cart.js" %}"></script>
+<script type="text/javascript">
+  window.__csrf_token = '{{ csrf_token }}';
 </script>
+<script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
+<script type="text/javascript" src="{% static "js/add_to_cart.js" %}"></script>
 {% endblock %}

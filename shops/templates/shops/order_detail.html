@@ -14,7 +14,7 @@
   Вы совершили покупку в {{ order.shop }}
   <ul>
     {% for item in order.items.all %}
-      <li>{{ item.title }}
+      <li>{{ item.title|capfirst }}
       {{ item.price }}
       {{ item.quantity }}
       {{ item.total_price }}</li>

@@ -20,16 +20,21 @@ class RestrictAdminMiddleware(object):
     def process_request(self, request):
         if request.path == reverse('fb_browse'):
             if not request.user.is_superuser:
-                path = HelloDjango.settings.MEDIA_ROOT + '/uploads/' + request.user.username
+                path = "%s/uploads/%s/%s" % (HelloDjango.settings.MEDIA_ROOT,
+                                             request.user.id, request.user.username)
+                # path = HelloDjango.settings.MEDIA_ROOT + '/uploads/' + request.user.username
 
                 pop = request.GET.get('pop', None)
                 height = request.GET.get('width', None)
                 width = request.GET.get('height', None)
+                url = '%s?type=Image&dir=%s/%s' % (reverse('fb_browse'), request.user.id, request.user.username)
+                # url = reverse('fb_browse') + '?type=Image&dir=' + \
 
-                url = reverse('fb_browse') + '?type=Image&dir=' + request.user.username
 
                 if width and height:
-                    url += '&width=' + request.GET['width'] + '&height=' + request.GET['height']
+                    url += '&width=' + \
+                        request.GET['width'] + '&height=' + \
+                        request.GET['height']
 
                 if pop:
                     url += '&pop=' + pop

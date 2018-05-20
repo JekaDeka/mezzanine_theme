@@ -1,0 +1,20 @@
+{% load theme_tags %}
+{% widthratio value 10 100 as percent %}
+{% to_stars value 10 5 as stars %}
+<div class="star-rating" title="{{ stars }}">
+  <div class="back-stars">
+    <i class="fa fa-star" aria-hidden="true"></i>
+    <i class="fa fa-star" aria-hidden="true"></i>
+    <i class="fa fa-star" aria-hidden="true"></i>
+    <i class="fa fa-star" aria-hidden="true"></i>
+    <i class="fa fa-star" aria-hidden="true"></i>
+
+    <div class="front-stars" style="width: {{ percent }}%;">
+      <i class="fa fa-star" aria-hidden="true"></i>
+      <i class="fa fa-star" aria-hidden="true"></i>
+      <i class="fa fa-star" aria-hidden="true"></i>
+      <i class="fa fa-star" aria-hidden="true"></i>
+      <i class="fa fa-star" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>

@@ -18,6 +18,7 @@ urlpatterns = [
     # cart delete item
     # cart update
     url(r'^ajax/cart/get/$', views.get_cart, name='get_cart'),
+    url(r'^ajax/cart/update/$', views.cart_update, name='cart_update'),
     url(r'^cart/$', views.CartView.as_view(), name='shop-cart'),
     url(r'^checkout/(?P<slug>[\w\-]+)/(?P<pk>[0-9]+)/$', views.CheckoutProcess.as_view(), name='shop-checkout'),
 

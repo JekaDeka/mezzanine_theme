@@ -14,105 +14,8 @@
     background-size: cover;
     color: #fff;
   }
-  .profile-background h2,
-  .profile-background p {
-    color: #fff;
-    font-weight: 400;
-    text-shadow: 0 1px 1px #555;
-  }
-  .profile-details {
-    padding: 4px 10px;
-    margin: 0 8px;
-    border-radius: 100px;
-    font-weight: 500;
-    font-size: 14px;
-    line-height: 14px;
-  }
-  .data-widget {
-    border-left: 1px solid #ebebeb;
-    border-right: 1px solid #ebebeb;
-    padding: 0 15px;
-  }
-
-  .user-shop-div {
-    box-shadow: rgba(0,0,0,0.15) 0px 1px 2px;
-    position: relative;
-    border-top: 1px solid #efefef;
-  }
-  .widget-inner-title {
-    padding: 10px;
-    background: #f5f5f5;
-    font-size: 20px;
-  }
-  .shop-title-name {
-    font-size: 18px;
-  }
-  .shop-stats {
-    text-align: left;
-    margin: 0 auto 10px auto;
-    padding: 5px 20px 20px 20px;
-    line-height: 26px;
-  }
-  .user-shop-div .shop-stats > div {
-    padding: 4px 10px;
-  }
-  .user-shop-div .shop-stats div:nth-child(even) {
-    background: #f5f5f5;
-  }
-  .user-shop-div .shop-stats i, .profile-details i {
-        margin-right: 5px;
-  }
-  .star-rating, .back-stars, .front-stars {
-    display: flex;
-  }
-  .star-rating i {
-    margin: 3px;
-  }
-
-  .star-rating {
-    align-items: center;
-    font-size: 1.6em;
-    justify-content: center;
-    /* margin-top: 50px; */
-  }
-
-  .back-stars {
-    color: rgb(224, 224, 224);
-    position: relative;
-    /* text-shadow: 4px 4px 10px #505050; */
-  }
-
-  .front-stars {
-    color: rgb(255, 199, 65);;
-    overflow: hidden;
-    position: absolute;
-    /* text-shadow: 2px 2px 5px #d29b09; */
-    top: 0;
-  }
-  @media only screen and (min-width: 768px) {
-    .profile-background > .container {
-      display: -ms-flexbox;
-      display: -webkit-flex;
-      display: flex;
-
-      -ms-flex-align: center;
-      -webkit-align-items: center;
-      -webkit-box-align: center;
-
-      align-items: center;
-    }
-  }
 </style>
 {% endblock %}
-
-
-{# {% block breadcrumbs_title %} #}
-{# <h2>{{ user.profile.get_full_name }}</h2> #}
-{# {% endblock breadcrumbs_title %} #}
-
-{# {% block breadcrumb_element %} #}
-{# <li>Профиль пользователя</li> #}
-{# {% endblock breadcrumb_element %} #}
 
 {% block breadcrumbs %}
 {% endblock %}
@@ -121,7 +24,7 @@
 <div class="fullwidth-element titlebar profile-background">
   <div class="container">
     <div class="three columns">
-        <img src="{{ MEDIA_URL }}{% thumbnail user.profile.image 200 200 %}" alt="{{ user.profile }}" class="shop-image margin-right-5 margin-bottom-10">
+        <img src="{{ MEDIA_URL }}{% thumbnail user.profile.image 200 200 %}" alt="{{ user.profile }}" class="profile-image">
     </div>
     <div class="six columns margin-bottom-10">
       <h2>
@@ -147,24 +50,9 @@
         <div><span>Рейтинг мастера: </span>
           <span class="pull-right">{{ reviews.master_reviews__avg_rating__avg|floatformat:1|default:"0" }}</span>
         </div>
-        <div class="">
-          <div class="star-rating" title="{% widthratio reviews.master_reviews__avg_rating__avg|default:'0' 5 100 %}%">
-            <div class="back-stars">
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-                <i class="fa fa-star" aria-hidden="true"></i>
-
-                <div class="front-stars" style="width: {% widthratio reviews.master_reviews__avg_rating__avg|default:'0' 5 100 %}%">
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                    <i class="fa fa-star" aria-hidden="true"></i>
-                </div>
-            </div>
-        </div>
+        <div class="margin-bottom-30">
+          {% include "includes/star_widget.html" with value=9 %}
+          <div class="clearfix"></div>
         </div>
       </div>
     </div>
@@ -212,8 +100,12 @@
         <td>{{ user.profile.get_full_name }}</td>
       </tr>
       <tr>
-        <th>Виды творчества</th>
-        <td>Акксесуары, ручная работа, вышивание</td>
+        <th>На сайте</th>
+        <td>{{ user.date_joined|timesince  }}</td>
+      </tr>
+      <tr>
+        <th>Выполнено работ</th>
+        <td>22</td>
       </tr>
       <tr>
         <th>О себе</th>
@@ -222,19 +114,21 @@
     </tbody>
   </table>
 </div>
+
+<!-- blogposts widget !-->
+{% if blogposts %}
 <div class="sixteen columns margin-top-20">
   <h3 class="headline">Записи в Блоге</h3><span class="line margin-bottom-0"></span><div class="clearfix"></div>
 </div>
 <div class="user-blog-posts">
-  {% if user.blogposts.all %}
-    {% for blog_post in user.blogposts.all|slice:":4" %}
+    {% for blog_post in blogposts|slice:":4" %}
     <div class="four columns half-columns margin-top-10">
       <article class="from-the-blog">
         {% if settings.BLOG_USE_FEATURED_IMAGE and blog_post.featured_image %}
         {% block blog_post_list_post_featured_image %}
         <figure class="from-the-blog-image">
           <a href="{{ blog_post.get_absolute_url }}">
-            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 300 200 %}" alt="{{ blog_post.title }}" />
+            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 300 200 %}" alt="{{ blog_post.title|capfirst }}" />
           </a>
           <div class="hover-icon"></div>
         </figure>
@@ -250,7 +144,7 @@
         {% endif %}
         <section class="from-the-blog-content">
           {% block blog_post_list_post_title %}
-            <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|title }}</h5></a>
+            <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|capfirst }}</h5></a>
           {% endblock %}
           {% block blog_post_list_post_metainfo %}
             {% with blog_post.user as author %}
@@ -283,56 +177,63 @@
       </article>
     </div>
     {% endfor %}
-  {% else %}
-    <p style="font-size: 32px; text-align: center;" class="margin-top-20">Записи пока отсутствуют</p>
-  {% endif %}
 </div>
+{% endif %}
+<!-- end widget !-->
+
+{% if master_reviews %}
 <div class="sixteen columns margin-top-20">
   <h3 class="headline">Отзывы</h3><span class="line margin-bottom-0"></span><div class="clearfix"></div>
-  {% with user.master_reviews.all as master_reviews %}
-  {% if master_reviews %}
-    <section class="comments">
+  <section class="comments">
+    {% if reviews %}
       <ul>
-        {% for review in master_reviews %}
+      {% for review in reviews %}
         <li>
           <div class="avatar">
-            <img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="">
+            {% if review.author__profile__image %}
+              <img src="{{ MEDIA_URL }}{% thumbnail review.author__profile__image 70 70 %}" alt="">
+            {% else %}
+              <img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="">
+            {% endif %}
           </div>
           <div class="comment-content">
             <div class="arrow-comment"></div>
-            <div class="comment-by"><strong>{{ review }}</strong>
-              <span class="date">{{ review.created_at|timesince }} назад</span>
+            <div class="comment-by">
+              <strong>{{ review.author__profile__first_name }} {{ review.author__profile__last_name }}</strong>
+              <span class="date"> {{ review.created_at|date:"d E Y" }} </span>
+              <div>
+                {% include "includes/star_widget.html" with value=review.rating %}
+              </div>
             </div>
-            <p>{{ review.text_review }}</p>
+            <p> {{ review.content }} </p>
           </div>
         </li>
-        {% endfor %}
-      </ul>
-    </section>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="margin-bottom-10">Отзывов ещё нет — ваш может стать первым.</p>
+    {% endif %}
+    {% if request.user.is_authenticated %}
+    <a href="#small-dialog" class="popup-with-zoom-anim button color {% if not reviews %}margin-left-0{% endif %}">Добавить отзыв</a>
 
-  {% else %}
-    <p style="font-size: 32px; text-align: center;" class="margin-top-20">Отзывы пока отсутствуют</p>
-  {% endif %}
-  {% endwith %}
+    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+      <h3 class="headline">Добавить отзыв</h3><span class="line margin-bottom-25"></span>
+      <div class="clearfix"></div>
+
+      <!-- Form -->
+      <form id="add-comment" class="add-comment" action="" method="POST">
+        {% csrf_token %}
+        {{ review_form }}
+        <input type="submit" class="button" value="Добавить отзыв"/>
+        <div class="clearfix"></div>
+      </form>
+    </div>
+    {% endif %}
+</section>
 </div>
+{% endif %}
 
-<!--  <h3 class="headline">Информация</h3><span class="line margin-bottom-3-"></span>
-  <div class="clearfix"></div>
-
-  <ul class="tabs-nav">
-    <li class="active"><a href="#tab1">Записи в Блоге (9)</a></li>
-    <li><a href="#tab2">Работы (15)</a></li>
-    <li><a href="#tab3">Отзывы (55)</a></li>
-  </ul>
-
-  <div class="tabs-container">
-    <div class="tab-content" id="tab1" style="display: block;">Lorem ipsum pharetra lorem felis. Aliquam egestas consectetur elementum class aptentea taciti sociosqu ad litora torquent perea conubia nostra lorem consectetur adipiscing elit. Donec vestibulum justo a diam ultricies pellentesque.</div>
-    <div class="tab-content" id="tab2" style="display: none;">Aenean dolor mi, luctus et laoreet hendrerit, condimentum faucibus mi. Nam et sem eros. Sed sed eros nec massa pellentesque accumsan in nec magna. Donec sollicitudin enim nec justo mollis bibendum. Nulla eleifend mollis velit. Ut sed risus eget metus
-      egestas sagittis. Etiam vestibulum interdum turpis.</div>
-    <div class="tab-content" id="tab3" style="display: none;">Suspendisse ut laoreet massa. Etiam vel dolor eu quam varius tempor eu eu mi. Duis auctor interdum ligula ut faucibus. Vivamus lorem ipsum dolor sit amet in tincidunt augue. Aenean at ligula justo, sed gravida metus. </div>
-  </div> -->
-
-{% endblock main %}
+{% endblock %}
 
 {% block extra_js %}
 {{ block.super }}

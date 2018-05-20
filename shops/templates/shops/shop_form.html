@@ -142,14 +142,15 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/additional-methods.min.js"></script>
 <script>
   $(document).ready(function() {
-    $("textarea").on("change input", function() {
-      var top = $(this).scrollTop();
-      var height = $(this).height();
-      if (top > 0) {
-        $(this).css("height", top + height + 35);
-      }
-    }).trigger('change');
-  });
+    // $("textarea").on("change input", function() {
+    //   var top = $(this).scrollTop();
+    //   var height = $(this).height();
+    //   if (top > 0) {
+    //     $(this).css("height", top + height + 35);
+    //   }
+    // }).trigger('input');
+
+  // });
   $.extend($.validator.messages, {
     required: "Это поле необходимо заполнить.",
     remote: "Пожалуйста, введите правильное значение.",
@@ -215,6 +216,7 @@
     },
     errorElement: 'p',
   });
+});
 </script>
 <script type="text/javascript">
   $(document).ready(function() {

@@ -14,7 +14,7 @@ from django.db import transaction
 from django.db.models import Avg, Count
 from django.shortcuts import redirect
 
-from profiles.models import UserProfile, MasterReview
+from profiles.models import UserProfile
 from profiles.forms import UserProfileForm
 
 from shops.models import Order
@@ -53,7 +53,17 @@ class ProfileSettings(TemplateView):
     def get_context_data(self, **kwargs):
         data = super(ProfileSettings, self).get_context_data(**kwargs)
         # user = User.objects.values('shop__id', 'shop__slug', 'profile__first_name', 'email').get(pk=self.request.user.pk)
-        user = User.objects.select_related(
+        user = User.objects.defer(
+            'password',
+            'last_login',
+            'first_name',
+            'last_name',
+            'date_joined',
+            'shop__background',
+            'shop__image',
+            'profile__background',
+            'profile__bio'
+        ).select_related(
             "shop",
             "profile",
             "profile__country",
@@ -62,11 +72,12 @@ class ProfileSettings(TemplateView):
 
         if user.profile.status == 1:
             ### if user is master ###
-            reviews = MasterReview.objects.filter(master=self.request.user).values_list(
-                'mastery', 'punctuality', 'responsibility', 'avg_rating')
-            data['reviews'] = reviews.aggregate(mastery=Avg('mastery'), punctuality=Avg(
-                'punctuality'), responsibility=Avg('responsibility'), avg_rating=Avg('avg_rating'))
-            data['reviews_count'] = reviews.count()
+            pass
+            # reviews = MasterReview.objects.filter(master=self.request.user).values_list(
+            #     'mastery', 'punctuality', 'responsibility', 'avg_rating')
+            # data['reviews'] = reviews.aggregate(mastery=Avg('mastery'), punctuality=Avg(
+            #     'punctuality'), responsibility=Avg('responsibility'), avg_rating=Avg('avg_rating'))
+            # data['reviews_count'] = reviews.count()
 
         ### get shop data
         try:
@@ -103,7 +114,7 @@ class ProfileSettings(TemplateView):
 
         ### get blog_post data
         try:
-            blogposts = user.blogposts.values('pk', 'title', 'publish_date')
+            blogposts = user.blogposts.all()
             blogposts_count = blogposts.count()
             data['blogposts'] = blogposts[:5]
             data['blogposts_count'] = blogposts_count

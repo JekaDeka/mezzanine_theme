@@ -1,13 +1,9 @@
 {% load i18n shop_tags mezzanine_tags theme_tags staticfiles %} {% spaceless %}
 <div class="cart-draw">
-	<div class="cart-btn">
+	<div class="cart-btn {% if request.cart.has_items %}has-items{% endif %}">
+		<span>{{  request.cart.total_quantity }}</span>
 		<a href="javascript:void(0);" class="button adc">
 			{% if request.cart.has_items %}{{ request.cart.total_price|rub_currency }}{% else %}0 руб{% endif %}
-		</a>
-	</div>
-	<div class="cart-btn loader">
-		<a href="javascript:void(0);" class="button adc">
-			<img class="loading-image" src="{% static 'js/ajax_loader.gif' %}" alt="loading..">
 		</a>
 	</div>
 	<div class="cart-list">
@@ -21,16 +17,25 @@
 
 		</div>
 		<ul>
-			{% if request.cart.has_items %} {% for item in request.cart %}
+			{% if request.cart.has_items %}
+			{% for item in request.cart %}
 			<li>
-				{% if item.image %}
-				<a href="{{ item.get_absolute_url }}"><img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"/></a> {% endif %}
-				<a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+				<a href="{{ item.get_absolute_url }}">
+					{% if item.image %}
+					<img alt="{{ item.title|capfirst }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}"/>
+					{% else %}
+					<div class="img">
+						<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+					</div>
+					{% endif %}
+				</a>
+				<a href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>
 				<span>{{ item.quantity }} x {{ item.price|rub_currency }}</span>
 				<div class="clearfix"></div>
 			</li>
-			{% endfor %} {% else %}
-			<li class="empty">{% trans "Your Cart is empty." %}</li>
+			{% endfor %}
+			{% else %}
+				<li class="empty">{% trans "Your Cart is empty." %}</li>
 			{% endif %}
 		</ul>
 

@@ -66,7 +66,8 @@ class UserProfile(models.Model):
         verbose_name = "Профиль пользователя"
         verbose_name_plural = _("Профили пользователей")
 
-    user = models.OneToOneField("auth.User", related_name="profile", on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        "auth.User", related_name="profile", on_delete=models.CASCADE)
     first_name = models.CharField(max_length=255, blank=False,
                                   verbose_name=("Имя"))
     last_name = models.CharField(max_length=255, blank=True, null=True,
@@ -131,46 +132,48 @@ class UserProfile(models.Model):
     # def get_truncated_bio(self):
     #     return Truncator(self.bio).words(20, truncate='<a href="#">Подробнее</a>', html=True)
     def __str__(self):              # __unicode__ on Python 2
-        return 'Профиль %s %s' % (self.first_name, self.last_name)
+        return '%s %s' % (self.first_name, self.last_name)
 
 
-
-RATING_CHOICES = (
-    ('5', '5'),
-    ('4', '4'),
-    ('3', '3'),
-    ('2', '2'),
-    ('1', '1'),
-)
 
 class MasterReview(models.Model):
     class Meta:
-        verbose_name = "Отзыв"
+        verbose_name = "Отзыв о мастере"
         verbose_name_plural = _("Отзывы о мастерах")
 
     # added_at = models.DateField(default=timezone.now)
     created_at = models.DateTimeField(default=timezone.now)
 
-    mastery=models.CharField(verbose_name=("Мастерство"), max_length = 1, choices = RATING_CHOICES)
-    punctuality=models.CharField(verbose_name=("Пунктуальность"), max_length = 1, choices = RATING_CHOICES)
-    responsibility=models.CharField(verbose_name=("Ответственность"), max_length = 1, choices = RATING_CHOICES)
-    avg_rating=models.FloatField(verbose_name=("Средний рейтинг"), default = 0)
-    text_review=models.TextField(verbose_name=("Отзыв"))
+    mastery = models.IntegerField(verbose_name=(
+        "Мастерство"), choices=settings.RATING_CHOICES, default=settings.RATING_CHOICES[0][0])
+    punctuality = models.IntegerField(verbose_name=(
+        "Пунктуальность"), choices=settings.RATING_CHOICES, default=settings.RATING_CHOICES[0][0])
+    responsibility = models.IntegerField(verbose_name=(
+        "Ответственность"), choices=settings.RATING_CHOICES, default=settings.RATING_CHOICES[0][0])
 
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE,
-                             related_name="reviews", verbose_name=("Пользователь"))
+    avg_rating = models.FloatField(verbose_name=("Средний рейтинг"), default=0)
+
+    content = models.TextField(verbose_name=("Отзыв"))
+
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE,
+                             related_name="author_master_reviews", verbose_name=("Автор"))
 
     master = models.ForeignKey("auth.User", on_delete=models.CASCADE,
-                             related_name="master_reviews", verbose_name=("Мастер"))
-    order = models.ForeignKey(OrderTableItem, on_delete=models.SET_NULL, null=True,
-                             related_name="reviews", verbose_name=("Работа"))
+                               related_name="master_reviews", verbose_name=("Мастер"))
+
+    order = models.ForeignKey(OrderTableItem, on_delete=models.SET_NULL, null=True, blank=True,
+                              related_name="reviews", verbose_name=("Работа"))
+
+    approved = models.BooleanField(
+        default=False, verbose_name=("Одобрен"))
 
     # def get_avg_rating(self):
     #     return (int(self.mastery) + int(self.punctuality) + int(self.responsibility))/3
 
     def save(self, *args, **kwargs):
-         self.avg_rating = (int(self.mastery) + int(self.punctuality) + int(self.responsibility))/3
-         super(MasterReview, self).save(*args, **kwargs)
+        self.avg_rating = (int(self.mastery) +
+                           int(self.punctuality) + int(self.responsibility)) / 3
+        super(MasterReview, self).save(*args, **kwargs)
 
     def __str__(self):              # __unicode__ on Python 2
-        return '%s review' % (self.id)
+        return 'Отзыв_%s о мастере %s' % (self.id, self.master)

@@ -15,7 +15,7 @@
 	<li class="{% if page.is_current_or_ascendant %}active{% endif %}
         {% if not top_level and forloop.first %} first{% endif %}
         {% if forloop.last %} last{% endif %}">
-		<a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+		<a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
 		{# remove this if tag to always show all nav items #}
 		{% if page.is_current_or_ascendant and page.has_children_in_menu %}
 		{% page_menu page %}

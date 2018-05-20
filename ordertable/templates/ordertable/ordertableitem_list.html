@@ -11,85 +11,116 @@
 
 {% block extra_content %}
 <div class="flat-background">
+	<div class="flat-row list-header">
+		<div class="container">
+			<div class="margin-top-20 margin-bottom-15">
+				<div class="ten columns">
+					<h2> Осталось доступных заявок: {{ remain }} </h2>
+				</div>
+				<div class="three columns margin-top-15">
+					  <a class="" href="{% url 'ordertableitem-add' %}"><i class="fa fa-plus-circle fa-lg" aria-hidden="true"></i> Добавить новую заявку</a>
+				</div>
+				<div class="three columns margin-top-15">
+					<a class="" href="{% url 'ordertableitem-list' %}"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Получить больше заявок</a>
+				</div>
+				{# <hr> #}
+	      <div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
 	<div class="flat-row">
 		<div class="container">
-      <div class="sixteen columns margin-bottom-10">
-          <h2>Осталось доступных записей: {{ remain }}</h2>
-          {% if remain > 0 %}
-              <a class="button dark" href="{% url 'blogpost-add' %}">Добавить запись в блог</a>
-          {% endif %}
-          <a class="button dark" href="{% url 'blogpost-list' %}">Получить больше</a>
-      </div>
-      <hr>
-      <div class="clearfix"></div>
-      {% if ordertableitem_list %}
-      <div id="masonry-wrapper">
-          {% for ordertableitem in ordertableitem_list %}
-              <div class="object-list columns masonry-item">
-                  <article class="from-the-blog">
-                      {% if settings.BLOG_USE_FEATURED_IMAGE %}
-                          {% if ordertableitem.main_image %}
-                          <figure class="from-the-blog-image">
-                              <a href="{{ ordertableitem.get_absolute_url }}">
-                                  <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail ordertableitem.main_image 300 200 %}" alt="{{ ordertableitem.title }}" />
-                              </a>
-                              <div class="hover-icon"></div>
-                          </figure>
-                          {% else %}
-                          <div class="post-quote">
-                              <a href="{{ ordertableitem.get_absolute_url }}">
-                              <blockquote>
-                                  <i class="fa fa-camera-retro"></i>
-                              </blockquote>
-                              </a>
-                          </div>
-                          {% endif %}
-                      {% endif %}
-                      <section class="from-the-blog-content">
-                          <a href="{{ ordertableitem.get_absolute_url }}"><h5>{{ ordertableitem.title|title }}</h5></a>
-                          {% if ordertableitem.preview_content %}
-                              {{ ordertableitem.preview_content|safe|truncatewords_html:55 }}
-                          {% else %}
-                              {{ ordertableitem.description_from_content|safe }}
-                          {% endif %}
-                      <div class="clearfix"></div>
-                      <a href="{% url 'ordertableitem-update' ordertableitem.pk %}" class="button gray margin-top-5">Редактировать</a>
-                      <a href="{% url 'ordertableitem-delete' ordertableitem.pk %}" class="button gray margin-top-5">Удалить</a>
-                      </section>
-
-                  </article>
-              </div>
-          {% endfor %}
-      </div>
-      {% else %}
-      <section id="not-found">
-          <p>Товары пока отсутствуют</p>
-      </section>
-      {% endif %}
-
-{% if is_paginated %}
-    <div class="pagination-container masonry">
-        <nav class="pagination">
-            <ul>
-                {% for i in page_obj.paginator.page_range %}
-                  {% if page_obj.number == i %}
-                    <li><a href="#" class="current-page">{{ i }}</a></li>
-                  {% else %}
-                    <li><a href="?page={{ i }}">{{ i }}</a></li>
-                  {% endif %}
-                {% endfor %}
-            </ul>
-        </nav>
-        <nav class="pagination-next-prev full-width">
-            <ul>
-                {% if page_obj.has_previous %}
-                    <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
-                {% endif %}
-                {% if page_obj.has_next %}
-                    <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
-                {% endif %}
-            </ul>
-        </nav>
-    </div>
-{% endif %}
+			{% if ordertableitem_list %}
+			<div id="masonry-wrapper">
+			    {% for ordertableitem in ordertableitem_list %}
+						<div class="object-list columns masonry-item">
+							<figure class="object-image">
+								{% if not ordertableitem.available %}
+								<div class="badge red">
+									Проверяется
+								</div>
+								{% else %}
+								<div class="badge green">
+									Опубликовано
+								</div>
+								{% endif %}
+								<a href="{{ ordertableitem.get_absolute_url }}">
+									{% if ordertableitem.main_image %}
+										<img src="{{ MEDIA_URL }}{% thumbnail ordertableitem.main_image 300 200 %}" alt="{{ ordertableitem.title|capfirst }}">
+									{% else %}
+									<div class="post-quote">
+										<blockquote>
+											<span><i class="fa fa-camera fa-5x" aria-hidden="true"></i></span>
+										</blockquote>
+									</div>
+									{% endif %}
+								</a>
+								<div class="hover-icon"></div>
+							</figure>
+							<section class="object-content">
+								<a href="{% url 'ordertableitem-update' ordertableitem.pk %}"><h5> {{ ordertableitem.title|capfirst }} </h5></a>
+								<i>Добавлено: {{ ordertableitem.created|date:"d.m.Y"  }}</i>
+								<p><strong>Статус:</strong>
+									{% if ordertableitem.active %}
+									открыта
+									{% else %}
+									закрыта
+									{% endif %}</p>
+								<p><strong>Кол-во откликов: </strong>
+									{{ ordertableitem.order_requests.count }}
+								</p>
+								<p><strong>Исполнитель: </strong>
+									{% if ordertableitem.performer.id %}
+									<a href="#">{{ ordertableitem.performer.profile.get_full_name }}</a>
+									{% else %}
+									не назначен
+									{% endif %}
+								</p>
+								<p>
+									<strong>Бюджет: </strong>
+									{% if ordertableitem.price %}
+									{{ ordertableitem.price }} <span>руб</span>
+									{% else %}
+									не указан
+									{% endif %}
+								</p>
+								<p>{{ ordertableitem.description|truncatewords:20|truncatechars:200 }}</p>
+								<a href="{% url 'ordertableitem-update' ordertableitem.pk %}" class="button outline"><i class="fa fa-pencil" aria-hidden="true"></i> Изменить</a>
+								<a href="{% url 'ordertableitem-delete' ordertableitem.pk %}" class="button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</a>
+							</section>
+						</div>
+			    {% endfor %}
+			</div>
+			{% else %}
+			<section id="not-found">
+			    <p>Заявки для стола заказов пока отсутствуют</p>
+			</section>
+			{% endif %}
+			{% if is_paginated %}
+	        <div class="pagination-container masonry">
+	            <nav class="pagination">
+	                <ul>
+	                    {% for i in page_obj.paginator.page_range %}
+	                      {% if page_obj.number == i %}
+	                        <li><a href="#" class="current-page">{{ i }}</a></li>
+	                      {% else %}
+	                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+	                      {% endif %}
+	                    {% endfor %}
+	                </ul>
+	            </nav>
+	            <nav class="pagination-next-prev full-width">
+	                <ul>
+	                    {% if page_obj.has_previous %}
+	                        <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
+	                    {% endif %}
+	                    {% if page_obj.has_next %}
+	                        <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
+	                    {% endif %}
+	                </ul>
+	            </nav>
+	        </div>
+	    {% endif %}
+		</div>
+	</div>
 {% endblock %}

@@ -6,6 +6,8 @@ urlpatterns = [
     url(r"^ordertable/$", views.order_list, name='order_list'),
     url(r"^ordertable/(?P<pk>[0-9]+)/$",
         views.OrderTableItemDetail.as_view(), name="order_detail"),
+    url(r"^ordertable/(?P<pk>[0-9]+)/$",
+        views.OrderTableItemDetail.as_view(), name="ordertableitem-detail"),
 
     url("^ordertable/category/(?P<category>[\w\-]+)/$",
         views.order_list, name='order_list_category'),

@@ -6,6 +6,8 @@ from django.core.mail import EmailMessage
 
 from mezzanine.conf import settings
 
+from shops.forms import ProductImageField, ThemeKeywordsWidget
+
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit, HTML
 
@@ -95,10 +97,12 @@ class OrderTableForm(forms.ModelForm):
             'color_suggest',
             'size_suggest',
             'material_suggest',
-            'lock_in_region', 'categories', 'description']
+            'lock_in_region', 'categories', 'description',
+            'keywords']
         widgets = {
             'author': forms.HiddenInput(),
             'performer': forms.HiddenInput(),
+            'description': forms.Textarea(attrs={'rows': '1'}),
         }
         # exclude = ['author', 'performer']
 
@@ -106,24 +110,33 @@ class OrderTableForm(forms.ModelForm):
         super(OrderTableForm, self).__init__(*args, **kwargs)
         self.fields['ended'].widget.format = '%d/%m/%Y'
         self.fields['ended'].input_formats = ['%d/%m/%Y']
-        self.helper = FormHelper(self)
-        # self.helper.template = 'theme_form/whole_uni_form.html'
-        self.helper.include_media = False
-        self.helper.layout.append(
-            ButtonHolder(
-                HTML("""
-                <a class="button dark" href="{% url 'ordertableitem-list' %}">Назад</a>
-                """),
-                Submit('submit', 'Сохранить', css_class='button abc'),
-            ),
-        )
+        self.fields['categories'].label = ""
+
+        self.fields['keywords'].label = "Теги"
+        self.fields['keywords'].help_text = "Введите значения через запятую"
+        self.fields['keywords'].widget = ThemeKeywordsWidget(
+            attrs={'multiple': 'multiple'})
+        # self.helper = FormHelper(self)
+        # # self.helper.template = 'theme_form/whole_uni_form.html'
+        # self.helper.include_media = False
+        # self.helper.layout.append(
+        #     ButtonHolder(
+        #         HTML("""
+        #         <a class="button dark" href="{% url 'ordertableitem-list' %}">Назад</a>
+        #         """),
+        #         Submit('submit', 'Сохранить', css_class='button abc'),
+        #     ),
+        # )
 
 
 class OrderTableImageForm(forms.ModelForm):
 
     class Meta:
         model = OrderTableItemImage
-        exclude = ['description', ]
+        fields = ['file']
+        widgets = {
+            'file': ProductImageField(),
+        }
 
 
 OrderTableImageFormSet = inlineformset_factory(
@@ -131,4 +144,4 @@ OrderTableImageFormSet = inlineformset_factory(
     OrderTableItemImage,
     form=OrderTableImageForm,
     can_delete=True,
-    extra=1)
+    extra=6, max_num=6)

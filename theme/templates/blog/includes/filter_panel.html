@@ -10,9 +10,9 @@
     {% spaceless %}
     <a href="{{ recent_post.get_absolute_url }}">
         {% if settings.BLOG_USE_FEATURED_IMAGE and recent_post.featured_image %}
-        <img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 24 24 %}" alt="{{ recent_post.title }}" />
+        <img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 24 24 %}" alt="{{ recent_post.title|capfirst }}" />
         {% endif %}
-    {{ recent_post.title }}
+    {{ recent_post.title|capfirst }}
     </a>
     {% endspaceless %}
 </li>

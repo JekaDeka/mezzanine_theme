@@ -10,50 +10,61 @@
 <li>Изменение данных</li>
 {% endblock breadcrumb_element %}
 {% block extra_content %}
-<div class="twelve columns margin-bottom-25">
-    <form method="post">
-        {% csrf_token %}
-        {{ form.first_name|as_crispy_field }}
-        {{ form.last_name|as_crispy_field }}
-        {# {{ form.status|as_crispy_field }} #}
-        <div class="clearfix"></div>
-        <div class="shop-images custom-field margin-top-15">
-            <label for="id_{{form.image.name}}" class="form-control-label  requiredField">
-                {{form.image.label}}
-                <span class="asteriskField">*</span>
-            </label>
-            {{ form.image }}
-            {{ form.image.errors }}
-        </div>
-        <div class="shop-images custom-field margin-top-15">
-            <label for="id_{{form.background.name}}" class="form-control-label  requiredField">
-                {{form.background.label}}
-                <span class="asteriskField">*</span>
-            </label>
-            {{ form.background }}
-            {{ form.background.errors }}
+<form method="post" enctype="multipart/form-data" class="input-no-background">
+    {% csrf_token %}
+    <div class="flat-background">
+    	<div class="flat-row padding-top-50">
+    		<div class="container fullwidth-element">
+            <div class="shop-images">
+        			{{ form.background }}
+        		</div>
+        		<div class="shop-images">
+        			{{ form.image }}
+        		</div>
         </div>
         <div class="clearfix"></div>
-        <div class="margin-top-15">
-            {{ form.country|as_crispy_field }}
-            {{ form.region|as_crispy_field }}
-            {{ form.city|as_crispy_field }}
-            {{ form.phone|as_crispy_field }}
+      </div>
+    </div>
+    <div class="container">
+      <div class="ten columns">
+        <div class="four columns alpha margin-top-20 margin-bottom-15">
+          {{ form.first_name|as_crispy_field }}
+        </div>
+        <div class="four columns omega margin-top-20 margin-bottom-15">
+          {{ form.last_name|as_crispy_field }}
         </div>
         <div class="clearfix"></div>
-        <div class="custom-field margin-top-15">
-            <label for="id_{{form.bio.name}}" class="form-control-label ">
-                {{ form.bio.label }}
-            </label>
-            <div>
-                {{ form.bio }}
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.country|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.region|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="eight columns alpha margin-top-20 margin-bottom-15">
+          {{ form.city|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="four columns alpha margin-top-20 margin-bottom-15">
+          {{ form.phone|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+        <div class="seven columns alpha margin-top-20 margin-bottom-15">
+          {{ form.bio|as_crispy_field }}
+        </div>
+        <div class="clearfix"></div>
+      </div>
+      <div class="six columns sticky margin-top-50">
+          <div class="action-bar">
+            <div class="save">
+              <input type="submit" class="button" value="Сохранить профиль"/>
             </div>
-        </div>
-        <div class="margin-top-15">
-            <input type="submit" class="button pull-right margin-right-10" value="Сохранить"/>
-        </div>
-    </form>
-</div>
+          </div>
+      </div>
+    </div>
+</form>
+<div class="margin-top-50"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -66,12 +77,4 @@ $(function() {
 <script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
 <script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
 <script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
-    <script type="text/javascript">
-        window.__csrf_token = '{{ csrf_token }}';
-        window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';
-        window.__filebrowser_url = '{% url "fb_browse" %}';
-    </script>
-    <script type="text/javascript" src="{% static "admin/js/mezz/ajax_csrf.js" %}"></script>
-    <script type="text/javascript" src="{% static "filebrowser/js/AddFileBrowser.js" %}"></script>
-    <script type="text/javascript" src="{% static "filebrowser/js/FB_FileBrowseField.js" %}"></script>
 {% endblock extra_js %}

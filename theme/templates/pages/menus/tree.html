@@ -13,7 +13,7 @@
   <li class="
     {% if page.is_current %} active{% endif %}
     {% if page.is_current_or_ascendant %} active-branch{% endif %}">
-    <a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+    <a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
     {# wrap the next line with 'if page.is_current_or_ascendant' #}
     {# to only show child pages in the menu for the current page #}
     {% if page.has_children_in_menu %}{% page_menu page %}{% endif %}

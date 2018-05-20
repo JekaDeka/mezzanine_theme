@@ -19,7 +19,7 @@
                     {% block blog_post_list_post_featured_image %}
                     <figure class="from-the-blog-image">
                         <a href="{{ blog_post.get_absolute_url }}">
-                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="{{ blog_post.title }}" />
+                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail blog_post.featured_image 400 300 %}" alt="{{ blog_post.title|capfirst }}" />
                         </a>
                         <div class="hover-icon"></div>
                     </figure>
@@ -28,7 +28,7 @@
                     <section class="from-the-blog-content">
                         {% block blog_post_list_post_title %}
                         {# {% editable blog_post.title %} #}
-                            <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title }}</h5></a>
+                            <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|capfirst }}</h5></a>
                         {# {% endeditable %} #}
                         {% endblock %}
                         {% block blog_post_list_post_metainfo %}
@@ -80,9 +80,9 @@
                         <div class="mediaholder">
                         <a href="{{ product.get_absolute_url }}">
                             {% if product.image %}
-                            <img src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}" alt="{{ product.title }}" />
+                            <img src="{{ MEDIA_URL }}{% thumbnail product.image 250 330 %}" alt="{{ product.title|capfirst }}" />
                             <div class="cover">
-                                <img src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}" alt="{{ product.title }}" />
+                                <img src="{{ MEDIA_URL }}{% thumbnail product.image 300 380 %}" alt="{{ product.title|capfirst }}" />
                             </div>
                             {% else %}
                             <img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="no-image" />
@@ -95,14 +95,14 @@
                         </div>
                         <a href="{{ product.get_absolute_url }}">
                             <section>
-                                <h5>{{ product.title|title }}</h5>
+                                <h5>{{ product.title|capfirst }}</h5>
                                 <span class="product-category">
                                 {{ product.material|truncatechars:22 }}
                                 </span>
                                 {% if product.on_custom_sale %}
-                                    <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price|rub_currency }}</i></span>
+                                    <span class="product-price-discount">{{ product.unit_price|rub_currency }}<i>{{ product.price }}</i></span>
                                 {% else %}
-                                <span class="product-price">{{ product.price|rub_currency }}</span>
+                                <span class="product-price">{{ product.price }}</span>
                                 {% endif %}
                             </section>
                         </a>

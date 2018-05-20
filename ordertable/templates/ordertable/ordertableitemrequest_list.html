@@ -27,7 +27,7 @@
         {% for ordertableitem in ordertableitems %}
         <div class="row">
           <div class="cell" data-title="Название">
-            <a href="{% url 'order_detail' ordertableitem.pk %}">{{ ordertableitem.title|title }}</a>
+            <a href="{% url 'order_detail' ordertableitem.pk %}">{{ ordertableitem.title|capfirst }}</a>
           </div>
           <div class="cell" data-title="Добавлено">
             {{ ordertableitem.created }}

@@ -1,0 +1,107 @@
+{% load mezzanine_tags blog_tags keyword_tags %}
+<div class="{{ size }} columns">
+	{% if page %}
+	<div class="widget margin-top-0">
+		<h3 class="headline">Информация</h3><span class="line"></span>
+		<div class="clearfix"></div>
+		<p>{{ page.description }}</p>
+	</div>
+	{% else %}
+	{% if category %}
+	<div class="widget margin-top-0">
+		<h3 class="headline">{{category.title}}</h3><span class="line"></span>
+		<div class="clearfix"></div>
+		<p>Записи из категории</p>
+	</div>
+	{% endif %}
+	{% if tag %}
+	<div class="widget margin-top-0">
+		<h3 class="headline">{{ tag.title|capfirst }}</h3><span class="line"></span>
+		<div class="clearfix"></div>
+		<p>Список записей по тегу: {{ tag.title|capfirst }}</p>
+	</div>
+	{% endif %}
+	{% endif %}
+
+{% blog_categories as categories %}
+{% if categories %}
+	<div class="widget">
+		<h3 class="headline">Категории</h3><span class="line"></span>
+		<div class="clearfix"></div>
+		<nav class="categories">
+			<ul>
+				<li><a href=" {% url 'blog' %} ">Все</a></li>
+				{% for category in categories %}
+				<li><a href="{% url "blogpost-list-category" category.slug %}">{{ category }}</a></li>
+				{% endfor %}
+			</ul>
+		</nav>
+	</div>
+{% endif %}
+
+
+	<div class="widget margin-top-40">
+		<ul class="tabs-nav blog">
+			<li class="active"><a href="#tab1">Недавние</a></li>
+			<li><a href="#tab2">Популярные</a></li>
+		</ul>
+		<div class="tabs-container">
+			<div class="tab-content" id="tab1">
+				<ul class="widget-tabs">
+					{% for blogpost in recent_posts %}
+					<li>
+						<div class="widget-thumb">
+							<a href="{{ blogpost.get_absolute_url }}">
+								{% if blogpost.featured_image %}
+								<img src="{{ MEDIA_URL }}{% thumbnail blogpost.featured_image 90 90 %}" alt="{{ blogpost.title|capfirst }}" />
+								{% endif %}
+							</a>
+						</div>
+						<div class="widget-text">
+							<h4><a href="{{ blogpost.get_absolute_url }}"> {{ blogpost.title|capfirst }} </a></h4>
+							<span>{{ blogpost.publish_date|date:"d E Y" }}</span>
+						</div>
+						<div class="clearfix"></div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+			<div class="tab-content" id="tab2">
+				<ul class="widget-tabs">
+					{% for blogpost in popular_posts %}
+					<li>
+						<div class="widget-thumb">
+							<a href="{{ blogpost.get_absolute_url }}">
+								{% if blogpost.featured_image %}
+								<img src="{{ MEDIA_URL }}{% thumbnail blogpost.featured_image 90 90 %}" alt="{{ blogpost.title|capfirst }}" />
+								{% endif %}
+							</a>
+						</div>
+						<div class="widget-text">
+							<h4><a href="{{ blogpost.get_absolute_url }}"> {{ blogpost.title|capfirst}} </a></h4>
+							<span>{{ blogpost.publish_date|date:"d E Y" }}</span>
+						</div>
+						<div class="clearfix"></div>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+	</div>
+
+{% keywords_for blog.blogpost as tags %}
+{% if tags %}
+	<div class="widget margin-top-10">
+		<h3 class="headline">Теги</h3><span class="line"></span>
+		<div class="clearfix"></div>
+		<nav class="tags">
+			{% for tag in tags %}
+			<a href="{% url "blogpost-list-tag" tag.slug %}">{{ tag }}</a>
+			{% endfor %}
+		</nav>
+	</div>
+{% endif %}
+	<br>
+	<br>
+
+</div>

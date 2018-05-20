@@ -7,11 +7,10 @@
 {% endblock %}
 
 {% block slider %}
-{% get_slideshow as images %}
-{% if images %}
+{% if slideshow %}
 <div class="container fullwidth-element home-slider margin-bottom-50">
     <div class="bss-slides">
-        {% for image in images %}
+        {% for image in slideshow %}
         <figure class="caption">
             <a href="{{image.href.get_absolute_url }}">
                 <img src="{{ MEDIA_URL }}{% thumbnail image.featured_image 1290 350 %}" alt="{{ image }}">
@@ -36,7 +35,7 @@
             <figure>
                 <img src="{{ MEDIA_URL }}{% thumbnail category.featured_image 250 250 %}" alt="{{ category.slug }}" />
                 <figcaption>
-                    <h3>{{ category.title }}</h3>
+                    <h3>{{ category.title|capfirst }}</h3>
                     <span>Подробнее</span>
                 </figcaption>
             </figure>
@@ -66,9 +65,11 @@
       {% for product in best_products %}
       <li><a href="{{ product.get_absolute_url }}">
         {% if product.images.all.0 %}
-          <img src="{{ MEDIA_URL }}{% thumbnail product.images.all.0 90 90 %}" alt="{{ product.title }}" />
+          <img src="{{ MEDIA_URL }}{% thumbnail product.images.all.0 90 90 %}" alt="{{ product.title|capfirst }}" />
         {% endif %}
-        <div class="product-list-desc">{{ product.title }}<i>{{ product.price|rub_currency }}</i></div>
+        <div class="product-list-desc">{{ product.title|capfirst }}
+          <br>
+          <i>{{ product.price|rub_currency }}</i></div>
       </a></li>
       {% endfor %}
       <li>
@@ -133,8 +134,10 @@
 {% block extra_content %}
 <div class="container">
   <div class="ten columns">
-    <h3 class="headline">Записи в Блоге</h3><span class="line margin-bottom-3-"></span>
-    <div class="clearfix"></div>
+    <div class="widget">
+  		<h3 class="headline">Записи в Блоге</h3><span class="line"></span>
+  		<div class="clearfix"></div>
+  	</div>
     {% if blog_posts %}
       <div id="masonry-wrapper">
         {% for blog_post in blog_posts %}
@@ -147,8 +150,8 @@
             </figure>
             {% endif %}
             <section class="from-the-blog-content {% if not blog_post.featured_image %}no-img{% endif %}">
-              <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title }}</h5></a>
-              <i>{{ blog_post.user }}, {{ blog_post.publish_date|date:"d M Y" }}</i>
+              <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|capfirst }}</h5></a>
+              <i>{{ blog_post.user.profile.get_full_name }}, {{ blog_post.publish_date|date:"d E Y" }}</i>
               <span>
                 {% if blog_post.preview_content %}
       						{{ blog_post.preview_content|safe|truncatewords_html:55 }}
@@ -165,128 +168,7 @@
     {% endif %}
 
   </div>
-  <div class="six columns">
-    <h3 class="headline">Категории</h3><span class="line margin-bottom-3-"></span>
-    <div class="clearfix"></div>
-
-
-    {% blog_categories as categories %}
-		{% if categories %}
-		<div class="margin-bottom-25">
-			<nav class="categories">
-				<ul>
-				{% for category in categories %}
-					<li><a href="{% url 'blog_post_list_category' category.slug %}">{{ category }}</a> ({{ category.post_count }})</li>
-				{% endfor %}
-				</ul>
-			</nav>
-		</div>
-		{% endif %}
-
-    <!-- Tabs Navigation -->
-    <ul class="tabs-nav">
-      <li class="active"><a href="#tab1">Недавние</a></li>
-      <li><a href="#tab2">Популярное</a></li>
-      <li><a href="#tab3">Комментарии</a></li>
-    </ul>
-
-    <!-- Tabs Content -->
-    <div class="tabs-container">
-      <div class="tab-content" id="tab1" style="display: block;">
-        {% if recent_posts %}
-          <div class="widget margin-top-0">
-            <ul class="widget-tabs">
-              {% for recent_post in recent_posts %}
-              <li>
-                {% spaceless %}
-                {% if recent_post.featured_image %}
-                <div class="widget-thumb">
-                  <a href="{{ recent_post.get_absolute_url }}">
-                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
-                	</a>
-                </div>
-                {% endif %}
-                <div class="widget-text">
-                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
-                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
-                </div>
-                <div class="clearfix"></div>
-                {% endspaceless %}
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% endif %}
-      </div>
-      <div class="tab-content" id="tab2" style="display: none;">
-        {% if popular_posts %}
-          <div class="widget margin-top-0">
-            <ul class="widget-tabs">
-              {% for recent_post in popular_posts %}
-              <li>
-                {% spaceless %}
-                {% if recent_post.featured_image %}
-                <div class="widget-thumb">
-                  <a href="{{ recent_post.get_absolute_url }}">
-                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
-                	</a>
-                </div>
-                {% endif %}
-                <div class="widget-text">
-                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
-                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
-                </div>
-                <div class="clearfix"></div>
-                {% endspaceless %}
-              </li>
-              {% endfor %}
-            </ul>
-          </div>
-          {% endif %}
-      </div>
-      <div class="tab-content" id="tab3" style="display: none;">
-          <div class="widget margin-top-0">
-            {% if comments %}
-            <ul class="widget-tabs">
-              {% for recent_post in comments %}
-              <li>
-                {% spaceless %}
-                {% if recent_post.featured_image %}
-                <div class="widget-thumb">
-                  <a href="{{ recent_post.get_absolute_url }}">
-                		<img src="{{ MEDIA_URL }}{% thumbnail recent_post.featured_image 90 90 %}" alt="{{ recent_post.title }}"/>
-                	</a>
-                </div>
-                {% endif %}
-                <div class="widget-text">
-                  <h4><a href="{{ recent_post.get_absolute_url }}">{{ recent_post.title }}</a></h4>
-                  <span>{{ recent_post.publish_date|date:"d M Y" }} </span>
-                </div>
-                <div class="clearfix"></div>
-                {% endspaceless %}
-              </li>
-              {% endfor %}
-            </ul>
-          {% else %}
-          <p style="text-align:center">Комментарив нет</p>
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <br>
-  </div>
-  <div class="six columns">
-    {% keywords_for blog.blogpost as tags %}
-		{% if tags %}
-				<h3 class="headline">{% trans "Tags" %}</h3><span class="line"></span><div class="clearfix"></div>
-				<nav class="tags">
-				{% for tag in tags %}
-				    <a href="{% url "blog_post_list_tag" tag.slug %}" class="tag-weight-{{ tag.weight }}">{{ tag }}</a>
-				{% endfor %}
-				</nav>
-		{% endif %}
-  </div>
+    {% include "includes/blog_right_sidebar.html" with size="six" %}
 </div>
 <div class="clearfix"></div>
 {% endblock %}

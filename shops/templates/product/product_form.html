@@ -2,7 +2,7 @@
 {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
 {% block meta_title %}
 {% if object %}
-    Изменение {{ object.title }}
+    Изменение {{ object.title|capfirst }}
 {% else %}
     Новый товар
 {% endif %}
@@ -16,7 +16,7 @@
 {% block breadcrumb_element %}
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
 <li><a href="{% url 'product-list' %}">Список моих товаров</a></li>
-<li>{% if object %}{{ object }}{% else %}Новый товар{% endif %}</li>
+<li>{% if object %}{{ object.title|capfirst }}{% else %}Новый товар{% endif %}</li>
 {% endblock %}
 
 
@@ -28,7 +28,8 @@
       <div class="sixteen columns">
         <div class="formset-images">
           <div class="header">
-            <h1>{% if object %}{{ object }}{% else %}Новый товар{% endif %} <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению карточки товара</a></h1>
+            <h1>{% if object %}{{ object.title|capfirst }}{% else %}Новый товар{% endif %}
+              <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению карточки товара</a></h1>
           </div>
           <p> Фотографии — это самая важная часть в вашем будущем магазине. Покупатели не смогут потрогать, примерить или рассмотреть поближе ваши товары. Всё, что у них есть, — это изображения вашей вещи. Помните об этом, когда отбираете фотографии для магазина. </p>
           <div class="image-row">
@@ -61,7 +62,12 @@
           {{ form.price|as_crispy_field }}
       </div>
       <div class="clearfix"></div>
+      <div class="five columns alpha margin-top-15 margin-bottom-15">
+          {{ form.size|as_crispy_field }}
+      </div>
+      <div class="clearfix"></div>
       <div class="seven columns alpha margin-top-15 margin-bottom-15">
+        <p style="color: #3acf87; margin: 0">Выберите категориюр: </p>
           {{ form.categories|as_crispy_field }}
       </div>
       <div class="clearfix"></div>
@@ -105,6 +111,8 @@
 <script type="text/javascript">
 $( document ).ready(function() {
   $.fn.get_categories("{% url 'get_categories' %}");
+
+  //flexdata
   $('#id_material').flexdatalist({
     minLength: 2,
     searchIn: 'title',
@@ -112,8 +120,17 @@ $( document ).ready(function() {
     maxShownResults: 10,
     selectionRequired: false,
     valuesSeparator: ',',
-    url: '{% static "data.json/material.json" %}',
+  url: '{% static "data.json/material.json" %}',
   });
+  // duplicates bug? remove it.
+  var duplicates = $('#id_material').val();
+  if (typeof duplicates !== "undefined"){
+    $('#id_material').val($.unique(duplicates.split(',')));
+  }
+  $('input#id_material-flexdatalist').focusin(function() {
+    $('#id_material').addClass("has-content");
+  });
+  //flexdata_end
 });
 </script>
 

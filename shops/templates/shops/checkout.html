@@ -48,17 +48,17 @@
           <td class="st-key"></td>
           <td class="st-val st-head-row">
             {% if item.image %}
-              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title }}">
+              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title|capfirst }}">
             {% endif %}
           </td>
         </tr>
         <tr>
           <td class="st-key"></td>
-          <td class="st-val"><a href="{{ item.url }}">{{ item.title }}</a></td>
+          <td class="st-val"><a href="{{ item.url }}">{{ item.title|capfirst }}</a></td>
         </tr>
         <tr>
           <td class="st-key">Цена</td>
-          <td class="st-val">{{ item.price|rub_currency }}</td>
+          <td class="st-val">{{ item.price }}</td>
         </tr>
         <tr>
           <td class="st-key">Кол-во</td>
@@ -84,11 +84,11 @@
         <tr>
           <td class="hide-on-mobile">
             {% if item.image %}
-              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title }}">
+              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title|capfirst }}">
             {% endif %}
           </td>
-          <td class="cart-title"><a href="{{ item.url }}">{{ item.title }}</a></td>
-          <td>{{ item.price|rub_currency }}</td>
+          <td class="cart-title"><a href="{{ item.url }}">{{ item.title|capfirst }}</a></td>
+          <td>{{ item.price }}</td>
           <td class="qty-checkout">{{ item.quantity }}</td>
           <td class="cart-total">{{ item.total_price|rub_currency }}</td>
         </tr>

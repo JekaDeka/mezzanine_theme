@@ -17,7 +17,7 @@
 			<ul class="list-unstyled">
 		{% endif %}
 		<li {% if page.is_current_or_ascendant %}class="active"{% endif %}>
-			<a href="{{ page.get_absolute_url }}">{{ page.title }}</a></li>
+			<a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a></li>
 	{% endif %}
 
 	{# {% if page.in_menu and page.has_children_in_menu %} #}

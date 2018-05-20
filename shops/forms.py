@@ -10,7 +10,7 @@ from django.forms.forms import BoundField
 
 
 from shops.models import UserShop, ShopProduct, ShopProductImage, Cart, CartItem, Order, \
-    UserShopDelivery, UserShopDeliveryOption
+    UserShopDelivery, UserShopDeliveryOption, ProductReview, UserShopPayment
 from cartridge.shop.models import Category
 
 from mezzanine.generic.models import Keyword
@@ -75,8 +75,17 @@ class ProductImageField(FileBrowseWidget):
         return render_to_string("product/image_field.html", dict(locals(), MEDIA_URL=settings.MEDIA_URL))
 
 
+class QuantityInput(forms.NumberInput):
+    """docstring for QuantityInput."""
+
+    def render(self, name, value, attrs=None):
+        rendered = super(QuantityInput, self).render(name, value, attrs=attrs)
+        return '<div class="qtyminus"></div>%s<div class="qtyplus"></div>' % (rendered)
+
+
 class AddProductForm(forms.Form):
-    quantity = forms.IntegerField(label="Количество", min_value=1)
+    quantity = forms.IntegerField(
+        label="", min_value=1, widget=QuantityInput(attrs={'class': 'qty'}))
     product_id = forms.CharField(required=False, widget=forms.HiddenInput())
     title = forms.CharField(required=False, widget=forms.HiddenInput())
     price = forms.CharField(required=False, widget=forms.HiddenInput())
@@ -180,7 +189,6 @@ class ShopForm(forms.ModelForm):
     #                                 code='invalid')
 
 
-
 class UserShopDeliveryOptionForm(forms.ModelForm):
     """docstring for UserShopDeliveryOptionForm"""
     class Meta:
@@ -215,8 +223,8 @@ class ProductForm(forms.ModelForm):
         model = ShopProduct
         fields = [
             'title',
-            'pre_order',
-            # 'categories',
+            'size',
+            'categories',
             'price',
             'material',
             'condition',
@@ -224,7 +232,8 @@ class ProductForm(forms.ModelForm):
             'description',
         ]
         widgets = {
-            'material': forms.TextInput(attrs={'multiple': 'multiple'}),
+            # 'material': forms.TextInput(attrs={'multiple': 'multiple'}),
+            'description': forms.Textarea(attrs={'rows': '1'}),
         }
         # exclude = ['author', 'performer']
 
@@ -232,9 +241,11 @@ class ProductForm(forms.ModelForm):
         super(ProductForm, self).__init__(*args, **kwargs)
         self.fields['keywords'].label = "Теги"
         self.fields['keywords'].help_text = "Введите значения через запятую"
-        # self.fields['description'].label = ""
         self.fields['keywords'].widget = ThemeKeywordsWidget(
             attrs={'multiple': 'multiple'})
+        self.fields['material'].widget = forms.TextInput(
+            attrs={'multiple': 'multiple'})
+        # self.fields['description'].label = ""
         # self.helper = FormHelper(self)
         # self.helper.template = 'theme_form/whole_uni_form.html'
         # self.helper.include_media = False
@@ -264,23 +275,13 @@ class CartItemForm(forms.ModelForm):
     Model form for each item in the cart - used for the
     ``CartItemFormSet`` below which controls editing the entire cart.
     """
-
-    quantity = forms.IntegerField(label="Количество", min_value=0)
+    # quantity = forms.IntegerField(label="Количество", min_value=0)
+    quantity = forms.IntegerField(label="Количество", min_value=0, widget=QuantityInput(attrs={'class': 'qty'}))
 
     class Meta:
         model = CartItem
         fields = ("quantity",)
 
-    # def clean_quantity(self):
-    #     """
-    #     Validate that the given quantity is available.
-    #     """
-    #     variation = ProductVariation.objects.get(sku=self.instance.sku)
-    #     quantity = self.cleaned_data["quantity"]
-    #     if not variation.has_stock(quantity - self.instance.quantity):
-    #         error = ADD_PRODUCT_ERRORS["no_stock_quantity"].rstrip(".")
-    #         raise forms.ValidationError("%s: %s" % (error, quantity))
-    #     return quantity
 
 
 class OrderForm(forms.ModelForm):
@@ -308,7 +309,7 @@ class OrderForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         super(OrderForm, self).__init__(*args, **kwargs)
         if self.shop:
-            self.fields['shipping_type'].choices = self.shop.get_express_fields()
+            self.fields['shipping_type'].choices = self.shop.get_delivery_options()
         if self.user:
             self.fields['user_first_name'].initial = self.user.profile.first_name
             self.fields['user_last_name'].initial = self.user.profile.last_name
@@ -317,6 +318,46 @@ class OrderForm(forms.ModelForm):
             self.fields['user_country'].initial = self.user.profile.country
             self.fields['user_city'].initial = self.user.profile.city
             self.fields['user_region'].initial = self.user.profile.region
+
+
+class ProductReviewForm(forms.ModelForm):
+    class Meta:
+        model = ProductReview
+        fields = ("rating", "content",)
+
+    def __init__(self, *args, **kwargs):
+        self.product = kwargs.pop("product", None)
+        super(ProductReviewForm, self).__init__(*args, **kwargs)
+
+
+class FilterForm(forms.Form):
+    min_price = forms.IntegerField(label="", min_value=0, required=False, widget=forms.NumberInput(
+        attrs={'class': 'price-input-filter', 'placeholder': 'От'}))
+    min_price.group = "Цена"
+    max_price = forms.IntegerField(label="", min_value=0, required=False, widget=forms.NumberInput(
+        attrs={'class': 'price-input-filter', 'placeholder': 'До'}))
+    max_price.group = "Цена"
+    deliveries = UserShopDelivery.objects.all()
+    payments = UserShopPayment.objects.all()
+
+    def __init__(self, *args, **kwargs):
+        super(FilterForm, self).__init__(*args, **kwargs)
+        for payment in self.payments:
+            self.fields['payment_type_%s' % payment.id] = forms.BooleanField(
+                label=payment.label, required=False)
+            self.fields['payment_type_%s' %
+                        payment.id].group = "Способы оплаты"
+
+        for delivery in self.deliveries:
+            self.fields['delivery_type_%s' % delivery.id] = forms.BooleanField(
+                label=delivery.label, required=False)
+            self.fields['delivery_type_%s' % delivery.id].group = "Доставка"
+
+        for condition in settings.PRODUCT_STATUS_TYPE_CHOICES:
+            self.fields['condition_type_%s' % condition[0]] = forms.BooleanField(
+                label=condition[1], required=False)
+            self.fields['condition_type_%s' %
+                        condition[0]].group = "Вид товара"
 
 
 CartItemFormSet = inlineformset_factory(Cart, CartItem, form=CartItemForm,

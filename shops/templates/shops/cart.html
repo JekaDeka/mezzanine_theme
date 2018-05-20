@@ -1,134 +1,133 @@
 {% extends "base.html" %}
-{% load i18n mezzanine_tags pages_tags staticfiles theme_tags crispy_forms_tags %}
+{% load mezzanine_tags pages_tags staticfiles theme_tags crispy_forms_tags %}
 {% block meta_title %} Корзина {% endblock %}
 {% block breadcrumbs_title %}<h2>Корзина</h2>{% endblock breadcrumbs_title %}
-{% block breadcrumb_element %}<li>{% trans "Your Cart" %}</li>{% endblock %}
+{% block breadcrumb_element %}<li>Корзина</li>{% endblock %}
 
 {% block main %}
-<div class="container cart">
+<div class="cart">
 		{% if cartitems.forms %}
-		<form method="post" class="cart-form">
-			{{ form }}
+		<form method="post" id="cart-form">
 		{% csrf_token %}
 		{{ cartitems.management_form }}
 		{% regroup cartitems|dictsort:"instance.shop_id" by instance.shop_id as item_list %}
 		{% for shop in item_list %}
-		<div class="twelve columns margin-bottom-20">
-			<table class="stacktable small-only">
-			<tbody>
-				{% for form in shop.list %}
-				{% with form.instance as item %}
-				<tr class="st-space">
-					<td></td>
-					<td></td>
-				</tr>
-				<tr class="st-new-item">
-					<td class="st-key"></td>
-					<td class="st-val st-head-row">
-						{{ form.id }}
-						{% if item.image %}
-						<a href="{{ item.get_absolute_url }}">
-							<img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" />
-						</a>
-						{% endif %}
-					</td>
-				</tr>
-				<tr>
-					<td class="st-key">Товар</td>
-					<td class="st-val"><a href="{{ item.get_absolute_url }}">{{ item.title }}</a></td>
-				</tr>
-				<tr>
-					<td class="st-key">Цена</td>
-					<td class="st-val">{{ item.price|rub_currency }}</td>
-				</tr>
-				<tr>
-					<td class="st-key">Кол-во</td>
-					<td class="st-val cart-qty">
-	            <div class="qtyminus"></div>
-						    {{ form.quantity }}
-							<div class="qtyplus"></div>
-					</td>
-				</tr>
-				<tr>
-					<td class="st-key">Total</td>
-					<td class="st-val">$79.00</td>
-				</tr>
-				{% endwith %}
-				{% endfor %}
-			</tbody>
-		</table>
-			<table class="cart-table responsive-table stacktable large-only">
-			    <tbody>
-			        <tr>
-	                <th>Товар</th>
-			            <th></th>
-			            <th>Цена</th>
-			            <th>Кол-во</th>
-			            <th>Итого</th>
-			            <th></th>
-			        </tr>
-	        {% for form in shop.list %}
-	        {% with form.instance as item %}
-	        <tr>
-						<td>
-							{{ form.id }}
-							{% if item.image %}
-							<a href="{{ item.get_absolute_url }}">
-								<img alt="{{ item.title }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" />
-							</a>
-							{% endif %}
-						</td>
-						<td class="cart-title">
-							<a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
-						</td>
-						<td>{{ item.price|rub_currency }}</td>
-						<td class="cart-qty">
-	            <div class="qtyminus"></div>
-						    {{ form.quantity }}
-							<div class="qtyplus"></div>
-						</td>
-						<td class="cart-total">{{ item.total_price|rub_currency }}</td>
-						<td class="delete"><a href="javascript:void(0);" class="cart-remove"></a>{{ form.DELETE }}</td>
-					</tr>
-	        {% endwith %}
-	        {% endfor %}
-				</tbody>
-			</table>
-		</div>
-		<div class="four columns margin-bottom-20">
-			{% get_shop_data cart shop_id=shop.grouper as shop_data %}
-			<h2 class="headline">{{ shop_data.0 }}</h2><span class="line"></span>
-			<div class="clearfix"></div>
-			<a href="{% url 'shop-view' shop_data.1 %}"><img class="shop-image" src="{{ MEDIA_URL }}{% thumbnail shop_data.2 60 60 %}" alt="{{ shop_data.0 }}"></a>
-			<p>{{ shop_data.3|rupluralize:"товар,товара,товаров" }} на сумму {{ shop_data.4|rub_currency }} <br>
-				<small>без учета доставки</small>
-			</p>
-			<a href="{% url 'shop-checkout' shop_data.1 shop.grouper %}" class="button">Оформить заказ</a>
+		<div class="sixteen columns">
+			<div class="limiter">
+				<div class="container-table100">
+					<div class="wrap-table100">
+						<div class="table table-767">
+							<div class="row header row-767 header-767">
+								<div class="cell cell-767">
+									Товар
+								</div>
+								<div class="cell cell-767">
+									{# Описание #}
+								</div>
+								<div class="cell cell-767">
+									Цена
+								</div>
+								<div class="cell cell-767">
+									Кол-во
+								</div>
+								<div class="cell cell-767">
+									Итого
+								</div>
+								<div class="cell cell-767">
 
+								</div>
+							</div>
+							{% for form in shop.list %}
+			        {% with form.instance as item %}
+							<div class="row row-767">
+								<div class="cell cell-767" data-title="Товар">
+									{{ form.id }}
+									<a href="{{ item.get_absolute_url }}">
+									{% if item.image %}
+										<img alt="{{ item.title|capfirst }}" src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" />
+									{% else %}
+									<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+									{% endif %}
+									</a>
+									{# <a href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a> #}
+								</div>
+								<div class="cell cell-767" data-title="">
+									<a href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>
+								</div>
+								<div class="cell cell-767" data-title="Цена">
+									{{ item.price|rub_currency }}
+								</div>
+								<div class="cell cell-767" data-title="Кол-во">
+									<div class="quantity-wrapper">
+										{{ form.quantity }}
+									<div class="clearfix"></div>
+									</div>
+								</div>
+								<div class="cell cell-767" data-title="Итого">
+									{{ item.total_price|rub_currency }}
+								</div>
+								<div class="cell cell-767 delete-input" data-title="">
+									<a href="#" class="cart-remove"></a>
+									<div class="clearfix"></div>
+									{{ form.DELETE }}
+								</div>
+							</div>
+							{% endwith %}
+			        {% endfor %}
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
+		<div class="sixteen columns divider">
+			<input type="submit" value="Обновить корзину" class="gray pull-right">
+		</div>
+			{% get_shop_data cart shop_id=shop.grouper as shop_data %}
+			{% for obj in shops %}
+			{% if obj.id == shop.grouper %}
+				<div class="seven columns cart-totals">
+					<h3 class="headline">Магазин</h3><span class="line"></span>
+					<div class="clearfix"></div>
+					<div class="widget-content">
+						<div class="image-content pull-left">
+							<a href="{% url 'shop-view' obj.slug %}">
+								<img src="{{ MEDIA_URL}}{% thumbnail obj.image 100 100 %}" alt="{{ obj.shopname }}" class="shop-image">
+							</a>
+						</div>
+						<div class="text-content pull-left">
+							<h2><a href="{% url 'shop-view' obj.slug %}">{{ obj.shopname }}</a></h2>
+						</div>
+						<div class="clearfix"></div>
+					</div>
+					<table class="cart-table margin-top-5">
+						<tbody>
+								<th>Товаров</th>
+								<td>{{ shop_data.0 }}</td>
+							</tr>
+							<tr>
+								<th>Сумма заказа</th>
+								<td><strong> {{ shop_data.1|rub_currency }} </strong></td>
+							</tr>
+						</tbody>
+					</table>
+					<br>
+					<a href="{% url 'shop-checkout' obj.slug shop.grouper %}" class="calculate-shipping">Оформить заказ <i class="fa fa-arrow-circle-right"></i></a>
+				</div>
+			{% endif %}
+			{% endfor %}
+
 		<div class="clearfix"></div>
 		{% endfor %}
-    <table class="cart-table bottom">
-      <tbody>
-        <tr>
-          <th>
-            <div class="cart-btns">
-              <a href="#" class="button color cart-btns proceed">Далее</a>
-              <input type="submit" name="update_cart" class="button gray cart-btns" value="Обновнить">
-            </div>
-          </th>
-        </tr>
-      </tbody>
-    </table> 
 	</form>
 	{% else %}
 	<div class="sixteen columns">
 		<section id="not-found">
-          <p>{% trans "Your Cart is empty." %}</p>
+          <p>Ваша корзина пуста.</p>
       </section>
 	</div>
 	{% endif %}
 </div>
+<div class="margin-top-50"></div>
 {% endblock %}
 
 {% block extra_js %}

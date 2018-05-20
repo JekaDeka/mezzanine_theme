@@ -46,7 +46,7 @@
 				</ul>
 			</nav>
 		</div>
-		{% endif %}	
+		{% endif %}
 	{% endblock %}
 <div class="widget margin-top-10">
     <h3 class="headline">Регион</h3><span class="line"></span>
@@ -79,13 +79,13 @@
 			{% endif %}
 		</div>
 		<div class="nine omega columns">
-		    <h2><a href="{{ order.get_absolute_url }}">{{ order.title|title }}</a></h2>
+		    <h2><a href="{{ order.get_absolute_url }}">{{ order.title|capfirst }}</a></h2>
 		    <div class="meta">
 		        <span><i class="fa fa-calendar-plus-o" aria-hidden="true"></i>Добавлено: {{ order.created }}</span>
 		        <br>
 		        <span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
 		        <br>
-		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price|rub_currency }}</span>
+		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price }}</span>
 		        <br>
 		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author_profile.region }} {% else %} Любой {% endif %}</span>
 		    </div>
@@ -104,4 +104,3 @@
 {% endif %}
 </div>
 {% endblock %}
-

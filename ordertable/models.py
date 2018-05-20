@@ -1,7 +1,7 @@
 from django.db import models
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 
-from mezzanine.core.models import Slugged
+from mezzanine.core.models import Slugged, Displayable
 from mezzanine.core.fields import FileField, RichTextField
 from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
 
@@ -34,6 +34,7 @@ class OrderTableItem(models.Model):
         )
 
     title = models.CharField(_("Название"), max_length=500, null=False)
+    available = models.BooleanField(_("Отображать на сайте"), default=False)
     active = models.BooleanField(_("Открыт"), default=True, editable=False)
     created = models.DateField(
         _("Дата добавления"), editable=False, default=date.today)
@@ -74,6 +75,10 @@ class OrderTableItem(models.Model):
 
     # objects = SearchableManager()
     # search_fields = ("title", "description")
+    main_image = models.CharField(
+        _("Изображение"), max_length=255, blank=True, default="")
+
+    keywords = KeywordsField()
 
     def __str__(self):              # __unicode__ on Python 2
         return str(self.title)
@@ -86,6 +91,11 @@ class OrderTableItem(models.Model):
     def save(self, request=False, *args, **kwargs):
         if self.price == 0:
             self.price = None
+        img = self.images.first()
+        if img:
+            self.main_image = img.file
+        else:
+            self.main_image = ""
         super(OrderTableItem, self).save(*args, **kwargs)
 
     @property

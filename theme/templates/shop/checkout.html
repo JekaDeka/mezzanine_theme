@@ -21,9 +21,9 @@ $(function() {$('.middle :input:visible:enabled:first').focus();});
 {% for step in steps %}
 <li>
     {% if step.title == step_title %}
-    <strong>{{ step.title }}</strong>
+    <strong>{{ step.title|capfirst }}</strong>
     {% else %}
-    {{ step.title }}
+    {{ step.title|capfirst }}
     {% endif %}
 </li>
 {% endfor %}

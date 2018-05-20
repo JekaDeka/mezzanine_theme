@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.timezone import now
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
@@ -10,6 +11,7 @@ from django.contrib.auth.models import User
 
 from mezzanine.conf import settings
 from mezzanine.utils.models import AdminThumbMixin, upload_to
+from mezzanine.utils.urls import unique_slug
 from mezzanine.core.fields import FileField, RichTextField
 from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
 
@@ -50,14 +52,15 @@ class UserShop(models.Model):
                         Ваш рассказ должен быть интересным, лаконичным, информативным и убедительным. Можете упомянуть любимую цитату или вдохновляющую идею. \
                         Не стоит злоупотреблять смайликами и прочими символами.")
 
-
-    delivery_options = models.ManyToManyField('UserShopDelivery', through='UserShopDeliveryOption')
+    delivery_options = models.ManyToManyField(
+        'UserShopDelivery', through='UserShopDeliveryOption')
     delivery_other = RichTextField(default="", blank=True,
-                                  verbose_name=(
-                                      "Дополнительная информация о доставке"),
-                                  help_text="Адреса, по которым покупатель сможет забрать товар самостоятельно. Любые другие нюансы и условия по доставке.")
+                                   verbose_name=(
+                                       "Дополнительная информация о доставке"),
+                                   help_text="Адреса, по которым покупатель сможет забрать товар самостоятельно. Любые другие нюансы и условия по доставке.")
 
-    payment_options = models.ManyToManyField('UserShopPayment', verbose_name=_("Способы оплаты"), help_text="")
+    payment_options = models.ManyToManyField(
+        'UserShopPayment', verbose_name=_("Способы оплаты"), help_text="")
 
     payment_other = RichTextField(default="", blank=True,
                                   verbose_name=(
@@ -73,56 +76,51 @@ class UserShop(models.Model):
     on_vacation = models.BooleanField(
         default=False, verbose_name=("На каникулах"), editable=False)
 
-    # comments = CommentsField()
-
-    def get_express_fields(self):
-        choices = []
-        for f in self._meta.fields:
-            fname = f.name
-            if fname.endswith('_price') and (f.name not in ('express_other'),):
-                try:
-                    value = getattr(self, fname)
-                except AttributeError:
-                    value = None
-                try:
-                    label_name = self._meta.get_field(fname[:-6]).verbose_name
-                except AttributeError:
-                    label_name = None
-                if value and label_name:
-                    choices.insert(0, (label_name, label_name + ' - ' +  str(value) + 'руб') )
-        return choices
-
-    # def price_fields_validate(self, end_with):
-    #     fields = []
-    #     for f in self._meta.fields:
-    #         fname = f.name
-            # try:
-            #     value = getattr(self, fname)
-            # except AttributeError:
-            #     value = None
-
-    #         if fname.endswith(end_with) and f.editable and value and (f.name not in ('id', 'user', 'express_other')):
-    #             fields.append(
-    #                 {
-    #                     'label': f.verbose_name,
-    #                     'name': f.name,
-    #                     'value': value,
-    #                 }
-    #             )
-    #     return fields
 
     def save(self, request=False, *args, **kwargs):
-        self.slug = slugify_unicode(self.shopname)
+        if not self.slug:
+            self.slug = self.generate_unique_slug()
         super(UserShop, self).save(*args, **kwargs)
 
+    def generate_unique_slug(self):
+        """
+        Create a unique slug by passing the result of get_slug() to
+        utils.urls.unique_slug, which appends an index if necessary.
+        """
+        # For custom content types, use the ``Page`` instance for
+        # slug lookup.
+        slug_qs = UserShop.objects.exclude(id=self.id)
+        return unique_slug(slug_qs, "slug", self.get_slug())
+
+    def get_slug(self):
+        """
+        Allows subclasses to implement their own slug creation logic.
+        """
+        return slugify_unicode(self.shopname)
+
     def get_products_count(self):
-        return ShopProduct.objects.filter(shop=self.id).count()
+        return self.products.count()
 
     def get_last_product(self):
-        return ShopProduct.objects.filter(shop=self.id).last()
+        return self.products.last()
 
     def get_active_orders(self):
         return 0
+
+    def get_related_products(self):
+        return self.products.only(
+            'id',
+            'available',
+            'slug',
+            'price',
+            'shop__id',
+            'condition',
+            'title',
+
+        ).filter(available=True).prefetch_related('images')[:settings.SHOP_MAX_RELATED_PRODUCTS]
+
+    def get_delivery_options(self):
+        return self.delivery_options.values('label', 'usershopdeliveryoption__price').all()
 
     def get_absolute_url(self):
         url_name = "shop-view"
@@ -142,6 +140,7 @@ class UserShopPayment(models.Model):
     def __str__(self):              # __unicode__ on Python 2
         return self.label
 
+
 class UserShopDelivery(models.Model):
     class Meta:
         verbose_name = "Способ доставки"
@@ -150,6 +149,7 @@ class UserShopDelivery(models.Model):
 
     def __str__(self):              # __unicode__ on Python 2
         return self.label
+
 
 class UserShopDeliveryOption(models.Model):
     class Meta:
@@ -162,14 +162,17 @@ class UserShopDeliveryOption(models.Model):
     price = models.PositiveIntegerField(_("Цена"), default=0)
 
     def __str__(self):              # __unicode__ on Python 2
-        return "%s, %s" % (self.shop, self.delivery)
+        return "%s, %s, %s" % (self.shop, self.delivery, self.price)
+
+    # def get_label_and_price(self):
+    #     return "%s: %s" % (self.shop, self.delivery, self.price)
 
 
 class ShopProduct(models.Model):
 
     class Meta:
         verbose_name = "Товар"
-        verbose_name_plural = _("Мои товары")
+        verbose_name_plural = _("Товары")
 
     shop = models.ForeignKey(UserShop, on_delete=models.CASCADE,
                              related_name="products", verbose_name=("Магазин"))
@@ -184,40 +187,59 @@ class ShopProduct(models.Model):
     price = models.PositiveIntegerField(_("Цена"), default=0)
     material = models.CharField(_("Материал"), max_length=255, blank=True, default="",
                                 help_text="В точности как на бирке")
+    size = models.CharField(_("Размер"), max_length=255, blank=True, default="",
+                            help_text="Укажите размеры товара")
     description = RichTextField(
         default="", verbose_name=("Описание"),
         help_text="Как можно более подробно опишите товар.")
-    condition = models.CharField(
+    condition = models.IntegerField(
         _("Состояние"),
         choices=settings.PRODUCT_STATUS_TYPE_CHOICES,
-        max_length=15,
         blank=False,
         default=settings.PRODUCT_STATUS_TYPE_CHOICES[0][0], help_text="Готовая работа - работа уже ждет покупателя. Под заказ - Вы можете выполнить точно такую же работу, но потребуется некоторое время. Для примера - повторить работу точь-в-точь невозможно.")
-
-    pre_order = models.BooleanField(
-        _("Удалить"),
-        default=False,
-        help_text="Удалить поле")
 
     main_image = models.CharField(
         _("Изображение"), max_length=255, blank=True, default="")
 
     keywords = KeywordsField()
+    reviews_count = models.IntegerField(default=0, editable=False)
+    reviews_sum = models.IntegerField(default=0, editable=False)
+    reviews_average = models.FloatField(default=0, editable=False)
+    # comments = CommentsField()
+    # rating = RatingField()
     # objects = SearchableManager()
     # search_fields = ("title", "description")
 
     # like fields
 
-    slug = models.URLField(editable=False, default='')
+    slug = models.URLField(editable=False, default='', unique=True)
 
     def save(self, request=False, *args, **kwargs):
-        self.slug = slugify_unicode(self.title + str(self.id))
+        if not self.slug:
+            self.slug = self.generate_unique_slug()
+
         img = self.images.first()
         if img:
             self.main_image = img.file
         else:
             self.main_image = ""
         super(ShopProduct, self).save(*args, **kwargs)
+
+    def generate_unique_slug(self):
+        """
+        Create a unique slug by passing the result of get_slug() to
+        utils.urls.unique_slug, which appends an index if necessary.
+        """
+        # For custom content types, use the ``Page`` instance for
+        # slug lookup.
+        slug_qs = ShopProduct.objects.exclude(id=self.id)
+        return unique_slug(slug_qs, "slug", self.get_slug())
+
+    def get_slug(self):
+        """
+        Allows subclasses to implement their own slug creation logic.
+        """
+        return slugify_unicode(self.title)
 
     def __str__(self):              # __unicode__ on Python 2
         return str(self.title)
@@ -268,19 +290,12 @@ class SelectedProduct(models.Model):
     image = models.CharField(max_length=200, null=True)
     url = models.CharField(max_length=2000)
 
-    # shop_id = models.IntegerField(_("shop_id"), default=0)
-    # shop_image = models.CharField(max_length=200, null=True)
-    # shop_slug = models.CharField(max_length=255)
-    # shop_name = models.CharField(max_length=255)
-
     class Meta:
         abstract = True
 
     def __str__(self):
         return ""
 
-    # def shop_fields(self):
-    #     return "%s,%s" % (self.shop_name, self.shop_slug, self.shop_name)
 
     def get_absolute_url(self):
         return self.url
@@ -308,7 +323,8 @@ class Order(models.Model):
 
     user_id = models.IntegerField(blank=True, null=True)
     user_first_name = models.CharField(_("First name"), max_length=255)
-    user_middle_name = models.CharField(_("Отчество"), max_length=255, blank=True)
+    user_middle_name = models.CharField(
+        _("Отчество"), max_length=255, blank=True)
     user_last_name = models.CharField(_("Last name"), max_length=255)
     user_phone = models.CharField(_("Phone"), max_length=20)
     user_email = models.EmailField(_("Email"), max_length=255)
@@ -317,12 +333,13 @@ class Order(models.Model):
     user_city = models.CharField(_("City/Suburb"), max_length=100)
     user_region = models.CharField("Регион", max_length=100)
 
-
     shipping_type = models.CharField(_("Доставка"), max_length=255, default="")
     shipping_price = models.PositiveIntegerField(_("Цена доставки"), default=0)
 
-    user_address =  models.CharField(_("Адрес"), max_length=255, blank=True, help_text="Улица, дом, подъезд, квартира")
-    user_postcode = models.CharField(_("Zip/Postcode"), max_length=15, blank=True)
+    user_address = models.CharField(
+        _("Адрес"), max_length=255, blank=True, help_text="Улица, дом, подъезд, квартира")
+    user_postcode = models.CharField(
+        _("Zip/Postcode"), max_length=15, blank=True)
     user_additional_info = models.TextField("Пожелания по заказку", blank=True)
 
     item_total = models.PositiveIntegerField(_("Сумма заказа"), default=0)
@@ -346,7 +363,7 @@ class Order(models.Model):
             self.user_id = request.user.id
         else:
             pass
-            ### create user -> activate -> send_email -> #create_profile
+            # create user -> activate -> send_email -> #create_profile
 
         self.item_total = request.cart.total_price_for_shop(form.shop.id)
         self.total = self.item_total + self.shipping_price
@@ -357,7 +374,6 @@ class Order(models.Model):
             self.items.create(**item)
 
         request.cart.items.filter(shop_id=form.shop.id).delete()
-
 
 
 class OrderItem(SelectedProduct):
@@ -386,13 +402,13 @@ class Cart(models.Model):
             self._cached_items = self.items.all()
         return iter(self._cached_items)
 
-    def add_item(self, product, quantity, shop_name):
+    def add_item(self, product, quantity):
         """
         Increase quantity of existing item if id matches, otherwise create
         new.
         """
-        self.last_updated = now()
-        self.save()
+        if not self.pk:
+            self.save()
         kwargs = {"sku": int(product.id), "price": int(
             product.price), "product": product}
         item, created = self.items.get_or_create(**kwargs)
@@ -404,9 +420,6 @@ class Cart(models.Model):
             item.image = force_text(product.main_image)
 
             item.shop_id = int(product.shop.id)
-            item.shop_image = force_text(product.shop.image)
-            item.shop_slug = force_text(product.shop.slug)
-            item.shop_name = force_text(product.shop.shopname)
             # item.product = int(product.pk)
 
         item.quantity += quantity
@@ -419,19 +432,13 @@ class Cart(models.Model):
         return len(list(self)) > 0
 
     def get_shop_data(self, shop_id=None):
-        shop_name = ""
-        shop_slug = ""
-        shop_image = ""
         quantity = 0
         total_price = 0
         for item in self:
             if item.shop_id == shop_id:
-                shop_name = item.shop_name
-                shop_slug = item.shop_slug
-                shop_image = item.shop_image
                 quantity += item.quantity
                 total_price += item.total_price
-        return [shop_name, shop_slug, shop_image, quantity, total_price]
+        return [quantity, total_price]
 
     def get_shop_items(self, shop_id=None):
         return [item for item in self if item.shop_id == shop_id]
@@ -441,6 +448,13 @@ class Cart(models.Model):
 
     def total_price_for_shop(self, shop_id=None):
         return sum([item.total_price for item in self if item.shop_id == shop_id])
+
+    def get_shops_id_list(self):
+        uniqueList = []
+        for item in self:
+            if item.shop_id not in uniqueList:
+                uniqueList.append(item.shop_id)
+        return uniqueList
 
     def total_quantity(self):
         """
@@ -458,12 +472,31 @@ class Cart(models.Model):
 class CartItem(SelectedProduct):
     """docstring for CartItem."""
     cart = models.ForeignKey("Cart", related_name="items")
-    shop_id = models.IntegerField(_("shop_id"), default=0)
-    shop_image = models.CharField(max_length=200, null=True)
-    shop_slug = models.CharField(max_length=255)
-    shop_name = models.CharField(max_length=255)
-    product = models.ForeignKey(
-        ShopProduct, related_name="in_cart", on_delete=models.CASCADE)
 
-    def shop_fields(self):
-        return "%s,%s" % (self.shop_name, self.shop_slug, self.shop_name)
+    shop_id = models.IntegerField(_("shop_id"), default=0)
+    product = models.ForeignKey(ShopProduct, related_name="in_cart", on_delete=models.CASCADE)
+
+
+
+# hard code review + rating
+class ProductReview(models.Model):
+    class Meta:
+        verbose_name = "Отзыв о товаре"
+        verbose_name_plural = _("Отзывы о товарах")
+        unique_together = ("author", "product")
+
+    created_at = models.DateTimeField(default=timezone.now)
+
+    approved = models.BooleanField(
+        default=False, verbose_name=("Одобрен"))
+
+    rating = models.IntegerField(verbose_name=(
+        "Рейтинг"), choices=settings.RATING_CHOICES, default=settings.RATING_CHOICES[0][0])
+
+    content = models.TextField(verbose_name=("Отзыв"))
+
+    author = models.ForeignKey("auth.User", on_delete=models.CASCADE,
+                               related_name="author_product_reviews", verbose_name=("Автор"), editable=False)
+
+    product = models.ForeignKey(ShopProduct, on_delete=models.CASCADE,
+                                related_name="product_reviews", verbose_name=("Товар"), editable=False)

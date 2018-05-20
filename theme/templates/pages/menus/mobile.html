@@ -17,7 +17,7 @@
 		<li class="
 			{% if forloop.first %} first{% endif %}
 			{% if forloop.last %} last{% endif %}">
-			<a href="{{ page.get_absolute_url }}">{{ page.title }}</a>
+			<a href="{{ page.get_absolute_url }}">{{ page.title|capfirst }}</a>
 		</li>
 		{% endif %}
 

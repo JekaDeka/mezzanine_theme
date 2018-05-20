@@ -1,165 +1,121 @@
 {% extends "pages/page.html" %}
-{% load mezzanine_tags shop_tags i18n theme_tags pages_tags static  %}
+{% load mezzanine_tags theme_tags pages_tags static  crispy_forms_tags %}
 
 {% block breadcumbs_menu %}
 	{% page_menu "pages/menus/breadcrumb.html" %}
 {% endblock %}
 
-
+{% block breadcrumbs_class %}shadow{% endblock %}
+{# {% block main_containter_class %}container fullwidth-element{% endblock %} #}
 {% block main_containter %}
-<div class="container">
 {% if sub_categories %}
-	<div id="portfolio-wrapper">
-	{% for category in sub_categories %}
-		<div class="four columns portfolio-item custom_column">
-			<figure>
-				<div class="portfolio-holder">
-					<a href="{{ category.get_absolute_url }}">
-					{% if settings.SHOP_CATEGORY_USE_FEATURED_IMAGE %}
-						{% if category.featured_image %}
-							<img alt="{{ category.title }}" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
-						{% else %}
-							{% with "23456"|make_list|random as rnd %}
-							{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
-							    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="{{ category.title }}" />
-							{% endwith %}
-							{% endwith %}
-						{% endif %}
-					{% else %}
-						<img src="{{ STATIC_URL }}{% thumbnail 'images/titlebar_bg_01.jpg' 280 280 %}" alt="no-image" />
-					{% endif %}
-						<div class="hover-cover"></div>
-						<div class="hover-icon"></div>
-					</a>
+<div class="flat-background">
+	<div class="flat-row">
+		<div class="margin-top-30"></div>
+		<div class="container">
+				<div id="portfolio-wrapper">
+				{% for category in sub_categories %}
+					<div class="four columns portfolio-item custom_column">
+						<figure>
+							<div class="portfolio-holder">
+								<a href="{{ category.get_absolute_url }}">
+									{% if category.featured_image %}
+										<img alt="{{ category.title|capfirst }}" src="{{ MEDIA_URL }}{% thumbnail category.featured_image 280 280 %}"/>
+									{% else %}
+										{% with "23456"|make_list|random as rnd %}
+										{% with 'images/product_category_0'|add:rnd|add:'.jpg' as img_path %}
+										    <img src="{{ STATIC_URL }}{% thumbnail img_path 280 280 %}" alt="{{ category.title|capfirst }}" />
+										{% endwith %}
+										{% endwith %}
+									{% endif %}
+									<div class="hover-cover"></div>
+									<div class="hover-icon"></div>
+								</a>
+							</div>
+							<a href="{{ category.get_absolute_url }}">
+								<section class="item-description">
+									<span>{{ category.parent.title|capfirst }}</span>
+									<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
+								</section>
+							</a>
+						</figure>
+					</div>
+				{% endfor %}
 				</div>
-				<a href="{{ category.get_absolute_url }}">
-					<section class="item-description">
-						<span>{{ category.parent.title }}</span>
-						<h5>{{ category.title|smart_truncate_chars:35 }}</h5>
-					</section>
-				</a>
-			</figure>
 		</div>
-	{% endfor %}
 	</div>
-{% endif %}
 </div>
-{{ block.super }}
+{% endif %}
+<div class="flat-background">
+	<div class="flat-row">
+			{{ block.super }}
+		<div class="margin-top-50"></div>
+	</div>
+</div>
 {% endblock %}
 
 {% block leftsidebar %}
-<div class="four columns">
-	<div class="widget margin-top-0">
-		<h3 class="headline"> {% trans "Categories" %} </h3>
-		<span class="line"></span><div class="clearfix"></div>
-		{% page_menu "pages/menus/sidebar_menu.html" %}
-		<div class="clearfix"></div>
-	</div>
+<div class="four adjust-left columns">
+	<a class="toggle-filter-button" href="#">Показать фильтры <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+	<div class="filter-panel">
+		<div class="widget margin-top-0">
+			<h3 class="headline"> {{ page.title }}</h3>
+			<span class="line"></span><div class="clearfix"></div>
+			{% if page.parent %}
+			<a href="{{ page.parent.get_absolute_url }}" class="list-back-button">
+				<i class="fa fa-chevron-left" aria-hidden="true"></i> Вернуться в {{ page.parent.title }}
+			</a>
+			{% endif %}
+				<ul class="category-menu">
+					{% for page in sub_categories %}
+							<li><a href="{{ page.get_absolute_url }}" class="">{{ page.title }}</a></li>
+					{% endfor %}
+				</ul>
+				<div class="clearfix"></div>
+		</div>
 
-	<!-- filters -->
-<form method="GET">
-	<div class="widget">
-	    <h3 class="headline">Цена</h3><span class="line"></span>
-	    <div class="clearfix"></div>
-	    <div class="input_price">
-	    	<span>от</span>
-	    	<input class="" id="id_min_price" name="min_price" step="1" type="number" {% if request.GET.min_price %}value="{{ request.GET.min_price }}"{% endif %}>
-	    </div><!-- -->
-	    <div class="input_price">
-	    	<span>до</span>
-	    	<input class="" id="id_max_price" name="max_price" step="1" type="number" {% if request.GET.max_price %}value="{{ request.GET.max_price }}"{% endif %}>
-	    </div>
-
+		<form action="" method="get">
+			{% regroup filter_form by field.group as field_groups %}
+		  {% for field_group in field_groups %}
+				<div class="widget">
+					<h3 class="headline"> {{ field_group.grouper }}</h3>
+					<span class="line"></span><div class="clearfix"></div>
+		    {% for field in field_group.list %}
+		      {{ field|as_crispy_field }}
+		    {% endfor %}
+				<div class="clearfix"></div>
+				</div>
+		  {% endfor %}
+			<input type="submit" value="Применить">
+		</form>
 	</div>
-
-	<div class="widget margin-top-10">
-	    <h3 class="headline">Отобразить</h3><span class="line"></span>
-	    <div class="clearfix"></div>
-	    <label class="control control--checkbox">
-	        <input {% if request.GET.region %}checked="checked" {% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user_profile.region.id }}">
-	        Товары из моего региона
-	        <div class="control__indicator"></div>
-	    </label>
-	    {% for label, name, value in main_filters %}
-	    <label class="control control--checkbox">
-	        <input {% if name in request.GET %}checked="checked" {% endif %} id="id_{{name}}" name="{{name}}" type="checkbox" value="{{ value }}">{{ label }}
-	        <div class="control__indicator"></div>
-	    </label>
-	    {% endfor %}
-	    <div class="clearfix"></div>
-	</div>
-
-	<div class="widget margin-top-5">
-	    <h3 class="headline">Доставка</h3><span class="line"></span>
-	    <div class="clearfix"></div>
-	    {% for label, name, value in delivery_filters %}
-	    <label class="control control--checkbox">
-	        <input {% if name in request.GET %}checked="checked" {% endif %} id="id_{{name}}" name="{{name}}" type="checkbox" value="{{ value }}">{{ label }}
-	        <div class="control__indicator"></div>
-	    </label>
-	    {% endfor %}
-	    <div class="clearfix"></div>
-	</div>
-
-	<div class="widget margin-top-5">
-	    <h3 class="headline">Оплата</h3><span class="line"></span>
-	    <div class="clearfix"></div>
-	    {% for label, name, value in payment_filters %}
-	    <label class="control control--checkbox">
-	        <input {% if name in request.GET %}checked="checked" {% endif %} id="id_{{name}}" name="{{name}}" type="checkbox" value="{{ value }}">{{ label }}
-	        <div class="control__indicator"></div>
-	    </label>
-	    {% endfor %}
-	    <div class="clearfix"></div>
-	</div>
-	<input type="submit" class="button pull-right" value="Применить"></input>
-</form>
 </div>
 {% endblock %}
 
 
 {% block main %}
 {% if true_products %}
-	<div class="twelve columns">
-		<form class="product-sorting" method="GET">
-		        <select onchange="location.href = this[this.selectedIndex].value;" class="orderby" id="sorting-select">
-		        {% for name, option in settings.SHOP_PRODUCT_SORT_OPTIONS %}
-		        {% if "rating" not in option or settings.SHOP_USE_RATINGS %}
-		        <option{% if option == products.sort_by %} selected{% endif %}
-		            value="{{ category.get_absolute_url }}?sort={{ option }}{{ querystring }}">
-		            {{ name }}
-		        </option>
-		        {% endif %}
-		        {% endfor %}
-		        </select>
-		</form>
-	</div>
-	<div class="twelve columns products">
+	<div class="twelve adjust-right columns products">
 		{% for product in true_products %}
-		<div class="four shop columns half-columns">
+		<div class="adjust-product columns">
 			<figure class="product">
-				<div class="badges">
-				{% if product.pre_order %}
-					<div class="product-example">Для примера</div>
-				{# {% else %} #}
-					<!--<div class="product-ready">Готовый вариант</div>-->
-				{% endif %}
-				{% if product.on_custom_sale %}
-					<div class="product-discnt">СКИДКА</div>
-				{% endif %}
+				{% if product.condition != 1 %}
+				<div class="badge type-{{ product.condition }}">
+					{{ product.get_condition_display }}
 				</div>
+				{% endif %}
 				{% with product.images.all as images %}
 				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
 				<a href="{{ product.get_absolute_url }}">
 					{% if images %}
-						<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title }}" />
+						<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ product.title|capfirst }}" />
 							{% if product.images.count != 1 %}
 							<div class="cover">
-									<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title }}" />
+									<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ product.title|capfirst }}" />
 							</div>
 							{% endif %}
 					{% else %}
-						<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title }}" />
+						<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ product.title|capfirst }}" />
 					{% endif %}
 				</a>
 				<a href="#" product-id="{{ product.id }}" class="product-button">
@@ -168,15 +124,9 @@
 				</div>
 				{% endwith %}
 					<section>
-						<a href="{{ product.get_absolute_url }}"><h5>{{ product.title|title|truncatechars:34 }}</h5></a>
+						<a href="{{ product.get_absolute_url }}"><h5>{{ product.title|capfirst|truncatechars:34 }}</h5></a>
 						<a href="{{ product.shop.get_absolute_url }}" class="shopname">{{ product.shop.shopname }}</a>
-						<!--<span class="product-category">
-						</span>-->
-						{% if product.on_custom_sale %}
-							<span class="product-price-discount">{{ product.unit_price }}<i>{{ product.price }}</i></span>
-						{% else %}
-						<span class="product-price">{{ product.price }}</span>
-						{% endif %}
+						<span class="product-price">{{ product.price|rub_currency }} </span>
 					</section>
 			</figure>
 		</div>

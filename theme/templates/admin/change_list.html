@@ -31,7 +31,7 @@
 	        $title.click(function(){
 	            $title.next().slideToggle();
 	        });
-	    });   
+	    });
 	  });
 	})(jQuery);
     (function ($) {
@@ -71,7 +71,7 @@
       }
     })(jQuery);
   </script>
-	
+
 {% endblock extrascript %}
 
 <!-- BREADCRUMBS -- >
@@ -109,7 +109,7 @@
 						<div class="panel-ctrls">
 							<div class="DTTT btn-group pull-left mt-sm">
 							<a href="add/{% if is_popup %}?_popup=1{% endif %}" class="btn btn-default DTTT_button_text" id="ToolTables_crudtable_0">
-								<i class="fa fa-plus"></i> 
+								<i class="fa fa-plus"></i>
 								<span>Добавить</span>
 							</a>
 							</div>
@@ -120,10 +120,10 @@
 					</div>
 					<div class="panel-body">
 						<form action="" method="post"{% if cl.formset.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
-				
-					
+
+
 						{% if is_popup %}<input type="hidden" name="_popup" value="1" />{% endif %}
-					
+
 
 						{% if cl.formset %}
 							{{ cl.formset.management_form }}
@@ -144,25 +144,25 @@
 											<span class="material-input"></span>
 										</div>
 <!-- 								      <span class="input-group-btn"> -->
-								  
+
 								    <button type="submit" class="btn" title="Выполнить выбранное действие" name="index" value="1" style="color: rgb(97, 97, 97)!important; margin: 0!important; font-size: inherit;">
 								    <i class="fa fa-minus"></i> <span>Удалить</span>
 								    <div class="ripple-container"></div></button>
 								      <!-- </span> -->
-								    </div>  
+								    </div>
 								<input class="select-across" name="select_across" type="hidden" value="1">
-								  
+
 								</div>
 								{% endif %}
 							{% endif %}
-								
+
 								{% result_list cl %}
 
 							{% if action_form and actions_on_bottom and cl.full_result_count and cl.result_count %}
 								{% admin_actions %}
 							{% endif %}
 						{% endblock %}
-						{% block pagination %}{% pagination cl %}{% endblock %}		
+						{% block pagination %}{% pagination cl %}{% endblock %}
 						{% if cl.formset and cl.result_count and request.user.is_superuser %}
 							<p class="submit-row">
 								<input class="btn-raised btn-primary btn" type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>
@@ -179,7 +179,7 @@
 						<div id="changelist-filter">
 
 							<!-- Results -->
-							
+
 							{% ifnotequal cl.result_count cl.full_result_count %}
 							<div class="col-sm-6 col-md-6 col-lg-12">
 							<div class="panel panel-default">
@@ -193,7 +193,7 @@
 							</div>
 							</div>
 							{% endifnotequal %}
-							
+
 
 							<!-- Search -->
 							<div class="col-sm-6 col-md-6 col-lg-12">
@@ -203,26 +203,24 @@
 							</div>
 
 							<!-- Date Hierarchy -->
-							<!--<div class="col-sm-6 col-md-6 col-lg-12">-->
-							{# {% block date_hierarchy %} #}
-								{# {% date_hierarchy cl %} #}
-							{# {% endblock %} #}
-							<!--</div>-->
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							{% block date_hierarchy %}
+								{% date_hierarchy cl %}
+							{% endblock %}
+							</div>
 
-							<!--<div class="col-sm-6 col-md-6 col-lg-12">-->
-							{# {% if cl.has_filters %} #}
-							<!--<div class="panel panel-midnightblue">-->
-    							<!--<div class="panel-heading">-->
-								<!--<h2>{# {% trans 'Filter' %} #}</h2>-->
-								<!--</div>-->
-								<!--<div class="panel-body">-->
-								{# {% for spec in cl.filter_specs %} #}
-									{# {% admin_list_filter cl spec %} #}
-								{# {% endfor %} #}
-								<!--</div>-->
-							<!--</div>-->
-							{# {% endif %} #}
-							<!--</div>-->
+							<div class="col-sm-6 col-md-6 col-lg-12">
+							{% if cl.has_filters %}
+							<div class="panel panel-midnightblue">
+    						<div class="panel-heading"><h2>{% trans 'Filter' %}</h2></div>
+								<div class="panel-body">
+								{% for spec in cl.filter_specs %}
+									{% admin_list_filter cl spec %}
+								{% endfor %}
+								</div>
+							</div>
+							{% endif %}
+							</div>
 						</div>
 					{% endif %}
 					</div>
