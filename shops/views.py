@@ -350,7 +350,14 @@ class ProductDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         form = ProductReviewForm(request.POST)
         product = self.get_object()
-        if form.is_valid() and product.shop != self.request.user.shop:
+        if form.is_valid():
+            # try:
+            #  add shop 
+            #     shop = self.request.user.shop
+            # except Exception as e:
+            #     pass
+
+
             review = form.save(commit=False)
             review.author = self.request.user
             review.product = product
