@@ -389,7 +389,7 @@ class Cart(models.Model):
     last_updated = models.DateTimeField(
         _("Last updated"), null=True, auto_now=True)
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         "auth.User", related_name="cart", verbose_name="Покупатель", null=True)
     objects = managers.CartManager()
 
