@@ -301,23 +301,29 @@ class OrderForm(forms.ModelForm):
     # user_region = forms.CharField(label="Регион", max_length=100)
     # user_city = forms.CharField(label="Город", max_length=100)
 
-    shipping_type = forms.ChoiceField(
-        label="Доставка", choices=[], required=True, widget=forms.RadioSelect())
+    # shipping_type = forms.ChoiceField(
+    #     label="Доставка", required=False, widget=forms.RadioSelect())
 
     def __init__(self, *args, **kwargs):
         self.shop = kwargs.pop("shop", None)
         self.user = kwargs.pop("user", None)
         super(OrderForm, self).__init__(*args, **kwargs)
+        self.fields['shipping_type'] = forms.ChoiceField(label="Доставка", widget=forms.RadioSelect())
         if self.shop:
-            self.fields['shipping_type'].choices = self.shop.get_delivery_options()
+            self.fields['shipping_type'].choices = [['Курьером по миру', '250'],]
         if self.user:
-            self.fields['user_first_name'].initial = self.user.profile.first_name
-            self.fields['user_last_name'].initial = self.user.profile.last_name
-            self.fields['user_phone'].initial = self.user.profile.phone
-            self.fields['user_email'].initial = self.user.email
-            self.fields['user_country'].initial = self.user.profile.country
-            self.fields['user_city'].initial = self.user.profile.city
-            self.fields['user_region'].initial = self.user.profile.region
+            try:
+                profile = self.user.profile
+                self.fields['user_first_name'].initial = self.user.profile.first_name
+                self.fields['user_last_name'].initial = self.user.profile.last_name
+                self.fields['user_phone'].initial = self.user.profile.phone
+                self.fields['user_email'].initial = self.user.email
+                self.fields['user_country'].initial = self.user.profile.country
+                self.fields['user_city'].initial = self.user.profile.city
+                self.fields['user_region'].initial = self.user.profile.region
+            except Exception as e:
+                pass
+
 
 
 class ProductReviewForm(forms.ModelForm):

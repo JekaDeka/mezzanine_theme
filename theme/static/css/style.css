@@ -5,6 +5,10 @@
 a:visited {
     color: #888;
 }
+h2 {
+    /* font-weight: 600; */
+    line-height: 30px;
+}
 /* #top-bar {
     background: #f5f5f5;
     color: #909090;
@@ -3020,7 +3024,7 @@ a.button.color:hover {
     left: 55px;
 
     width: 90%;
-    /* line-height: 40px; */
+    line-height: 40px;
 }
 
 .parallax-titlebar span {
@@ -6955,10 +6959,6 @@ img.rsImg {
     font-weight: 600;
     line-height: 30px;
 } */
-h2 {
-    /* font-weight: 600; */
-    line-height: 30px;
-}
 
 .product-page .product-price,
 .product-page .product-price-discount {
@@ -8548,13 +8548,13 @@ html[xmlns] .slides {
         padding: 0;
     }
     .parallax-content h2 span {
-        display: none;
+        /* display: none; */
     }
     .parallax-titlebar #breadcrumbs ul {
         left: 55px;
         display: block;
         float: left;
-        top: 30px;
+        top: 40px;
     }
     #not-found {
         margin: 15px 0 25px 0;
