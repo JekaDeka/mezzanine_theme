@@ -7230,7 +7230,7 @@ a.cart-remove:hover {
 .qtyminus:before {
     position: relative;
     display: block;
-    top: 14px;
+    top: 10px;
     left: 15px;
 }
 

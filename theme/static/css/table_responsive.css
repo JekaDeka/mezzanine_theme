@@ -3,6 +3,11 @@
   margin: 0 auto;
 }
 
+.qtyplus:before,
+.qtyminus:before {
+  top: 14px;
+}
+
 .container-table100 {
   width: 100%;
 }
