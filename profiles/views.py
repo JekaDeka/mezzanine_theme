@@ -7,7 +7,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import update_session_auth_hash
 from django.contrib.auth.forms import PasswordChangeForm
-from django.core import paginator
+from django.core import paginator, serializers
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.http import Http404, HttpResponse, HttpResponseRedirect, JsonResponse
 from django.db import transaction
@@ -52,7 +52,6 @@ class ProfileSettings(TemplateView):
 
     def get_context_data(self, **kwargs):
         data = super(ProfileSettings, self).get_context_data(**kwargs)
-        # user = User.objects.values('shop__id', 'shop__slug', 'profile__first_name', 'email').get(pk=self.request.user.pk)
         user = User.objects.defer(
             'password',
             'last_login',
@@ -70,9 +69,9 @@ class ProfileSettings(TemplateView):
             "profile__city").get(pk=self.request.user.pk)
         data['user'] = user
 
-        if user.profile.status == 1:
+        # if user.profile.status == 1:
             ### if user is master ###
-            pass
+            # pass
             # reviews = MasterReview.objects.filter(master=self.request.user).values_list(
             #     'mastery', 'punctuality', 'responsibility', 'avg_rating')
             # data['reviews'] = reviews.aggregate(mastery=Avg('mastery'), punctuality=Avg(
@@ -80,10 +79,19 @@ class ProfileSettings(TemplateView):
             # data['reviews_count'] = reviews.count()
 
         ### get shop data
+
         try:
             shop = user.shop
-            orders = Order.objects.filter(shop=shop).values('status')
-            orders_status_count = orders.order_by(
+            # products = shop.products.only('pk', 'date_added', 'main_image', 'title')
+            products = shop.products.all()
+            products_count = products.count()
+            data['products'] = products
+            data['products_count'] = products_count
+            data['products_remain'] = user.profile.allow_product_count - products_count
+
+
+            orders = Order.objects.filter(shop=shop).only('status', 'time', 'total', 'item_total', 'user_first_name', 'user_last_name', 'shipping_type')
+            orders_status_count = orders.values('status').order_by(
                 'status').annotate(total=Count('status'))
             orders_data = dict()
 
@@ -96,15 +104,18 @@ class ProfileSettings(TemplateView):
 
             for order in orders_status_count:
                 orders_data[order['status']]['total'] = order['total']
-            data['orders'] = orders_data
+            data['orders_data'] = orders_data
             data['orders_count'] = orders.count()
+            data['orders'] = orders
+
         except Exception as e:
-            pass
+            data['products_count'] = 0
+            data['products_remain'] = user.profile.allow_product_count
 
 
         ### get order table data
         try:
-            ordertableitems = user.orders_as_author.values('pk', 'created', 'title')
+            ordertableitems = user.orders_as_author.only('pk', 'created', 'title')
             ordertablitems_count = ordertableitems.count()
             data['ordertablitems'] = ordertableitems[:5]
             data['ordertablitems_count'] = ordertablitems_count
@@ -114,15 +125,13 @@ class ProfileSettings(TemplateView):
 
         ### get blog_post data
         try:
-            blogposts = user.blogposts.all()
+            blogposts = user.blogposts.only('pk', 'title', 'publish_date', 'site_id', 'user', 'status', 'slug', 'id', 'featured_image').all()
             blogposts_count = blogposts.count()
             data['blogposts'] = blogposts[:5]
             data['blogposts_count'] = blogposts_count
             data['blogposts_remain'] = user.profile.allow_blogpost_count - blogposts_count
-
-            pass
         except Exception as e:
-            raise
+            pass
 
         return data
 

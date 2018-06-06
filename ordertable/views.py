@@ -126,6 +126,10 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
         order.performer = performer
         order.active = False
         order.save()
+
+        ###
+        # order.order_requests.all().delete()
+        ###
     except Exception as e:
         messages.error(request, e.args[0])
     else:

@@ -48,9 +48,10 @@ function FileSubmit(FilePath, FileURL, ThumbURL, FileType, BrowseUrl) {
         var res = input_id.split("-");
         res[res.length - 1] = "DELETE";
         var delete_input_id = res.join('-');
-        opener.document.getElementById(delete_input_id).checked = false;;
+        if (opener.document.getElementById(delete_input_id)) {
+          opener.document.getElementById(delete_input_id).checked = false;
+        }
 
-        
     }
     this.close();
 }

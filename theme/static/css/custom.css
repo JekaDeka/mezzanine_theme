@@ -574,7 +574,6 @@ figure.blue-effect img {
   top: 0;
   right: 0;
 }
-
 .badge.green {
   background-color: #4caf50;
 }
@@ -589,6 +588,18 @@ figure.blue-effect img {
 
 .badge.type-3, .badge.blue {
   background-color: #0e83cd;
+}
+
+.info {
+  padding: 3px;
+  font-weight: 600;
+  font-size: 13px;
+}
+.info.red {
+  color: #de5959;
+}
+.info.green {
+  color: #3acf87;
 }
 
 /* .rub {
@@ -1357,7 +1368,7 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
 
 .widget-card-body .widget-button {
   cursor: pointer;
-  padding: 0 6px;
+  /* padding: 0 6px; */
   display: inline-block;
   text-transform: uppercase;
   font-weight: 600;
@@ -1366,6 +1377,11 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
 
 .widget-card-body .widget-button.error {
   color: #de5959;
+}
+
+.widget-card-header {
+  padding-top: 5px;
+  padding-bottom: 20px;
 }
 
 .widget-card-header h2 {
@@ -1654,6 +1670,11 @@ span.big-green>span>i {
   .widget-card-body .top-side, .widget-card-body .bottom-side, .widget-card-body .left-side, .widget-card-body .right-side, .container .widget-card {
     width: 364px;
   }
+  .container .widget-card.extra,
+  .widget-card.extra .top-side,
+  .widget-card.extra .bottom-side {
+    width: 748px;
+  }
   .widget-card .left-side {
     padding-bottom: 5px;
   }
@@ -1867,9 +1888,9 @@ span.big-green>span>i {
   }
 }
 
-.red {
+/* .red {
   background-color: #c62020;
-}
+} */
 
 .pull-left {
   float: left !important;

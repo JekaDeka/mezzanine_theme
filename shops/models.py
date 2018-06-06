@@ -319,7 +319,7 @@ class Order(models.Model):
                                  choices=settings.SHOP_ORDER_STATUS_CHOICES,
                                  default=settings.SHOP_ORDER_STATUS_CHOICES[0][0])
     time = models.DateTimeField(_("Time"), auto_now_add=True, null=True)
-    shop = models.ForeignKey("UserShop", related_name="orders")
+    shop = models.ForeignKey("UserShop", related_name="orders", on_delete=models.CASCADE)
 
     user_id = models.IntegerField(blank=True, null=True)
     user_first_name = models.CharField(_("First name"), max_length=255)

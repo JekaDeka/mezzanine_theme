@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^settings/shop/(?P<slug>.*)/$', views.ShopDeliveryOptionUpdate.as_view(), name='shop-update'),
     url(r'^settings/shop/(?P<slug>.*)/delete/$', views.ShopDelete.as_view(), name='shop-delete'),
 
+
     url(r'^settings/orders/(?P<slug>[\w\-]+)/(?P<pk>[0-9]+)/$', views.OrderList.as_view(), name='shop-order-list'),
     url(r'^orders/$', views.OrderList.as_view(), name='user-order-list'),
     url(r'^settings/orders/(?P<pk>[0-9]+)/edit/$', views.OrderUpdate.as_view(), name='order-update'),

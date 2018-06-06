@@ -42,6 +42,8 @@
 							<a href="{% url 'shop-order-list' user.shop.slug user.shop.pk %}">Список заказов</a>
 						</div>
 					</div>
+					{% else %}
+					<a href="{% url 'shop-add' %}"><i class="fa fa-cart-plus" aria-hidden="true"></i> Создать магазин</a>
 					{% endif %}
 					<div class="dropdown">
 						<button class="dropbtn"><i class="fa fa-pencil" aria-hidden="true"></i> Блог <i class="fa fa-caret-down"></i></button>
@@ -100,8 +102,8 @@
 							<ul class="cycle margin-top-15">
 								<li>Статус: </li>
 								<li>{{ user.profile.get_status_display }} {% if user.shop %} / Владелец магазина{% endif %}</li>
-								<li>Всего товаров: {{ user.shop.get_products_count|default:0  }}</li>
-								<li>Доступно: 0 <a href="#">Купить</a></li>
+								<li>Всего товаров: {{ products_count }}</li>
+								<li>Доступно: {{ products_remain }} <a href="#">Купить</a></li>
 								<li>Записей в блоге: {{ blogposts_count }}</li>
 								<li>Доступно: {{ blogposts_remain }} <a href="#">Купить</a></li>
 								<li>Заявок для стола заказов: {{ ordertablitems_count }}</li>
@@ -161,17 +163,17 @@
 					<div class="left-side margin-top-15">
 						<div class="widget-card-content">
 							<h2>Магазин <a href="{% url 'shop-update' user.shop.slug %}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i></a></h2>
+							{% if user.shop.on_vacation %}
+								<a href="{% url 'shop_toggle_vacation' %}" class="widget-button">Вернуться с каникул</a>
+							{% else %}
+								<a href="{% url 'shop_toggle_vacation' %}" class="widget-button error">Уйти на каникулы</a>
+							{% endif %}
 							<p class="strong">Нравится <span class="big-green"> 0 </span> людям</p>
 							<ul class="strong">
 								<li>Рейтинг товаров: <span> 0 </span></li>
 							</ul>
-							<p class="strong">
-								{% if user.shop.on_vacation %}
-									<a href="{% url 'shop_toggle_vacation' %}" class="widget-button">Вернуться с каникул</a>
-								{% else %}
-									<a href="{% url 'shop_toggle_vacation' %}" class="widget-button error">Уйти на каникулы</a>
-								{% endif %}
-								</p>
+							{# <p class="strong"> #}
+							{# </p> #}
 							{# <p class="strong">Дневная выручка <span class="big-green"> 12₽</span></p> #}
 						</div>
 					</div>
@@ -182,7 +184,7 @@
 									{{ orders_count }}</a> </span> </li>
 							</ul>
 							<ul>
-								{% for order in orders.items %}
+								{% for order in orders_data.items %}
 								<li>{{ order.1.label|capfirst }}: <span> <a href="#"> {{ order.1.total }} </a> </span>	</li>
 								{% endfor %}
 							</ul>
@@ -204,23 +206,22 @@
 		</div>
 	</div>
 	<div class="flat-row">
-		<div class="container" id="masonry-wrapper">
+		<div class="container">
 
 			{% if ordertablitems_count %}
 			<!-- order table !-->
-			<div class="widget-card columns masonry-item">
+			<div class="widget-card extra columns" id="adjust-4">
 				<div class="widget-card-header">
 					<h2>Стол заказов
 						{% if ordertablitems_remain > 0 %}
 						<a href="{% url 'ordertableitem-add' %}">
-							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить новый
-						</a>
+							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить
+						</a><div class="clearfix"></div>
 						{% endif %}
 					</h2>
 				</div>
 
 				<div class="widget-card-body">
-					{% if ordertablitems_count %}
 					<div class="top-side">
 						<div class="limiter">
 					    <div class="container-table100">
@@ -228,16 +229,21 @@
 					        <div class="table">
 										{% for ordertableitem in ordertablitems %}
 										<div class="row">
-											<div class="cell" data-title="Добавлено">
-												{{ ordertableitem.created|date:"d.m.Y" }}
+											<div class="cell publish-date" data-title="Добавлено">
+												<div>{{ ordertableitem.created|date:"d.m.Y" }}</div>
+												{% if not ordertableitem.available %}
+												<div class="info red">Проверяется</div>
+												{% else %}
+												<div class="info green">Опубликовано</div>
+												{% endif %}
 											</div>
-											<div class="cell" data-title="Название заявки">
+											<div class="cell title" data-title="Заявка">
 												<a href="{{ ordertableitem.get_absolute_url }}">{{ ordertableitem.title|capfirst }}</a>
 											</div>
-											<div class="cell" data-title="Редактировать">
+											<div class="cell edit" data-title="Редактировать">
 												<a href="{% url 'ordertableitem-update' ordertableitem.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
 											</div>
-											<div class="cell" data-title="Удалить">
+											<div class="cell delete" data-title="Удалить">
 												<a href="{% url 'ordertableitem-delete' ordertableitem.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
 											</div>
 										</div>
@@ -250,32 +256,36 @@
 					<div class="bottom-side">
 						<a href="{% url 'ordertableitem-list' %}">Смотреть все заявки</a>
 					</div>
-					{% else %}
-					<div class="widget-info">
-						<p>
-							Здесь будет отображаться список ваших последних заявок для Стола Заказов.
-						</p>
-					</div>
-					{% endif %}
 				</div>
+			</div>
+			{% else %}
+			<div class="widget-card extra columns" id="adjust-4">
+				<a href="{% url 'ordertableitem-add' %}">
+					<div class="content-box color-effect-1">
+						<h2>Добавьте новую заявку</h2>
+						<ul>
+							<li>Найдите исполнителя под Ваш индвидуальный заказ.</li>
+							{# <li>---</li> #}
+						</ul>
+					</div>
+				</a>
 			</div>
 			{% endif %}
 			<!-- order table end !-->
 
 			<!-- blog post !-->
 			{% if blogposts_count %}
-			<div class="widget-card columns masonry-item">
+			<div class="widget-card extra columns" id="adjust-5">
 				<div class="widget-card-header">
 					<h2>Блог
 						{% if blogposts_remain > 0 %}
 						<a href="{% url 'blogpost-add' %}">
-							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить новый
-						</a>
+							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить
+						</a><div class="clearfix"></div>
 						{% endif %}
 					</h2>
 				</div>
 				<div class="widget-card-body">
-				{% if blogposts_count %}
 					<div class="top-side">
 						<div class="limiter">
 							<div class="container-table100">
@@ -283,16 +293,32 @@
 									<div class="table">
 										{% for blogpost in blogposts %}
 										<div class="row">
-											<div class="cell" data-title="Добавлено">
-												{{ blogpost.publish_date|date:"d.m.Y" }}
+											<div class="cell publish-date" data-title="Добавлено">
+												<div>{{ blogpost.publish_date|date:"d.m.Y" }}</div>
+												{% if blogpost.status == 1 %}
+												<div class="info red">Проверяется</div>
+												{% else %}
+												<div class="info green">{{ blogpost.get_status_display }}</div>
+												{% endif %}
 											</div>
-											<div class="cell" data-title="Название статьи">
+
+											<div class="cell image" data-title="Статья">
+												<a href="{{ blogpost.get_absolute_url }}">
+												{% if blogpost.featured_image %}
+													<img src="{{ MEDIA_URL }}{% thumbnail blogpost.featured_image 50 50 %}" alt="{{ blogpost.title }}">
+												{% else %}
+													<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+												{% endif %}
+												</a>
+											</div>
+											<div class="cell title">
 												<a href="{{ blogpost.get_absolute_url }}">{{ blogpost.title|capfirst }}	</a>
 											</div>
-											<div class="cell" data-title="Редактировать">
+
+											<div class="cell edit" data-title="Редактировать">
 												<a href="{% url 'blogpost-update' blogpost.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
 											</div>
-											<div class="cell" data-title="Удалить">
+											<div class="cell delete" data-title="Удалить">
 												<a href="{% url 'blogpost-delete' blogpost.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
 											</div>
 										</div>
@@ -305,32 +331,40 @@
 					<div class="bottom-side">
 						<a href="{% url 'blogpost-list' %}">Смотреть все записи</a>
 					</div>
-					{% else %}
-					<div class="widget-info">
-						<p>
-							Здесь будет отображаться список ваших последних записей в Блоге.
-						</p>
-					</div>
-					{% endif %}
 				</div>
+			</div>
+			{% else %}
+			<div class="widget-card extra columns" id="adjust-5">
+				<a href=" {% url 'blogpost-add' %} ">
+					<div class="content-box color-effect-2">
+						<h2>Создайте свою первую запись в Блоге</h2>
+						<ul>
+							<li>Поделитесь своими мыслями с миром.</li>
+						</ul>
+					</div>
+				</a>
 			</div>
 			{% endif %}
 			<!-- blogpost end !-->
-			{% if user.shop.id %}
+		</div>
+	</div>
+	<div class="flat-row">
+		<div class="container">
+
+		{% if user.shop.id %}
 			<!-- products !-->
 			{% if products_count %}
-			<div class="widget-card columns masonry-item">
+			<div class="widget-card extra columns" id="adjust-6">
 				<div class="widget-card-header">
-					<h2>Список моих товаров
+					<h2>Товары
 						{% if products_remain > 0 %}
 						<a href="{% url 'product-add' %}">
-							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить новый
-						</a>
+							<i class="fa fa-plus-circle" aria-hidden="true"></i> Добавить
+						</a><div class="clearfix"></div>
 						{% endif %}
 					</h2>
 				</div>
 				<div class="widget-card-body">
-				{% if products_count %}
 					<div class="top-side">
 						<div class="limiter">
 							<div class="container-table100">
@@ -338,16 +372,32 @@
 									<div class="table">
 										{% for product in products %}
 										<div class="row">
-											<div class="cell" data-title="Добавлено">
-												{{ product.date_added|date:"d.m.Y" }}
+											<div class="cell publish-date" data-title="Добавлено">
+												<div>{{ product.date_added|date:"d.m.Y" }}</div>
+												{% if not product.available %}
+												<div class="info red">Проверяется</div>
+												{% else %}
+												<div class="info green">Опубликовано</div>
+												{% endif %}
 											</div>
-											<div class="cell" data-title="Название товара">
-												<a href="{{ product.get_absolute_url }}">{{ product.title|capfirst }}</a>
+
+											<div class="cell image" data-title="Товар">
+												<a href="{{ product.get_absolute_url }}">
+													{% if product.main_image %}
+														<img src="{{ MEDIA_URL }}{% thumbnail product.main_image 50 50 %}" alt="{{ product.title }}">
+													{% else %}
+														<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+													{% endif %}
+												</a>
 											</div>
-											<div class="cell" data-title="Редактировать">
+
+											<div class="cell title">
+												<a href="{{ product.get_absolute_url }}">{{ product.title|capfirst }}	</a>
+											</div>
+											<div class="cell edit" data-title="Редактировать">
 												<a href="{% url 'product-update' product.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
 											</div>
-											<div class="cell" data-title="Удалить">
+											<div class="cell delete" data-title="Удалить">
 												<a href="{% url 'product-delete' product.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
 											</div>
 										</div>
@@ -360,27 +410,29 @@
 					<div class="bottom-side">
 						<a href="{% url 'product-list' %}">Смотреть все товары</a>
 					</div>
-					{% else %}
-					<div class="widget-info">
-						<p>
-							Здесь будет отображаться список товаров из вашего магазина.
-						</p>
-					</div>
-					{% endif %}
 				</div>
+			</div>
+			{% else %}
+			<div class="widget-card extra columns" id="adjust-6">
+				<a href=" {% url 'product-add' %} ">
+					<div class="content-box color-effect-1">
+						<h2>Добавьте свой первый товар в магазин</h2>
+						<ul>
+							<li>Начните продавать уже сейчас.</li>
+						</ul>
+					</div>
+				</a>
 			</div>
 			{% endif %}
 			<!-- products end  !-->
 
 			<!-- orders !-->
 			{% if orders_count %}
-			<div class="widget-card columns masonry-item">
+			<div class="widget-card extra columns" id="adjust-7">
 				<div class="widget-card-header">
-					<h2>Заказы для магазина
-					</h2>
+					<h2>Заказы для магазина</h2>
 				</div>
 				<div class="widget-card-body">
-				{% if orders_count %}
 					<div class="top-side">
 						<div class="limiter">
 							<div class="container-table100">
@@ -388,8 +440,8 @@
 									<div class="table">
 										{% for order in orders %}
 										<div class="row">
-											<div class="cell" data-title="Поступил">
-												{{ order.time|date:"d.m.Y" }}
+											<div class="cell publish-date" data-title="Поступил">
+												<span>{{ order.time|date:"d.m.Y" }}</span>
 											</div>
 											<div class="cell" data-title="Пользователь">
 												{{ order.user_first_name }} {{ order.user_last_name }}
@@ -408,16 +460,20 @@
 						</div>
 					</div>
 					<div class="bottom-side">
-						<a href="{% url 'order-list' %}">Смотреть все заказы</a>
+						<a href="{% url 'user-order-list' %}">Смотреть все заказы</a>
 					</div>
-					{% else %}
-					<div class="widget-info">
-						<p>
-							Здесь будет отображаться список заказов для магазина.
-						</p>
-					</div>
-					{% endif %}
 				</div>
+			</div>
+			{% else %}
+			<div class="widget-card extra columns" id="adjust-7">
+				<a href=" {% url 'user-order-list' %} ">
+					<div class="content-box color-effect-2">
+						<h2>В Ваш магазин не поступало заказов</h2>
+						<ul>
+							<li>Здесь будет отображен список последних заказов для магазина</li>
+						</ul>
+					</div>
+				</a>
 			</div>
 			{% endif %}
 			<!-- orders end !-->
@@ -429,57 +485,132 @@
 	{% endblock %}
 	{% block extra_js %}
 	{{ block.super }}
-<script type="text/javascript">
-	$(document).ready(function() {
-		$('.dropdown').on('click touch', function () {
-			$('.dropdown-content').not($(this).find('.dropdown-content')).removeClass('visible');
-			$(this).find('.dropdown-content').toggleClass('visible');
-		});
-		$('.responsive-toggle').on('click touch', function () {
-			$('.topnav').toggleClass('responsive-menu');
-			$('.dropdown-content').removeClass('visible');
-		});
+	<script type="text/javascript">
 
-		var card_1 = $("#adjust-1").find('.widget-card-body');
-		var card_2 = $("#adjust-2").find('.widget-card-body').length ? $("#adjust-2").find('.widget-card-body') : $("#adjust-2").find('.content-box');
-		var card_3 = $("#adjust-3").find('.widget-card-body').length ? $("#adjust-3").find('.widget-card-body') : $("#adjust-3").find('.content-box');
-		$(window).bind("resize", function() {
-			$(card_1).css('padding', '');
-			$(card_2).css('padding', '');
-			$(card_3).css('padding', '');
-			if ($(this).width() > 751) {
+	function equalSize(adjust1, adjust2) {
+		var card_1 = $(adjust1).find('.widget-card-body').length ? $(adjust1).find('.widget-card-body') : $(adjust1).find('.content-box');
+		var card_2 = $(adjust2).find('.widget-card-body').length ? $(adjust2).find('.widget-card-body') : $(adjust2).find('.content-box');
+		$(card_1).css({'margin': '', 'padding': '', 'height': ''});
+		$(card_2).css({'margin': '', 'padding': '', 'height': ''});
+		if ($(window).width() > 973) {
+			if ($(adjust1).find('.content-box').length && $(adjust2).find('.content-box').length) {
+				// Если и слева и справа "виджет-сообщения"
+				$(card_1).height($(card_2).height());
+				// var card_1_height = $(card_1).outerHeight();
+				// var card_2_height = $(card_2).outerHeight();
+				// if (card_1_height > card_2_height) {
+				// 	$(card_1).height($(card_2).height());
+				// }
+				// else if (card_1_height > card_2_height) {
+				// 	$(card_2).height($(card_1).height());
+				// }
+				// else {
+				// 	console.log('wtf!');
+				// }
+			}
+			else if ($(adjust1).find('.content-box').length || $(adjust2).find('.content-box').length ){
 				var card_1_height = $(card_1).height();
 				var card_2_height = $(card_2).height();
-				var card_3_height = $(card_3).height();
-				var diff = card_1_height - card_2_height - card_3_height - 20
+				var diff = card_2_height - card_1_height
 				if (diff > 0) {
-					if ($("#adjust-2").find('.content-box').length && $("#adjust-3").find('.content-box').length) {
-						$(card_2).css('padding', diff/4 + 'px 0 ' + diff/4 + 'px 0 ');
-						$(card_3).css('padding', diff/4 + 'px 0 ' + diff/4 + 'px 0 ');
-					}
-					else {
-						if (card_2_height > card_3_height) {
-							$(card_3).css('padding', diff/2 + 'px 0 ' + diff/ 2 + 'px 0 ');
-						}
-						else {
-							$(card_2).css('padding', diff/2 + 'px 0 ' + diff/ 2 + 'px 0 ');
-						}
-					}
+					//Справа "виджет-список"
+					$(card_1).css({
+						'margin-top': 55,
+						'padding': diff / 2 + 'px 10px'
+					});
 				}
-				else if(card_1_height < card_2_height + card_3_height + 20) {
-					$(card_1).css('padding', (-diff/2) + 'px 0 ' + (-diff/ 2) + 'px 0 ');
+				else if (diff < 0) {
+					//Слева "виджет-список"
+					$(card_2).css({
+						'margin-top': 55,
+						'padding': - diff / 2 + 'px 10px'
+					});
 				}
 				else {
-					// console.log('equal');
+					// console.log('equal size');
 				}
 			}
-
-			else {
+		}
+	}
+		$(document).ready(function() {
+			$('.dropdown').on('click touch', function() {
+				$('.dropdown-content').not($(this).find('.dropdown-content')).removeClass('visible');
+				$(this).find('.dropdown-content').toggleClass('visible');
+			});
+			$('.responsive-toggle').on('click touch', function() {
+				$('.topnav').toggleClass('responsive-menu');
 				$('.dropdown-content').removeClass('visible');
-			}
-		}).trigger('resize');
-	});
-</script>
+			});
+
+			var card_1 = $("#adjust-1").find('.widget-card-body');
+			var card_2 = $("#adjust-2").find('.widget-card-body').length ? $("#adjust-2").find('.widget-card-body') : $("#adjust-2").find('.content-box');
+			var card_3 = $("#adjust-3").find('.widget-card-body').length ? $("#adjust-3").find('.widget-card-body') : $("#adjust-3").find('.content-box');
+
+			$(window).bind("resize", function() {
+				$(card_1).css('padding', '');
+				$(card_2).css('padding', '');
+				$(card_3).css('padding', '');
+
+				// $(card_4).css({'margin': '', 'padding': '', 'height': ''});
+				// $(card_5).css({'margin': '', 'padding': '', 'height': ''});
+				equalSize('#adjust-4', '#adjust-5');
+				equalSize('#adjust-6', '#adjust-7');
+
+				if ($(this).width() > 751) {
+					var card_1_height = $(card_1).height();
+					var card_2_height = $(card_2).height();
+					var card_3_height = $(card_3).height();
+					var diff = card_1_height - card_2_height - card_3_height - 20
+					if (diff > 0) {
+						if ($("#adjust-2").find('.content-box').length && $("#adjust-3").find('.content-box').length) {
+							$(card_2).css('padding', diff / 4 + 'px 0 ' + diff / 4 + 'px 0 ');
+							$(card_3).css('padding', diff / 4 + 'px 0 ' + diff / 4 + 'px 0 ');
+						} else {
+							if (card_2_height > card_3_height) {
+								$(card_3).css('padding', diff / 2 + 'px 0 ' + diff / 2 + 'px 0 ');
+							} else {
+								$(card_2).css('padding', diff / 2 + 'px 0 ' + diff / 2 + 'px 0 ');
+							}
+						}
+					} else if (card_1_height < card_2_height + card_3_height + 20) {
+						$(card_1).css('padding', (-diff / 2) + 'px 0 ' + (-diff / 2) + 'px 0 ');
+					} else {
+						// console.log('equal');
+					}
+
+					// if ($("#adjust-4").find('.content-box').length && $("#adjust-5").find('.content-box').length) {
+					// 	// Если и слева и справа "виджет-сообщения"
+					// 	// Правый виджет всегда больше.
+					// 	$(card_4).height($(card_5).height());
+					// }
+					// else {
+					// 	var card_4_height = $(card_4).height();
+					// 	var card_5_height = $(card_5).height();
+					// 	var diff = card_5_height - card_4_height
+					// 	if (diff > 0) {
+					// 		//Справа "виджет-список"
+					// 		$(card_4).css({
+					// 			'margin-top': 55,
+					// 			'padding': diff / 2 + 'px 0'
+					// 		});
+					// 	}
+					// 	else if (diff < 0) {
+					// 		//Слева "виджет-список"
+					// 		$(card_5).css({
+					// 			'margin-top': 55,
+					// 			'padding': - diff / 2 + 'px 0'
+					// 		});
+					// 	}
+					// 	else {}
+					// }
+
+
+				} else {
+					$('.dropdown-content').removeClass('visible');
+				}
+			}).trigger('resize');
+		});
+	</script>
 <script type="text/javascript">
   window.__csrf_token = '{{ csrf_token }}';
   window.__admin_keywords_submit_url = '{% url "admin_keywords_submit" %}';

@@ -141,6 +141,9 @@ class OrderTableItemRequest(models.Model):
     performer = models.ForeignKey(
         'auth.User', on_delete=models.CASCADE, related_name="order_performers", verbose_name=("Исполнители"))
 
+    # def __str__(self):
+    #     return performer.profile.get_full_name()
+
 
 class OrderTableItemCategory(Slugged):
     """
