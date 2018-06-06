@@ -232,9 +232,9 @@
 											<div class="cell publish-date" data-title="Добавлено">
 												<div>{{ ordertableitem.created|date:"d.m.Y" }}</div>
 												{% if not ordertableitem.available %}
-												<div class="info red">Проверяется</div>
+												<div class="status red">Проверяется</div>
 												{% else %}
-												<div class="info green">Опубликовано</div>
+												<div class="status green">Опубликовано</div>
 												{% endif %}
 											</div>
 											<div class="cell title" data-title="Заявка">
@@ -296,9 +296,9 @@
 											<div class="cell publish-date" data-title="Добавлено">
 												<div>{{ blogpost.publish_date|date:"d.m.Y" }}</div>
 												{% if blogpost.status == 1 %}
-												<div class="info red">Проверяется</div>
+												<div class="status red">Проверяется</div>
 												{% else %}
-												<div class="info green">{{ blogpost.get_status_display }}</div>
+												<div class="status green">{{ blogpost.get_status_display }}</div>
 												{% endif %}
 											</div>
 
@@ -375,9 +375,9 @@
 											<div class="cell publish-date" data-title="Добавлено">
 												<div>{{ product.date_added|date:"d.m.Y" }}</div>
 												{% if not product.available %}
-												<div class="info red">Проверяется</div>
+												<div class="status red">Проверяется</div>
 												{% else %}
-												<div class="info green">Опубликовано</div>
+												<div class="status green">Опубликовано</div>
 												{% endif %}
 											</div>
 

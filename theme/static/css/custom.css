@@ -590,15 +590,15 @@ figure.blue-effect img {
   background-color: #0e83cd;
 }
 
-.info {
+.status {
   padding: 3px;
   font-weight: 600;
   font-size: 13px;
 }
-.info.red {
+.status.red {
   color: #de5959;
 }
-.info.green {
+.status.green {
   color: #3acf87;
 }
 
