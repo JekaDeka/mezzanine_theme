@@ -98,8 +98,7 @@ class ProfileSettings(TemplateView):
             morph = pymorphy2.MorphAnalyzer()
             for key, value in settings.SHOP_ORDER_STATUS_CHOICES:
                 label = morph.parse(value)[0]
-                if key != 2:
-                    label = label.inflect({'gent', 'plur'})
+                label = label.inflect({'gent', 'plur'})
                 orders_data[key] = {'label': label.word, 'total': 0 }
 
             for order in orders_status_count:

@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils import timezone
 from django.utils.timezone import now
+from django.utils.safestring import mark_safe
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator
@@ -21,8 +22,19 @@ from theme.utils import slugify_unicode
 
 from shops import managers
 
-from profiles.models import UserProfile
+from profiles.models import UserProfile, Country, Region, City
+from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
 from datetime import datetime
+
+
+import random
+import string
+# Sample of an ID generator - could be any string/number generator
+# For a 6-char field, this one yields 2.1 billion unique IDs
+
+
+def id_generator(size=7, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
 
 
 class UserShop(models.Model):
@@ -76,7 +88,6 @@ class UserShop(models.Model):
     on_vacation = models.BooleanField(
         default=False, verbose_name=("На каникулах"), editable=False)
 
-
     def save(self, request=False, *args, **kwargs):
         if not self.slug:
             self.slug = self.generate_unique_slug()
@@ -122,6 +133,9 @@ class UserShop(models.Model):
     def get_delivery_options(self):
         return self.delivery_options.values('label', 'usershopdeliveryoption__price').all()
 
+    def get_delivery_options_for_form(self):
+        return self.delivery_options.values('id', 'label', 'usershopdeliveryoption__price')
+
     def get_absolute_url(self):
         url_name = "shop-view"
         kwargs = {"slug": self.slug}
@@ -162,10 +176,11 @@ class UserShopDeliveryOption(models.Model):
     price = models.PositiveIntegerField(_("Цена"), default=0)
 
     def __str__(self):              # __unicode__ on Python 2
-        return "%s, %s, %s" % (self.shop, self.delivery, self.price)
+        return "%s - %s ₽" % (self.delivery, self.price)
 
-    # def get_label_and_price(self):
-    #     return "%s: %s" % (self.shop, self.delivery, self.price)
+    # def __html__(self):
+    #     return mark_safe(
+    #         '<span style="color: red">Number is {0}</span>'.format(self.price))
 
 
 class ShopProduct(models.Model):
@@ -296,7 +311,6 @@ class SelectedProduct(models.Model):
     def __str__(self):
         return ""
 
-
     def get_absolute_url(self):
         return self.url
 
@@ -319,31 +333,55 @@ class Order(models.Model):
                                  choices=settings.SHOP_ORDER_STATUS_CHOICES,
                                  default=settings.SHOP_ORDER_STATUS_CHOICES[0][0])
     time = models.DateTimeField(_("Time"), auto_now_add=True, null=True)
-    shop = models.ForeignKey("UserShop", related_name="orders", on_delete=models.CASCADE)
+    number = models.CharField(
+        _("Номер заказа"), max_length=7, null=True, blank=True, unique=True)
+
+    shop = models.ForeignKey("UserShop", related_name="orders",
+                             on_delete=models.CASCADE, verbose_name=_("Магазин"))
 
     user_id = models.IntegerField(blank=True, null=True)
     user_first_name = models.CharField(_("First name"), max_length=255)
     user_middle_name = models.CharField(
         _("Отчество"), max_length=255, blank=True)
-    user_last_name = models.CharField(_("Last name"), max_length=255)
-    user_phone = models.CharField(_("Phone"), max_length=20)
-    user_email = models.EmailField(_("Email"), max_length=255)
+    user_last_name = models.CharField(_("Last name"), blank=True, max_length=255)
+    user_phone = models.CharField(_("Phone"), blank=True, max_length=20)
+    user_email = models.EmailField(_("Почта"), max_length=255)
+    user_country = models.ForeignKey(Country, verbose_name=("Страна"))
 
-    user_country = models.CharField(_("Country"), max_length=100)
-    user_city = models.CharField(_("City/Suburb"), max_length=100)
-    user_region = models.CharField("Регион", max_length=100)
+    user_region = ChainedForeignKey(
+        Region,
+        chained_field="user_country",
+        chained_model_field="country",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Регион"))
+    user_city = ChainedForeignKey(
+        City,
+        chained_field="user_region",
+        chained_model_field="region",
+        show_all=False,
+        auto_choose=True,
+        sort=True, verbose_name=("Город"))
 
     shipping_type = models.CharField(_("Доставка"), max_length=255, default="")
     shipping_price = models.PositiveIntegerField(_("Цена доставки"), default=0)
+
+    shipping = models.ForeignKey("UserShopDeliveryOption", verbose_name=_(
+        "Доставка"), null=True, on_delete=models.SET_NULL)
+
+    payment = models.ForeignKey("UserShopPayment", verbose_name=_(
+        "Оплата"), null=True, on_delete=models.SET_NULL)
 
     user_address = models.CharField(
         _("Адрес"), max_length=255, blank=True, help_text="Улица, дом, подъезд, квартира")
     user_postcode = models.CharField(
         _("Zip/Postcode"), max_length=15, blank=True)
-    user_additional_info = models.TextField("Пожелания по заказку", blank=True)
+    user_additional_info = models.TextField("Пожелания по заказку", blank=True, help_text="Напишите ваши пожелания по способу и времени доставки, требуемый размер, а также любые вопросы по товару.")
 
+    item_quantity_total = models.PositiveIntegerField(
+        _("Количество товаров"), default=0)
     item_total = models.PositiveIntegerField(_("Сумма заказа"), default=0)
-    total = models.PositiveIntegerField(_("Всего"), default=0)
+    total = models.PositiveIntegerField(_("Итого по заказу"), default=0)
 
     class Meta:
         verbose_name = "Заказ"
@@ -351,7 +389,21 @@ class Order(models.Model):
         ordering = ("-id",)
 
     def __str__(self):
-        return "%s %s" % (self.billing_name(), self.time)
+        return self.number
+
+    def save(self, *args, **kwargs):
+        if not self.number:
+            # Generate ID once, then check the db. If exists, keep trying.
+            self.number = id_generator()
+            while Order.objects.filter(number=self.number).exists():
+                self.number = id_generator()
+
+        super(Order, self).save(*args, **kwargs)
+
+    # def get_absolute_url(self):
+    #     url_name = "shop-order-detail"
+    #     kwargs = {"pk": self.pk}
+    #     return reverse(url_name, kwargs=kwargs)
 
     def billing_name(self):
         return "%s %s" % (self.user_first_name,
@@ -365,7 +417,11 @@ class Order(models.Model):
             pass
             # create user -> activate -> send_email -> #create_profile
 
+        self.item_quantity_total = request.cart.total_quantity_for_shop(
+            form.shop.id)
         self.item_total = request.cart.total_price_for_shop(form.shop.id)
+        self.shipping_type = self.shipping.delivery.label
+        self.shipping_price = self.shipping.price
         self.total = self.item_total + self.shipping_price
         self.save()
         for item in request.cart.get_shop_items(form.shop.id):
@@ -380,7 +436,7 @@ class OrderItem(SelectedProduct):
     """docstring for OrderProduct."""
     order = models.ForeignKey("Order", related_name="items")
     product = models.ForeignKey(
-        ShopProduct, related_name="in_orders", null=True, on_delete=models.SET_NULL)
+        ShopProduct, related_name="in_orders", blank=True, null=True, on_delete=models.SET_NULL)
 
 
 class Cart(models.Model):
@@ -474,8 +530,8 @@ class CartItem(SelectedProduct):
     cart = models.ForeignKey("Cart", related_name="items")
 
     shop_id = models.IntegerField(_("shop_id"), default=0)
-    product = models.ForeignKey(ShopProduct, related_name="in_cart", on_delete=models.CASCADE)
-
+    product = models.ForeignKey(
+        ShopProduct, related_name="in_cart", on_delete=models.CASCADE)
 
 
 # hard code review + rating

@@ -18,12 +18,9 @@
 {% endblock breadcrumb_element %}
 
 {% block main_containter %}
-
-
 {% url 'profile-settings' as profile_settings %}
 {% url 'product-list' as product_list %}
 {% url 'ordertableitem-list' as ordertableitem_list %}
-
 <!-- MENU !-->
 <div class="row-tmp">
 	<div class="container fullwidth-element row-shadow">
@@ -39,7 +36,7 @@
 							<a href="{{ product_list }}">Список моих товаров</a>
 							<a href="{% url 'shop-update' user.shop.slug %}">Настройки магазина</a>
 							<a href="{% url 'shop-view' user.shop.slug %}">Посмотреть магазин на сайте</a>
-							<a href="{% url 'shop-order-list' user.shop.slug user.shop.pk %}">Список заказов</a>
+							<a href="{% url 'shop-order-list' %}">Список заказов</a>
 						</div>
 					</div>
 					{% else %}
@@ -180,12 +177,12 @@
 					<div class="right-side margin-top-10">
 						<div class="widget-card-content">
 							<ul class="strong">
-								<li>Всего заказов: <span> <a href="#">
+								<li>Всего заказов: <span> <a href="{% url 'shop-order-list' %}">
 									{{ orders_count }}</a> </span> </li>
 							</ul>
 							<ul>
 								{% for order in orders_data.items %}
-								<li>{{ order.1.label|capfirst }}: <span> <a href="#"> {{ order.1.total }} </a> </span>	</li>
+								<li>{{ order.1.label|capfirst }}: <span> <a href="{% url 'user-order-list' %}?status={{ order.0 }}"> {{ order.1.total }} </a> </span>	</li>
 								{% endfor %}
 							</ul>
 						</div>
@@ -223,35 +220,46 @@
 
 				<div class="widget-card-body">
 					<div class="top-side">
-						<div class="limiter">
-					    <div class="container-table100">
-					      <div class="wrap-table100">
-					        <div class="table">
+						{# <div class="limiter"> #}
+					    {# <div class="container-table100"> #}
+					      {# <div class="wrap-table100"> #}
+					        <table class="table-responsive widget-table" role="table">
+										<tbody class="rowgroup body-row" role="rowgroup">
 										{% for ordertableitem in ordertablitems %}
-										<div class="row">
-											<div class="cell publish-date" data-title="Добавлено">
+										<tr class="row" role="row">
+											<td class="cell publish-date" data-title="Добавлено">
 												<div>{{ ordertableitem.created|date:"d.m.Y" }}</div>
 												{% if not ordertableitem.available %}
 												<div class="status red">Проверяется</div>
 												{% else %}
 												<div class="status green">Опубликовано</div>
 												{% endif %}
-											</div>
-											<div class="cell title" data-title="Заявка">
+											</td>
+											<td class="cell image" data-title="Изображение">
+												<a href="{{ ordertableitem.get_absolute_url }}">
+												{% if ordertableitem.main_image %}
+													<img src="{{ MEDIA_URL }}{% thumbnail ordertableitem.main_image 50 50 %}" alt="{{ ordertableitem.title }}">
+												{% else %}
+													<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+												{% endif %}
+												</a>
+											</td>
+											<td class="cell title" data-title="Заявка">
 												<a href="{{ ordertableitem.get_absolute_url }}">{{ ordertableitem.title|capfirst }}</a>
-											</div>
-											<div class="cell edit" data-title="Редактировать">
+											</td>
+											<td class="cell edit" data-title="Редактировать">
 												<a href="{% url 'ordertableitem-update' ordertableitem.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-											<div class="cell delete" data-title="Удалить">
+											</td>
+											<td class="cell delete" data-title="Удалить">
 												<a href="{% url 'ordertableitem-delete' ordertableitem.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-										</div>
+											</td>
+										</tr>
 										{% endfor %}
-					        </div>
-					      </div>
-					    </div>
-					  </div>
+										</tbody>
+								</table>
+					      {# </div> #}
+					    {# </div> #}
+					  {# </div> #}
 					</div>
 					<div class="bottom-side">
 						<a href="{% url 'ordertableitem-list' %}">Смотреть все заявки</a>
@@ -287,22 +295,23 @@
 				</div>
 				<div class="widget-card-body">
 					<div class="top-side">
-						<div class="limiter">
-							<div class="container-table100">
-								<div class="wrap-table100">
-									<div class="table">
+						{# <div class="limiter"> #}
+							{# <div class="container-table100"> #}
+								{# <div class="wrap-table100"> #}
+								<table class="table-responsive widget-table" role="table">
+									<tbody class="rowgroup body-row" role="rowgroup">
 										{% for blogpost in blogposts %}
-										<div class="row">
-											<div class="cell publish-date" data-title="Добавлено">
+										<tr class="row" role="row">
+											<td class="cell publish-date" data-title="Добавлено">
 												<div>{{ blogpost.publish_date|date:"d.m.Y" }}</div>
 												{% if blogpost.status == 1 %}
 												<div class="status red">Проверяется</div>
 												{% else %}
 												<div class="status green">{{ blogpost.get_status_display }}</div>
 												{% endif %}
-											</div>
+											</td>
 
-											<div class="cell image" data-title="Статья">
+											<td class="cell image" data-title="Статья">
 												<a href="{{ blogpost.get_absolute_url }}">
 												{% if blogpost.featured_image %}
 													<img src="{{ MEDIA_URL }}{% thumbnail blogpost.featured_image 50 50 %}" alt="{{ blogpost.title }}">
@@ -310,23 +319,24 @@
 													<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
 												{% endif %}
 												</a>
-											</div>
-											<div class="cell title">
+											</td>
+											<td class="cell title">
 												<a href="{{ blogpost.get_absolute_url }}">{{ blogpost.title|capfirst }}	</a>
-											</div>
+											</td>
 
-											<div class="cell edit" data-title="Редактировать">
+											<td class="cell edit" data-title="Редактировать">
 												<a href="{% url 'blogpost-update' blogpost.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-											<div class="cell delete" data-title="Удалить">
+											</td>
+											<td class="cell delete" data-title="Удалить">
 												<a href="{% url 'blogpost-delete' blogpost.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-										</div>
+											</td>
+										</tr>
 										{% endfor %}
-									</div>
-								</div>
-							</div>
-						</div>
+									</tbody>
+							</table>
+								{# </div> #}
+							{# </div> #}
+						{# </div> #}
 					</div>
 					<div class="bottom-side">
 						<a href="{% url 'blogpost-list' %}">Смотреть все записи</a>
@@ -366,22 +376,23 @@
 				</div>
 				<div class="widget-card-body">
 					<div class="top-side">
-						<div class="limiter">
-							<div class="container-table100">
-								<div class="wrap-table100">
-									<div class="table">
+						{# <div class="limiter"> #}
+							{# <div class="container-table100"> #}
+								{# <div class="wrap-table100"> #}
+								<table class="table-responsive widget-table" role="table">
+									<tbody class="rowgroup body-row" role="rowgroup">
 										{% for product in products %}
-										<div class="row">
-											<div class="cell publish-date" data-title="Добавлено">
+										<tr class="row" role="row">
+											<td class="cell publish-date" data-title="Добавлено">
 												<div>{{ product.date_added|date:"d.m.Y" }}</div>
 												{% if not product.available %}
 												<div class="status red">Проверяется</div>
 												{% else %}
 												<div class="status green">Опубликовано</div>
 												{% endif %}
-											</div>
+											</td>
 
-											<div class="cell image" data-title="Товар">
+											<td class="cell image" data-title="Товар">
 												<a href="{{ product.get_absolute_url }}">
 													{% if product.main_image %}
 														<img src="{{ MEDIA_URL }}{% thumbnail product.main_image 50 50 %}" alt="{{ product.title }}">
@@ -389,23 +400,24 @@
 														<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
 													{% endif %}
 												</a>
-											</div>
+											</td>
 
-											<div class="cell title">
+											<td class="cell title">
 												<a href="{{ product.get_absolute_url }}">{{ product.title|capfirst }}	</a>
-											</div>
-											<div class="cell edit" data-title="Редактировать">
+											</td>
+											<td class="cell edit" data-title="Редактировать">
 												<a href="{% url 'product-update' product.pk %}"><i class="fa fa-pencil-square-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-											<div class="cell delete" data-title="Удалить">
+											</td>
+											<td class="cell delete" data-title="Удалить">
 												<a href="{% url 'product-delete' product.pk %}"><i class="fa fa-trash-o fa-lg" aria-hidden="true"></i></a>
-											</div>
-										</div>
+											</td>
+										</tr>
 										{% endfor %}
-									</div>
-								</div>
-							</div>
-						</div>
+									</tbody>
+							</table>
+								{# </div> #}
+							{# </div> #}
+						{# </div> #}
 					</div>
 					<div class="bottom-side">
 						<a href="{% url 'product-list' %}">Смотреть все товары</a>
@@ -434,39 +446,41 @@
 				</div>
 				<div class="widget-card-body">
 					<div class="top-side">
-						<div class="limiter">
-							<div class="container-table100">
-								<div class="wrap-table100">
-									<div class="table">
+						{# <div class="limiter"> #}
+							{# <div class="container-table100"> #}
+								{# <div class="wrap-table100"> #}
+								<table class="table-responsive widget-table" role="table">
+									<tbody class="rowgroup body-row" role="rowgroup">
 										{% for order in orders %}
-										<div class="row">
-											<div class="cell publish-date" data-title="Поступил">
+										<tr class="row" role="row">
+											<td class="cell publish-date" data-title="Поступил">
 												<span>{{ order.time|date:"d.m.Y" }}</span>
-											</div>
-											<div class="cell" data-title="Пользователь">
+											</td>
+											<td class="cell" data-title="Пользователь">
 												{{ order.user_first_name }} {{ order.user_last_name }}
-											</div>
-											<div class="cell" data-title="Доставка">
+											</td>
+											<td class="cell" data-title="Доставка">
 												{{ order.shipping_type }}
-											</div>
-											<div class="cell" data-title="Сумма заказа">
+											</td>
+											<td class="cell" data-title="Сумма заказа">
 												{{ order.total|rub_currency }}
-											</div>
-										</div>
+											</td>
+										</tr>
 										{% endfor %}
-									</div>
-								</div>
-							</div>
-						</div>
+									</tbody>
+							</table>
+								{# </div> #}
+							{# </div> #}
+						{# </div> #}
 					</div>
 					<div class="bottom-side">
-						<a href="{% url 'user-order-list' %}">Смотреть все заказы</a>
+						<a href="{% url 'shop-order-list' %}">Смотреть все заказы</a>
 					</div>
 				</div>
 			</div>
 			{% else %}
 			<div class="widget-card extra columns" id="adjust-7">
-				<a href=" {% url 'user-order-list' %} ">
+				<a href=" {% url 'shop-order-list' %} ">
 					<div class="content-box color-effect-2">
 						<h2>В Ваш магазин не поступало заказов</h2>
 						<ul>

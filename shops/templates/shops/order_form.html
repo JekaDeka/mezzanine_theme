@@ -2,14 +2,20 @@
 {% load i18n mezzanine_tags pages_tags staticfiles crispy_forms_tags %}
 
 {% block meta_title %}
-    Изменение данных
+    Заказ {{ object }}
 {% endblock %}
 
 {% block breadcrumbs_title %}
-<h2>Личный кабинет</h2> {% endblock breadcrumbs_title %} {% block breadcrumb_element %}
-<li>Мои покупки</li>
+<h2>Личный кабинет</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li> <a href="{% url 'shop-order-list' %}"> Заказы магазина </a> </li>
+<li>Заказ: {{ object }}</li>
 {% endblock breadcrumb_element %}
-{% block main %}
+
+
+{% block extra_content %}
   <form class="" action="" method="post">
     {% csrf_token %}
     {{ form|crispy }}

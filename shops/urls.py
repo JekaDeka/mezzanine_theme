@@ -29,11 +29,17 @@ urlpatterns = [
     url(r'^settings/shop/$', views.ShopList.as_view(), name='shop-list'),
     url(r'^settings/shop/add/$', views.ShopDeliveryOptionCreate.as_view(), name='shop-add'),
     url(r'^settings/shop/(?P<slug>.*)/$', views.ShopDeliveryOptionUpdate.as_view(), name='shop-update'),
-    url(r'^settings/shop/(?P<slug>.*)/delete/$', views.ShopDelete.as_view(), name='shop-delete'),
 
+    url(r'^settings/shops/orders/$', views.ShopOrderList.as_view(), name='shop-order-list'),
+    url(r'^settings/shops/orders/(?P<pk>[0-9]+)/detail/$', views.ShopOrderDetail.as_view(), name='shop-order-detail'),
+    url(r'^settings/shops/orders/(?P<pk>[0-9]+)/status/send/$', views.shop_order_send, name='shop-order-send'),
+    url(r'^settings/shops/orders/(?P<pk>[0-9]+)/status/received/$', views.shop_order_received, name='shop-order-send'),
+    url(r'^settings/shops/orders/(?P<pk>[0-9]+)/status/cancel/$', views.shop_order_cancel, name='shop-order-cancel'),
 
-    url(r'^settings/orders/(?P<slug>[\w\-]+)/(?P<pk>[0-9]+)/$', views.OrderList.as_view(), name='shop-order-list'),
-    url(r'^orders/$', views.OrderList.as_view(), name='user-order-list'),
-    url(r'^settings/orders/(?P<pk>[0-9]+)/edit/$', views.OrderUpdate.as_view(), name='order-update'),
-    url(r'^settings/orders/(?P<pk>[0-9]+)/detail/$', views.OrderDetail.as_view(), name='order-detail'),
+    # url(r'^settings/shop/(?P<slug>.*)/delete/$', views.ShopDelete.as_view(), name='shop-delete'),
+
+    url(r'^settings/profile/orders/$', views.UserOrderList.as_view(), name='user-order-list'),
+    url(r'^settings/profile/orders/(?P<pk>[0-9]+)/detail/$', views.UserOrderDetail.as_view(), name='user-order-detail'),
+    # url(r'^settings/orders/(?P<pk>[0-9]+)/edit/$', views.OrderUpdate.as_view(), name='order-update'),
+    # url(r'^settings/orders/(?P<pk>[0-9]+)/detail/$', views.OrderDetail.as_view(), name='order-detail'),
 ]

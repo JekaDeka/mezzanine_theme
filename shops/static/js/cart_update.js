@@ -6,13 +6,13 @@ $(function() {
     var row = $(this).parent().parent();
     $(row).hide('200');
 
-    var table = $(row).closest('.table');
+    var table = $(row).closest('.body-row');
     var all_table_is_hidden = true;
     setTimeout(function() { //calls click event after a certain time
       if ($(table).children(':visible').length == 1) {
          $("#cart-form").submit();
       }
-    }, 500);
+    }, 300);
 
   });
 

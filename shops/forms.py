@@ -276,41 +276,48 @@ class CartItemForm(forms.ModelForm):
     ``CartItemFormSet`` below which controls editing the entire cart.
     """
     # quantity = forms.IntegerField(label="Количество", min_value=0)
-    quantity = forms.IntegerField(label="Количество", min_value=0, widget=QuantityInput(attrs={'class': 'qty'}))
+    quantity = forms.IntegerField(
+        label="Количество", min_value=0, widget=QuantityInput(attrs={'class': 'qty'}))
 
     class Meta:
         model = CartItem
         fields = ("quantity",)
 
 
+class OrderFormAdmin(forms.ModelForm):
+    """docstring for OrderFormAdmin."""
+
+    def __init__(self, *args, **kwargs):
+        super(OrderFormAdmin, self).__init__(*args, **kwargs)
+        self.fields['shipping'].queryset = UserShopDeliveryOption.objects.filter(
+            shop=self.instance.shop)
+
 
 class OrderForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('user_first_name', 'user_middle_name', 'user_last_name',
-                  'user_phone', 'user_email', 'user_country', 'user_region', 'user_city', 'shipping_type',
+                  'user_phone', 'user_email', 'user_country', 'user_region', 'user_city', 'shipping', 'payment',
                   'user_address', 'user_postcode', 'user_additional_info')
-    # user_first_name = forms.CharField(label="Имя", max_length=255)
-    # user_middle_name = forms.CharField(required=False, label="Отчество", max_length=255)
-    # user_last_name = forms.CharField(label="Фамилия", max_length=255)
-    #
-    # user_phone = forms.CharField(label="Телефон", max_length=20)
-    # user_email = forms.EmailField(label="Почта", max_length=255)
-    #
-    # user_country = forms.CharField(label="Страна", max_length=100)
-    # user_region = forms.CharField(label="Регион", max_length=100)
-    # user_city = forms.CharField(label="Город", max_length=100)
-
-    # shipping_type = forms.ChoiceField(
-    #     label="Доставка", required=False, widget=forms.RadioSelect())
+        widgets = {
+            'shipping': forms.RadioSelect(),
+            'payment': forms.RadioSelect(),
+            'user_phone': forms.TextInput(attrs={'class': 'mask',}),
+            'user_additional_info': forms.Textarea(attrs={'rows': '1'}),
+            # 'user_email': forms.TextInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         self.shop = kwargs.pop("shop", None)
         self.user = kwargs.pop("user", None)
         super(OrderForm, self).__init__(*args, **kwargs)
-        self.fields['shipping_type'] = forms.ChoiceField(label="Доставка", widget=forms.RadioSelect())
-        if self.shop:
-            self.fields['shipping_type'].choices = [['Курьером по миру', '250'],]
+        self.fields["shipping"].queryset = UserShopDeliveryOption.objects.filter(
+            shop=self.shop)
+        self.fields['shipping'].empty_label = None
+
+        self.fields['payment'].queryset = self.shop.payment_options.all()
+        self.fields['payment'].empty_label = None
+
         if self.user:
             try:
                 profile = self.user.profile
@@ -325,7 +332,6 @@ class OrderForm(forms.ModelForm):
                 pass
 
 
-
 class ProductReviewForm(forms.ModelForm):
     class Meta:
         model = ProductReview
@@ -335,6 +341,13 @@ class ProductReviewForm(forms.ModelForm):
         self.product = kwargs.pop("product", None)
         super(ProductReviewForm, self).__init__(*args, **kwargs)
 
+
+# class OrderStatusChoiceForm(forms.Form):
+#      def __init__(self, *args, **kwargs):
+#          super(OrderStatusChoiceForm, self).__init__(*args, **kwargs)
+#          for status in settings.SHOP_ORDER_STATUS_CHOICES:
+#              self.fields['status_type_%s' % status[0]] = forms.BooleanField(
+#                  label=status[1], required=False)
 
 class FilterForm(forms.Form):
     min_price = forms.IntegerField(label="", min_value=0, required=False, widget=forms.NumberInput(

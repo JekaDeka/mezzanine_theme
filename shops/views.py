@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.mail import EmailMessage
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse, Http404
 from django.template.loader import get_template, render_to_string
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.db import transaction
 from django.db.models import Avg, Count
@@ -23,6 +23,7 @@ from shops.utils import recalculate_cart, bind_cart
 from theme.forms import MessageForm
 from mezzanine.conf import settings
 
+import pymorphy2
 
 class AjaxableResponseMixin(object):
     """
@@ -318,15 +319,16 @@ class ProductDetailView(DetailView):
     model = ShopProduct
     template_name = "product/product.html"
     context_object_name = 'product'
+
     def get_queryset(self):
         qs = super(ProductDetailView, self).get_queryset()
         qs = qs.prefetch_related(
-                'keywords__keyword',
-                'images').select_related(
-                    "shop__user__profile",
-                    "shop__user__profile__city",
-                    "shop__user__profile__country"
-                    )
+            'keywords__keyword',
+            'images').select_related(
+            "shop__user__profile",
+            "shop__user__profile__city",
+            "shop__user__profile__country"
+        )
 
         return qs
 
@@ -336,14 +338,14 @@ class ProductDetailView(DetailView):
         data['review_form'] = ProductReviewForm(product=self.object)
         reviews = self.object.product_reviews.filter(approved=True).select_related(
             'author__profile',
-            ).values(
-                'created_at',
-                'rating',
-                'content',
-                'author__profile__image',
-                'author__profile__first_name',
-                'author__profile__last_name',
-            )
+        ).values(
+            'created_at',
+            'rating',
+            'content',
+            'author__profile__image',
+            'author__profile__first_name',
+            'author__profile__last_name',
+        )
         data['reviews'] = reviews[:5]
         return data
 
@@ -352,11 +354,10 @@ class ProductDetailView(DetailView):
         product = self.get_object()
         if form.is_valid():
             # try:
-            #  add shop 
+            #  add shop
             #     shop = self.request.user.shop
             # except Exception as e:
             #     pass
-
 
             review = form.save(commit=False)
             review.author = self.request.user
@@ -364,12 +365,14 @@ class ProductDetailView(DetailView):
             try:
                 review.save()
             except Exception as e:
-                 messages.error(request, "Вы уже оставили отзыв для этого товара.")
+                messages.error(
+                    request, "Вы уже оставили отзыв для этого товара.")
             else:
                 messages.success(request, "Отзыв успешно добавлен. Как только модератор проверит его, \
                                  мы отобразим его на сайте.")
         else:
-            messages.error(request, "Нельзя оставить отзыв на собственынй товар.")
+            messages.error(
+                request, "Нельзя оставить отзыв на собственынй товар.")
         return HttpResponseRedirect(product.get_absolute_url())
 
     def get_object(self, queryset=None):
@@ -587,7 +590,6 @@ def get_cart(request):
             print('lets_bind')
             cart = bind_cart(request)
 
-
         quantity = int(request.POST.get('quantity', 0))
         data = {
             'error': True if quantity < 1 else False
@@ -595,13 +597,13 @@ def get_cart(request):
         if data['error']:
             data['error_message'] = 'No quantity provided'
         try:
-            product = ShopProduct.objects.get(id=request.POST.get('product_id'))
+            product = ShopProduct.objects.get(
+                id=request.POST.get('product_id'))
         except ShopProduct.DoesNotExist:
             product = None
             data.update({'error': True, 'error_message': 'No product found'})
         except Exception:
             data.update({'error': True, 'error_message': '500'})
-
 
         if cart and product and not data['error']:
             print('seems fine, try to add')
@@ -616,7 +618,7 @@ def get_cart(request):
 def cart_update(request):
     if request.is_ajax():
         html = render_to_string('includes/cart_response.html',
-            {'request': request, 'MEDIA_URL': settings.MEDIA_URL})
+                                {'request': request, 'MEDIA_URL': settings.MEDIA_URL})
         return HttpResponse(html)
 
     data = {}
@@ -657,7 +659,8 @@ class CartView(UpdateView):
                 self.request.POST, instance=self.object)
         else:
             data['cartitems'] = CartItemFormSet(instance=self.object)
-        data['shops'] = UserShop.objects.filter(id__in=self.object.get_shops_id_list()).values('id', 'shopname', 'slug', 'image')
+        data['shops'] = UserShop.objects.filter(
+            id__in=self.object.get_shops_id_list()).values('id', 'shopname', 'slug', 'image', 'user__profile__country__name', 'user__profile__city__name')
         return data
 
     def form_valid(self, form):
@@ -668,20 +671,18 @@ class CartView(UpdateView):
                 cartitems.save()
                 messages.success(self.request, self.success_message)
         ###
-        ### We don't have to save the cart instance because cart manager handle it already
+        # We don't have to save the cart instance because cart manager handle it already
         ###
         return redirect(self.success_url)
 
 
-
-
-### if shop has no orders
+# if shop has no orders
 class CheckoutProcess(CreateView):
     model = Order
     form_class = OrderForm
     template_name = "shops/checkout.html"
     context_object_name = 'order'
-    success_url = reverse_lazy('profile-settings')
+    success_url = reverse_lazy('true_index')
     success_message = "Заказ сформирован"
 
     def get_context_data(self, **kwargs):
@@ -710,36 +711,158 @@ class CheckoutProcess(CreateView):
 
 
 @method_decorator(login_required, name='dispatch')
-class OrderList(ListView):
+class ShopOrderList(ListView):
     model = Order
-    template_name = "shops/order_list.html"
+    template_name = "shops/shop_order_list.html"
     context_object_name = "order_list"
+    paginate_by = 15
 
     def get_queryset(self):
-        if self.kwargs.get('pk'):
-            qs = self.model.objects.filter(shop__pk=self.kwargs['pk'])
-        else:
-            qs = self.model.objects.filter(user_id=self.request.user.id)
+        qs = self.model.objects.filter(shop__pk=self.request.user.shop.pk)
+        status = self.request.GET.get('status', None)
+        if status:
+            try:
+                qs = qs.filter(status=status)
+            except Exception as e:
+                pass
         return qs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.kwargs.get('pk'):
-            context['for_shop'] = True
-        return context
+        data = super(ShopOrderList, self).get_context_data(**kwargs)
+        # data['order_status_choice_form'] = OrderStatusChoiceForm()
+        try:
+            status = int(self.request.GET.get('status', 0))
+        except Exception as e:
+            status = 0
+
+        orders_status_choice = dict()
+        morph = pymorphy2.MorphAnalyzer()
+        for key, value in settings.SHOP_ORDER_STATUS_CHOICES:
+            label = morph.parse(value)[0]
+            active = True if status == key else False
+            label = label.inflect({'plur'})
+            orders_status_choice[key] = {'value': key, 'label': label.word, 'active': active }
+        data['order_status_choice'] = orders_status_choice
+        data['status'] = status
+        return data
+
+@method_decorator(login_required, name='dispatch')
+class UserOrderList(ListView):
+    model = Order
+    template_name = "shops/user_order_list.html"
+    context_object_name = "order_list"
+    paginate_by = 15
+
+    def get_queryset(self):
+        qs = self.model.objects.filter(user_id=self.request.user.id)
+        status = self.request.GET.get('status', None)
+        if status:
+            try:
+                qs = qs.filter(status=status)
+            except Exception as e:
+                pass
+        return qs
+
+    def get_context_data(self, **kwargs):
+        data = super(UserOrderList, self).get_context_data(**kwargs)
+        # data['order_status_choice_form'] = OrderStatusChoiceForm()
+        try:
+            status = int(self.request.GET.get('status', 0))
+        except Exception as e:
+            status = 0
+
+        orders_status_choice = dict()
+        morph = pymorphy2.MorphAnalyzer()
+        for key, value in settings.SHOP_ORDER_STATUS_CHOICES:
+            label = morph.parse(value)[0]
+            active = True if status == key else False
+            label = label.inflect({'plur'})
+            orders_status_choice[key] = {'value': key, 'label': label.word, 'active': active }
+        data['order_status_choice'] = orders_status_choice
+        data['status'] = status
+        return data
+
 
 
 @method_decorator(login_required, name='dispatch')
 class OrderUpdate(UpdateView):
     model = Order
-    fields = '__all__'
-    form = OrderForm
+    form_class = OrderForm
     template_name = "shops/order_form.html"
-    # context_object_name = "order_list"
+    success_url = reverse_lazy('shop-order-list')
+    success_message = "Заказ успешно обновлен"
 
 
-class OrderDetail(DetailView):
+def shop_order_send(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if order.shop.user == request.user and order.status == 1:
+        order.status = 2
+        order.save()
+        messages.success(request, "Заказ успешно отправлен. Покупателю отправлено уведомление.")
+    else:
+        messages.error(request, "Ошибка.")
+    return HttpResponseRedirect(reverse('shop-order-list'))
+
+def shop_order_cancel(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if order.shop.user == request.user and order.status == 1:
+        order.status = 4
+        order.save()
+        messages.success(request, "Заказ успешно отменен. Покупателю отправлено уведомление.")
+    else:
+        messages.error(request, "Ошибка.")
+    return HttpResponseRedirect(reverse('shop-order-list'))
+
+
+def shop_order_received(request, pk):
+    order = get_object_or_404(Order, pk=pk)
+    if order.user_id == request.user.id and order.status == 2:
+        order.status = 3
+        order.save()
+        messages.success(request, "Заказ успешно завершен. Мы уведомили магазин об успешном получении товара.")
+    else:
+        messages.error(request, "Ошибка.")
+    return HttpResponseRedirect(reverse('user-order-list'))
+
+
+class ShopOrderDetail(DetailView):
     model = Order
-    # template_name = "shops/order.html"
+    template_name = "shops/shop_order_detail.html"
     context_object_name = 'order'
     queryset = Order.objects.select_related('shop').prefetch_related('items')
+
+    def get_context_data(self, **kwargs):
+        data = super(ShopOrderDetail, self).get_context_data(**kwargs)
+        morph = pymorphy2.MorphAnalyzer()
+        status = self.object.status
+        order_status_string = "Новый"
+        if status == 2:
+            order_status_string = "Отправлен"
+        if status == 3:
+            order_status_string = "Завершен"
+        if status == 4:
+            order_status_string = "Отменен"
+
+        data['order_status_string'] = order_status_string
+        return data
+
+class UserOrderDetail(DetailView):
+    model = Order
+    template_name = "shops/user_order_detail.html"
+    context_object_name = 'order'
+    queryset = Order.objects.select_related('shop').prefetch_related('items')
+
+    def get_context_data(self, **kwargs):
+        data = super(UserOrderDetail, self).get_context_data(**kwargs)
+        morph = pymorphy2.MorphAnalyzer()
+        status = self.object.status
+        order_status_string = ""
+        if status == 1:
+            order_status_string = "Заказ обрабатывается"
+        if status == 3:
+            order_status_string = "Завершен"
+        if status == 4:
+            order_status_string = "Отменен"
+
+        data['order_status_string'] = order_status_string
+        return data

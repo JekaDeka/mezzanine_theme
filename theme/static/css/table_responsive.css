@@ -1,4 +1,156 @@
-.limiter {
+/*
+	Max width before this PARTICULAR table gets nasty. This query will take effect for any screen smaller than 760px and also iPads specifically.
+	*/
+
+a.procced-to-checkout:hover {
+  background-color: #606060;
+}
+
+.button.gray {
+  background-color: #c0c0c0;
+}
+
+.button.gray:hover {
+  background-color: #3acf87;
+}
+
+a.procced-to-checkout {
+  text-align: center;
+  display: block;
+  color: #fff;
+  padding: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.table-responsive {
+  width: 100%;
+}
+
+table.widget-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: none;
+}
+
+table.widget-table td {
+  padding: 10px;
+  border-bottom: #eee 1px solid;
+  border-top: none;
+  border-right: none;
+  vertical-align: middle;
+}
+
+.table-responsive input[type="checkbox"] {
+  display: none;
+}
+
+th.columnheader, td.cell {
+  text-align: left;
+}
+
+td.cell.image {
+  text-align: center;
+  width: 100px;
+}
+
+table.widget-table td.cell.image {
+  width: 60px;
+}
+
+td.cell.image img {
+  margin: 0 auto;
+}
+
+td.cell.total, td.cell.title a {
+  font-weight: 600;
+  color: #666;
+}
+
+td.cell.action {
+  width: 120px;
+}
+
+td.cell.action .cart-remove:before {
+  top: 9px;
+}
+
+td.cell.publish-date {
+  width: 102px
+}
+
+td.cell.edit, td.cell.delete {
+  width: 40px;
+}
+
+tr.row:last-child td {
+  border: none;
+}
+
+@media (max-width: 767px) {
+  /* Force table to not be like tables anymore */
+  .table-responsive, thead.rowgroup, tbody.rowgroup, th.columnheader, td.cell, tr.row {
+    display: block;
+  }
+  /* Hide table headers (but not display: none;, for accessibility) */
+  thead.rowgroup tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+  tr.row {
+    margin: 0 0 1rem 0;
+  }
+  /* tr.row:nth-child(odd) {
+    background: #ccc;
+  } */
+  td.cell {
+    /* Behave  like a "row" */
+    /* border: 1px solid #eee!important; */
+    /* border-bottom: 1px solid #eee; */
+    border-right: 1px solid #f0f0f0 !important;
+    border-left: 1px solid #f0f0f0 !important;
+    border-top: 1px solid #f0f0f0 !important;
+    border-bottom: 0px solid #eee !important;
+    position: relative;
+    padding-left: 50% !important;
+  }
+  td.cell:last-child {
+    border-bottom: 1px solid #f0f0f0 !important;
+  }
+  td.cell:before {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 45%;
+    height: 100%;
+    padding-right: 10px;
+    padding-top: 10px;
+    padding-left: 15px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background-color: #f6f6f6;
+    color: #606060;
+    font-size: 14px;
+    font-weight: 600;
+    border-bottom: 1px solid #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    content: attr(data-title);
+  }
+  td.cell.image img {
+    margin: 0;
+  }
+  table.widget-table td.cell.image, td.cell.publish-date, td.cell.edit, td.cell.delete, td.cell.action, td.cell.image {
+    width: auto;
+    text-align: left;
+  }
+}
+
+/* .limiter {
   width: 100%;
   margin: 0 auto;
 }
@@ -114,10 +266,11 @@
   border-bottom: 1px solid #e6e6e6;
   vertical-align: middle;
 }
-
-.row .cell:first-child {
-  padding-left: 0;
+.row .cell.extra-padding {
+  padding-left: 10px;
+  padding-right: 5px;
 }
+
 .cell.publish-date {
   width: 75px;
   text-align: center;
@@ -158,7 +311,7 @@
 
 .row.header .cell {
   text-align: left;
-  padding: 15px;
+  padding: 15px 10px;
   color: #606060;
   vertical-align: top;
   font-size: 14px;
@@ -251,4 +404,4 @@
     left: 0;
     top: 10px;
   }
-}
+} */

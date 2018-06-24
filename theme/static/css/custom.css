@@ -825,7 +825,59 @@ a.profile-image {
   float: left;
 }
 
-.input-no-background input[type="text"], .input-no-background input[type="number"], .input-no-background select, .input-no-background textarea {
+.radio {
+  /* margin: 0.5rem; */
+}
+.radio input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+}
+
+.radio-label {
+  position: relative!important;
+  pointer-events: auto!important;
+  cursor: pointer!important;
+  margin-bottom: 10px;
+}
+.radio input[type="radio"] + .radio-label:before {
+  content: '';
+  background: #f4f4f4;
+  border-radius: 100%;
+  border: 1px solid #b4b4b4;
+  display: inline-block;
+  width: 1.4em;
+  height: 1.4em;
+  position: relative;
+  top: 1px;
+  margin-right: 3px;
+  vertical-align: top;
+  cursor: pointer;
+  text-align: center;
+  transition: all 250ms ease;
+}
+.radio input[type="radio"]:checked + .radio-label:before {
+  background-color: #3acf87;
+  box-shadow: inset 0 0 0 4px #f4f4f4;
+}
+.radio input[type="radio"]:focus + .radio-label:before {
+  outline: none;
+  border-color: #3acf87;
+}
+.radio input[type="radio"]:disabled + .radio-label:before {
+  box-shadow: inset 0 0 0 4px #f4f4f4;
+  border-color: #b4b4b4;
+  background: #b4b4b4;
+}
+.radio input[type="radio"] + .radio-label:empty:before {
+  margin-right: 0;
+}
+
+
+.input-no-background input[type="email"],
+.input-no-background input[type="text"],
+.input-no-background input[type="number"],
+.input-no-background select,
+.input-no-background textarea {
   background: none;
   color: #6d6d6d;
   font-size: 14px;
@@ -842,8 +894,11 @@ a.profile-image {
   border-bottom: 1px solid #c0c0c0;
   resize: none;
 }
-
-.input-no-background input[type="text"]:focus, .input-no-background input[type="number"]:focus, .input-no-background select:focus, .input-no-background textarea:focus {
+.input-no-background input[type="email"]:focus,
+.input-no-background input[type="text"]:focus,
+.input-no-background input[type="number"]:focus,
+ .input-no-background select:focus,
+ .input-no-background textarea:focus {
   outline: none;
   background: none;
   border: none;
@@ -868,9 +923,10 @@ a.profile-image {
   border-color: #3acf87;
 }
 
+.input-no-background input[type="email"]:focus~label,
 .input-no-background input[type="text"]:focus~label,
 /* .input-no-background input[type="text"]:valid ~ label, */
-
+.input-no-background input[type="email"].has-content~label,
 .input-no-background input[type="text"].has-content~label, .input-no-background input[type="number"]:focus~label,
 /* .input-no-background input[type="number"]:valid ~ label, */
 
@@ -889,7 +945,11 @@ a.profile-image {
   color: #3dc182;
 }
 
-.input-no-background input[type="text"]:focus~.bar:before, .input-no-background input[type="number"]:focus~.bar:before, .input-no-background select:focus~.bar:before, .input-no-background textarea:focus~.bar:before {
+.input-no-background input[type="email"]:focus~.bar:before,
+.input-no-background input[type="text"]:focus~.bar:before,
+.input-no-background input[type="number"]:focus~.bar:before,
+.input-no-background select:focus~.bar:before,
+.input-no-background textarea:focus~.bar:before {
   width: 100%;
 }
 
@@ -1030,7 +1090,7 @@ div#div_id_categories>label, .input-no-background label.label-default {
 }
 
 .action-bar>.delete>.button {
-  width: 30%;
+  /* width: 30%; */
   background-color: #fff;
   color: #999;
   font-weight: 500;
@@ -1237,7 +1297,7 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
 }
 
 .widget-content {
-  margin: 0 0 50px 0;
+  margin: 0 0 10px 0;
 }
 
 .widget-content>.text-content {
@@ -1347,6 +1407,8 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
   padding-bottom: 20px;
 }
 
+
+.shadow-panel,
 .widget-card-body {
   overflow: auto;
   background-color: #fff;

@@ -1,0 +1,215 @@
+{% extends "profiles/profile_settings.html" %}
+{% load mezzanine_tags theme_tags %}
+
+{% block meta_title %}
+    Детали заказа
+{% endblock %}
+
+{% block breadcrumb_element %}
+<li> <a href="{% url 'shop-order-list' %}"> Заказы магазина </a> </li>
+<li>Заказ: {{ order }}</li>
+{% endblock breadcrumb_element %}
+
+
+{% block extra_content %}
+<div class="flat-background">
+  <div class="container">
+    <div class="sixteen columns">
+      <div class="formset-images">
+        <div class="header">
+          <h1>
+            Заказ: {{ order }}
+            {# <a href="#"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> Советы по заполнению карточки товара</a> #}
+          </h1>
+        </div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
+        <div class="clearfix"></div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="container margin-top-30 margin-bottom-50">
+  <div class="twelve columns">
+
+    <div class="five columns alpha">
+      <div class="widget margin-top-0">
+        <h3 class="headline">Магазин</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <table class="basic-table">
+          <tbody>
+            <tr>
+              <th>Название</th>
+              <td>
+                <a href="{{ order.shop.get_absolute_url }}">{{ order.shop.shopname }}</a>
+              </td>
+            </tr>
+            <tr>
+              <th>Продавец</th>
+              <td>{{ order.shop.user.profile.get_full_name }}</td>
+            </tr>
+            {# <tr> #}
+              {# <th>Телефон</th> #}
+              {# <td> #}
+                {# {% if order.shop.user.profile.phone %} #}
+                  {# {{ order.shop.user.profile.phone }} #}
+                {# {% else %} #}
+                  {# не указан #}
+                {# {% endif %} #}
+              {# </td> #}
+            {# </tr> #}
+          </tbody>
+        </table>
+      </div>
+      {% if order.user_additional_info %}
+      <div class="widget margin-top-10">
+        <h3 class="headline">Пожелания по заказку</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <p>{{ order.user_additional_info }}</p>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="seven columns omega">
+      <div class="widget margin-top-0">
+        <h3 class="headline">Доставка</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <table class="basic-table">
+          <tbody>
+            <tr>
+              <th>Страна</th>
+              <td>{{ order.user_country }}</td>
+            </tr>
+            <tr>
+              <th>Регион</th>
+              <td>{{ order.user_region }}, {{ order.user_city }} </td>
+            </tr>
+            <tr>
+              <th>Почтовый индекс</th>
+              <td>{{ order.user_postcode }}</td>
+            </tr>
+            <tr>
+              <th>Адрес</th>
+              <td>{{ order.user_address }}</td>
+            </tr>
+            <tr>
+              <th>Доставка</th>
+              <td>{{ order.shipping_type }}</td>
+            </tr>
+            <tr>
+              <th>Цена</th>
+              <td>{{ order.shipping_price|rub_currency }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="twelve columns alpha">
+      <div class="widget margin-top-20">
+        <h3 class="headline">Товары</h3><span class="line"></span>
+        <div class="clearfix"></div>
+
+        {# <div class="limiter"> #}
+          {# <div class="container-table100"> #}
+            {# <div class="wrap-table100"> #}
+            <table class="table-responsive cart-table" role="table">
+              <thead class="rowgroup" role="rowgroup">
+                <tr class="row" role="row">
+                  <th class="columnheader" role="columnheader">Товар</th>
+                  <th class="columnheader" role="columnheader"></th>
+                  <th class="columnheader" role="columnheader">Цена</th>
+                  <th class="columnheader" role="columnheader">Кол-во</th>
+                  <th class="columnheader" role="columnheader">Итого</th>
+                </tr>
+              </thead>
+              <tbody class="rowgroup body-row" role="rowgroup">
+                {% for item in order.items.all %}
+                <tr class="row" role="row">
+      						<td class="cell image" data-title="" role="cell">
+      							{{ form.id }}
+      							<a href="{{ item.get_absolute_url }}">
+      							{% if item.image %}
+      								<img alt="{{ item.title|capfirst }}" src="{{ MEDIA_URL }}{% thumbnail item.image 80 80 %}" />
+      							{% else %}
+      								<i class="fa fa-camera fa-2x" aria-hidden="true"></i>
+      							{% endif %}
+      							</a>
+      						</td>
+      						<td class="cell title" data-title="Товар" role="cell">
+      							<a href="{{ item.get_absolute_url }}">{{ item.title|capfirst }}</a>
+      						</td>
+      						<td class="cell" data-title="Цена" role="cell">
+      							{{ item.price|rub_currency }}
+      						</td>
+      						<td class="cell" data-title="Кол-во" role="cell">
+      							{{ item.quantity }}
+      						</td>
+      						<td class="cell total" data-title="Итого" role="cell">
+      							{{ item.total_price|rub_currency }}
+      						</td>
+      					</tr>
+                {% endfor %}
+              </tbody>
+      			</table>
+            {# </div> #}
+          {# </div> #}
+        {# </div> #}
+
+
+      </div>
+    </div>
+    <div class="twelve columns alpha">
+      <div class="widget margin-top-20">
+        <h3 class="headline">Итого по заказу</h3><span class="line"></span>
+        <div class="clearfix"></div>
+        <table class="basic-table">
+          <tbody>
+            <tr>
+              <th>Количество товаров</th>
+              <td>{{ order.item_quantity_total }}</td>
+            </tr>
+            <tr>
+              <th>Стоимость товаров</th>
+              <td>{{ order.item_total|rub_currency }} </td>
+            </tr>
+            <tr>
+              <th>Стоимость доставки</th>
+              <td>{{ order.shipping_price|rub_currency }}</td>
+            </tr>
+            <tr>
+              <th>Общая стоимость заказа</th>
+              <td>{{ order.total|rub_currency }}</td>
+            </tr>
+            <tr>
+              <th>Статус заказа</th>
+              <td>{{ order_status_string }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  <div class="four columns sticky">
+      <div class="action-bar">
+        <div class="save">
+          {% if order.status == 2 %}
+            <a class="popup-with-zoom-anim button color text-center" href="#send-order-dialog"><i class="fa fa-info-circle"></i> Подтвердить получение</a>
+            <div id="send-order-dialog" class="zoom-anim-dialog mfp-hide modal-dialog">
+      				<h2 class="margin-bottom-10">Подтвердите получение заказа</h2>
+      				<p>
+                Статус заказа будет помечен как "Завершен", а магазин получит уведомление о том, что Вы получили заказ.
+              </p>
+              <a href="{% url 'shop-order-send' order.pk %}" class="button color">Подтвердить получение</a>
+      			</div>
+          {% else %}
+            <button type="button" class="button color">{{ order_status_string }}</button>
+          {% endif %}
+        </div>
+        <div class="delete">
+          <a href="{% url 'user-order-list' %}" class="button dark">Назад</a>
+        </div>
+      </div>
+  </div>
+</div>
+{% endblock %}

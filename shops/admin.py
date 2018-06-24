@@ -2,14 +2,14 @@ from django.contrib import admin
 from copy import deepcopy
 
 from shops.models import UserShop, ShopProduct, ShopProductImage, \
-                        Cart, CartItem, Order, OrderItem,  \
-                        UserShopDelivery, UserShopPayment, UserShopDeliveryOption,  ProductReview
+    Cart, CartItem, Order, OrderItem,  \
+    UserShopDelivery, UserShopPayment, UserShopDeliveryOption,  ProductReview
 
 
+from shops.forms import OrderFormAdmin
 
 class CartItemInline(admin.StackedInline):
     model = CartItem
-
 
 
 class CartAdmin(admin.ModelAdmin):
@@ -24,9 +24,15 @@ class OrderItemInline(admin.StackedInline):
 
 
 class OrderAdmin(admin.ModelAdmin):
+    form = OrderFormAdmin
     inlines = [
         OrderItemInline,
     ]
+    list_display = ('number', 'shop', 'user_first_name',
+                    'user_last_name', 'shipping', 'total', 'status')
+    list_filter = ('status',)
+    search_fields = ('number', )
+
 
 
 class ProductImageInline(admin.StackedInline):
@@ -53,6 +59,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_editable = ('available',)
     search_fields = ('title', 'shop', )
     list_filter = ('available', 'condition')
+
     def show_link(self, obj):
         return '<a href="%s">Посмотреть на сайте</a>' % obj.get_absolute_url()
     show_link.allow_tags = True
@@ -69,6 +76,7 @@ class ProductReviewAdmin(admin.ModelAdmin):
     #     return '<a href="%s">Посмотреть на сайте</a>' % obj.get_absolute_url()
     # show_link.allow_tags = True
     # show_link.short_description = "Посмотреть на сайте"
+
 
 admin.site.register(ShopProduct, ProductAdmin)
 admin.site.register(UserShopDelivery)

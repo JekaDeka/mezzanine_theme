@@ -1,5 +1,12 @@
 {% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles theme_tags crispy_forms_tags %}
 {% block meta_title %}Оформление заказа{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/table_responsive.css' %}">
+{% endblock %}
+
+
 {% block breadcrumbs_title %}
 <h2>Оформление заказа</h2>
 {% endblock breadcrumbs_title %}
@@ -13,112 +20,161 @@
 {% get_shop_items request.cart shop_id=shop_id as items %}
 {% get_shop_data request.cart shop_id=shop_id as shop_data %}
   <div class="eight columns">
-
-    <!-- Billing Details Content -->
     <div class="checkout-section active">Контактная информация</div>
     <div class="checkout-content">
-      <form class="checkout" action="" method="post">
+      <form class="checkout input-no-background" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        {# {{ form|crispy }} #}
-        {% for field in form %}
-          {{ field|as_crispy_field }}
-        {% endfor %}
-        <p>{{ form.shop.payment_other }}</p>
-        <p>{{ form.shop.express_other }}</p>
+          <div class="four columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_first_name|as_crispy_field }}
+          </div>
+          <div class="four columns omega margin-top-20 margin-bottom-15">
+            {{ form.user_last_name|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="four columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_phone|as_crispy_field }}
+          </div>
+          <div class="four columns omega margin-top-20 margin-bottom-15">
+            {{ form.user_email|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="eight columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_country|as_crispy_field }}
+          </div>
+          <div class="eight columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_region|as_crispy_field }}
+          </div>
+          <div class="eight columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_city|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="eight columns alpha omega margin-top-25 margin-bottom-20">
+            <h3 class="headline">Доставка</h3><span class="line"></span><div class="clearfix"></div>
+            {% if form.shop.delivery_other %}
+              <p>{{ form.shop.delivery_other }}</p>
+            {% endif %}
+            {{ form.shipping|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="eight columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_address|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+          <div class="four columns alpha margin-top-15 margin-bottom-15">
+            {{ form.user_postcode|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="eight columns alpha margin-top-20 margin-bottom-15">
+            {{ form.user_additional_info|as_crispy_field }}
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="eight columns alpha omega margin-top-25 margin-bottom-15">
+            <h3 class="headline">Оплата</h3><span class="line"></span><div class="clearfix"></div>
+            {% if form.shop.payment_other %}
+              <p>{{ form.shop.payment_other }}</p>
+            {% endif %}
+            {{ form.payment|as_crispy_field }}
+          </div>
       </form>
       <div class="clearfix"></div>
     </div>
     <div class="clearfix"></div>
   </div>
-  <!-- Billing Details / Enc -->
 
-
-  <!-- Checkout Cart -->
   <div class="eight columns">
     <div class="checkout-section cart">{% trans "Your Cart" %}</div>
-    <!-- Cart -->
-    <table class="stacktable small-only">
-      <tbody>
+    <table class="table-responsive cart-table" role="table">
+      <thead class="rowgroup" role="rowgroup">
+        <tr class="row" role="row">
+          <th class="columnheader" role="columnheader">Товар</th>
+          <th class="columnheader" role="columnheader"></th>
+          <th class="columnheader" role="columnheader">Цена</th>
+          <th class="columnheader" role="columnheader">Кол-во</th>
+          <th class="columnheader" role="columnheader">Итого</th>
+        </tr>
+      </thead>
+      <tbody class="rowgroup body-row" role="rowgroup">
         {% for item in items %}
-        <tr class="st-space">
-          <td></td>
-          <td></td>
-        </tr>
-        <tr class="st-new-item">
-          <td class="st-key"></td>
-          <td class="st-val st-head-row">
+        <tr class="row" role="row">
+          <td class="cell image" data-title="" role="cell">
+            <a href="{{ item.get_absolute_url }}">
             {% if item.image %}
-              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title|capfirst }}">
+              <img alt="{{ item.title|capfirst }}" src="{{ MEDIA_URL }}{% thumbnail item.image 80 80 %}" />
+            {% else %}
+              <i class="fa fa-camera fa-2x" aria-hidden="true"></i>
             {% endif %}
+            </a>
           </td>
-        </tr>
-        <tr>
-          <td class="st-key"></td>
-          <td class="st-val"><a href="{{ item.url }}">{{ item.title|capfirst }}</a></td>
-        </tr>
-        <tr>
-          <td class="st-key">Цена</td>
-          <td class="st-val">{{ item.price }}</td>
-        </tr>
-        <tr>
-          <td class="st-key">Кол-во</td>
-          <td class="st-val">{{ item.quantity }}</td>
-        </tr>
-        <tr>
-          <td class="st-key">Всего</td>
-          <td class="st-val">{{ item.total_price|rub_currency }}</td>
+          <td class="cell title" data-title="Товар" role="cell">
+            <a href="{{ item.url }}">{{ item.title|capfirst }}</a>
+          </td>
+          <td class="cell" data-title="Цена" role="cell">
+            {{ item.price|rub_currency }}
+          </td>
+          <td class="cell" data-title="Кол-во" role="cell">
+            {{ item.quantity }}
+          </td>
+          <td class="cell total" data-title="Итого" role="cell">
+            {{ item.total_price|rub_currency }}
+          </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    <table class="checkout cart-table responsive-table stacktable large-only">
-      <tbody>
-        <tr>
-          <th class="hide-on-mobile">Товар</th>
-          <th></th>
-          <th>Цена</th>
-          <th>Кол-во</th>
-          <th>Всего</th>
-        </tr>
-        {% for item in items %}
-        <tr>
-          <td class="hide-on-mobile">
-            {% if item.image %}
-              <img src="{{ MEDIA_URL }}{% thumbnail item.image 60 60 %}" alt="{{ item.title|capfirst }}">
-            {% endif %}
-          </td>
-          <td class="cart-title"><a href="{{ item.url }}">{{ item.title|capfirst }}</a></td>
-          <td>{{ item.price }}</td>
-          <td class="qty-checkout">{{ item.quantity }}</td>
-          <td class="cart-total">{{ item.total_price|rub_currency }}</td>
-        </tr>
-        {% endfor %}
-
-      </tbody>
-    </table>
-
     <table class="cart-table bottom">
       <tbody>
         <tr>
           <th class="checkout-totals">
             <div class="checkout-subtotal">
-              {{ shop_data.3|rupluralize:"товар,товара,товаров" }} на сумму: <span>{{ shop_data.4|rub_currency }}</span>
+              {{ shop_data.0|rupluralize:"товар,товара,товаров" }} на сумму: <span>{{ shop_data.1|rub_currency }}</span>
             </div>
           </th>
         </tr>
       </tbody>
     </table>
-    <div class="margin-top-10 pull-right">
-      <a href="#" class="button color checkout-button">Оформить заказ</a>
+    <div class="margin-top-10">
+      <h3 class="headline">Магазин</h3><span class="line"></span>
+      <div class="clearfix"></div>
+      <div class="widget-content">
+        <div class="image-content pull-left">
+          <a href="{% url 'shop-view' form.shop.slug %}">
+            <img src="{{ MEDIA_URL}}{% thumbnail form.shop.image 100 100 %}" alt="{{ form.shop.shopname }}" class="shop-image">
+          </a>
+        </div>
+        <div class="text-content pull-left">
+          <h2><a href="{% url 'shop-view' form.shop.slug %}">{{ form.shop.shopname }}</a></h2>
+          <span>{{ form.shop.user.profile.get_location }}</span>
+        </div>
+        <div class="clearfix"></div>
+      </div>
     </div>
+    <div>
+      <p>
+        Вы делаете покупку напрямую в магазине.
+        После того, как магазин свяжется с вами, вы договоритесь о способах оплаты и доставки.
+      </p>
+      {% if form.shop.rules %}
+      <h3 class="headline">Правила магазина</h3><span class="line"></span>
+      <div class="clearfix"></div>
+      <p> {{ form.shop.rules }} </p>
+      {% endif %}
 
+      <a href="#" class="button color checkout-button pull-right">Оформить заказ</a>
+    </div>
   </div>
 {% endif %}
 </div>
+<div class="margin-top-50"></div>
 {% endblock %}
 
 {% block extra_js %}
-  {{ block.super }}
+{{ block.super }}
 <script type="text/javascript">
   $(document).ready(function() {
     $('.checkout-button').on('click', function(event) {
@@ -127,5 +183,21 @@
     })
   });
 </script>
+<script type="text/javascript" src="{% static "js/jquery.ns-autogrow.min.js" %}"></script>
+<script type="text/javascript">
+  $(function() {
+    $('.input-no-background input, .input-no-background textarea').bind('change', function () {
+      if ($(this).val() != "") {
+        $(this).addClass("has-content");
+      } else {
+        $(this).removeClass("has-content");
+      }
+    }).trigger('change');
+		$('textarea').autogrow({vertical: true, horizontal: false});
+    $(".mask").mask('+0 (000) 000 0000');
+  });
 </script>
+<script src="{% static 'smart-selects/js/bindfields.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedfk.js' %}"></script>
+<script src="{% static 'smart-selects/js/chainedm2m.js' %}"></script>
 {% endblock %}

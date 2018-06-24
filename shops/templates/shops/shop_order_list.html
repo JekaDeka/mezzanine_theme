@@ -1,0 +1,130 @@
+{% extends "profiles/profile_settings.html" %}
+{% load mezzanine_tags staticfiles theme_tags crispy_forms_tags %}
+
+{% block meta_title %}
+Заказы магазина
+{% endblock %}
+
+{% block breadcrumbs_title %}
+<h2>Магазин</h2>
+{% endblock breadcrumbs_title %}
+
+{% block breadcrumb_element %}
+<li>Заказы магазина</li>
+{% endblock %}
+
+
+{% block extra_content %}
+<div class="flat-background">
+	<div class="flat-row">
+		<div class="container">
+			<div class="four columns">
+				<div class="default-panel">
+					<div class="widget margin-top-0">
+						<h3 class="headline">Заказы</h3><span class="line"></span><div class="clearfix"></div>
+						<nav class="categories">
+							<ul>
+								<li><a href="{% url 'shop-order-list' %}" class="{% if not status %}active{% endif %}">Все</a></li>
+								{% for choice in order_status_choice.items  %}
+									<li>
+										<a href="{% url 'shop-order-list' %}?status={{ choice.1.value }}" class="{% if choice.1.active %}active{% endif %}">
+											{{ choice.1.label|capfirst }}
+										</a>
+									</li>
+								{% endfor %}
+							</ul>
+						</nav>
+					</div>
+				</div>
+			</div>
+			{% if order_list %}
+				<div class="twelve columns">
+					<div class="shadow-panel margin-top-20">
+						{# <div class="limiter"> #}
+							{# <div class="container-table100"> #}
+								{# <div class="wrap-table100"> #}
+								<table class="table-responsive cart-table widget-table" role="table">
+									<thead class="rowgroup" role="rowgroup">
+										<tr class="row" role="row">
+											<th class="columnheader" role="columnheader">Дата</th>
+											<th class="columnheader" role="columnheader">Номер заказа</th>
+											<th class="columnheader" role="columnheader">Покупатель</th>
+											<th class="columnheader" role="columnheader">Доставка</th>
+											<th class="columnheader" role="columnheader">Сумма заказа</th>
+											<th class="columnheader" role="columnheader">Статус</th>
+										</tr>
+									</thead>
+									<tbody class="rowgroup body-row" role="rowgroup">
+										{% for order in order_list %}
+										<tr class="row" role="row">
+											<td class="cell" data-title="Дата" role="cell">
+												{{ order.time|date:"d.m.Y" }}
+											</td>
+											<td class="cell" data-title="Номер заказа" role="cell">
+												<a href="{% url 'shop-order-detail' order.pk %}">{{ order.number }}</a>
+											</td>
+											<td class="cell" data-title="Покупатель" role="cell">
+												{{ order.billing_name }}
+											</td>
+											<td class="cell" data-title="Доставка" role="cell">
+												{{ order.shipping_type }}
+											</td>
+											<td class="cell" data-title="Сумма заказа" role="cell">
+												{{ order.total|rub_currency }}
+											</td>
+											<td class="cell" data-title="Дата" role="Статус">
+												{{ order.get_status_display }}
+											</td>
+										</tr>
+						        {% endfor %}
+									</tbody>
+								</table>
+							{# </div> #}
+						{# </div> #}
+						<div class="divider">
+							<span>Всего заказов:
+								{% if is_paginated %} {{ page_obj.paginator.count }} {% else %} {{ order_list.count }} {% endif %}
+							</span>
+						</div>
+					</div>
+						{% if is_paginated %}
+				        <div class="pagination-container margin-top-20">
+				            <nav class="pagination">
+				                <ul>
+				                    {% for i in page_obj.paginator.page_range %}
+				                      {% if page_obj.number == i %}
+				                        <li><a href="#" class="current-page">{{ i }}</a></li>
+				                      {% else %}
+				                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+				                      {% endif %}
+				                    {% endfor %}
+				                </ul>
+				            </nav>
+				            <nav class="pagination-next-prev full-width">
+				                <ul>
+				                    {% if page_obj.has_previous %}
+				                        <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
+				                    {% endif %}
+				                    {% if page_obj.has_next %}
+				                        <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
+				                    {% endif %}
+				                </ul>
+				            </nav>
+				        </div>
+				    {% endif %}
+				</div>
+			{% else %}
+			<div class="twelve columns">
+				<div class="shadow-panel margin-top-20">
+					<section id="orders-not-found">
+		        <p>Заказы не найдены</p>
+					</section>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+
+
+		</div>
+	</div>
+{% endblock %}
