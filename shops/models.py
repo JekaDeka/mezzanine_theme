@@ -217,7 +217,7 @@ class ShopProduct(models.Model):
         _("Изображение"), max_length=255, blank=True, default="")
 
     keywords = KeywordsField()
-    reviews_count = models.IntegerField(default=0, editable=True)
+    reviews_count = models.IntegerField(default=0, editable=False)
     reviews_sum = models.IntegerField(default=0, editable=False)
     reviews_average = models.FloatField(default=0, editable=False)
     # comments = CommentsField()
@@ -559,7 +559,7 @@ class ProductReview(models.Model):
 
     def save(self, *args, **kwargs):
         super(ProductReview, self).save(*args, **kwargs)
-        print('PRODUCT_RATING_UPDATE')
+        # print('PRODUCT_RATING_UPDATE')
         ratings = [r.rating for r in ProductReview.objects.filter(product=self.product, approved=True)]
         count = len(ratings)
         _sum = sum(ratings)

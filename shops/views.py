@@ -12,7 +12,7 @@ from django.db import transaction
 from django.db.models import Avg, Count
 
 from shops.models import UserShop, UserShopDelivery, UserShopDeliveryOption, \
-    ShopProduct, ShopProductImage, Cart, Order
+    ShopProduct, ShopProductImage, Cart, Order, ProductReview
 from shops.forms import ProductForm, ProductImageForm, ShopForm, ProductImageFormSet, \
     AddProductForm, CartItemForm, CartItemFormSet, OrderForm, ProductReviewForm
 from shops.utils import recalculate_cart, bind_cart
@@ -24,6 +24,7 @@ from theme.forms import MessageForm
 from mezzanine.conf import settings
 
 import pymorphy2
+
 
 class AjaxableResponseMixin(object):
     """
@@ -353,12 +354,6 @@ class ProductDetailView(DetailView):
         form = ProductReviewForm(request.POST)
         product = self.get_object()
         if form.is_valid():
-            # try:
-            #  add shop
-            #     shop = self.request.user.shop
-            # except Exception as e:
-            #     pass
-
             review = form.save(commit=False)
             review.author = self.request.user
             review.product = product
@@ -381,6 +376,54 @@ class ProductDetailView(DetailView):
             if not obj.available:
                 raise Http404()
         return obj
+
+
+class ProductReviewList(ListView):
+    model = ProductReview
+    paginate_by = 30
+    template_name = "product/product_reviews.html"
+    context_object_name = 'reviews'
+
+    def get_queryset(self):
+        self.product = get_object_or_404(ShopProduct, slug=self.kwargs['slug'])
+        return ProductReview.objects.filter(product=self.product).filter(approved=True).select_related(
+            'author__profile',
+        ).values(
+            'created_at',
+            'rating',
+            'content',
+            'author__profile__image',
+            'author__profile__first_name',
+            'author__profile__last_name',
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductReviewList, self).get_context_data(**kwargs)
+        context['product'] = self.product
+        context['add_to_cart_form'] = AddProductForm(product=self.product)
+        context['review_form'] = ProductReviewForm(product=self.product)
+        return context
+
+
+    def post(self, request, *args, **kwargs):
+        product = ShopProduct.objects.get(slug=self.kwargs['slug'])
+        form = ProductReviewForm(request.POST)
+        if form.is_valid():
+            review = form.save(commit=False)
+            review.author = self.request.user
+            review.product = product
+            try:
+                review.save()
+            except Exception as e:
+                messages.error(
+                    request, "Вы уже оставили отзыв для этого товара.")
+            else:
+                messages.success(request, "Отзыв успешно добавлен. Как только модератор проверит его, \
+                                 мы отобразим его на сайте.")
+        else:
+            messages.error(
+                request, "Нельзя оставить отзыв на собственынй товар.")
+        return HttpResponseRedirect(product.get_absolute_url())
 
 
 class ShopList(ListView):
@@ -741,10 +784,12 @@ class ShopOrderList(ListView):
             label = morph.parse(value)[0]
             active = True if status == key else False
             label = label.inflect({'plur'})
-            orders_status_choice[key] = {'value': key, 'label': label.word, 'active': active }
+            orders_status_choice[key] = {
+                'value': key, 'label': label.word, 'active': active}
         data['order_status_choice'] = orders_status_choice
         data['status'] = status
         return data
+
 
 @method_decorator(login_required, name='dispatch')
 class UserOrderList(ListView):
@@ -777,11 +822,11 @@ class UserOrderList(ListView):
             label = morph.parse(value)[0]
             active = True if status == key else False
             label = label.inflect({'plur'})
-            orders_status_choice[key] = {'value': key, 'label': label.word, 'active': active }
+            orders_status_choice[key] = {
+                'value': key, 'label': label.word, 'active': active}
         data['order_status_choice'] = orders_status_choice
         data['status'] = status
         return data
-
 
 
 @method_decorator(login_required, name='dispatch')
@@ -798,17 +843,20 @@ def shop_order_send(request, pk):
     if order.shop.user == request.user and order.status == 1:
         order.status = 2
         order.save()
-        messages.success(request, "Заказ успешно отправлен. Покупателю отправлено уведомление.")
+        messages.success(
+            request, "Заказ успешно отправлен. Покупателю отправлено уведомление.")
     else:
         messages.error(request, "Ошибка.")
     return HttpResponseRedirect(reverse('shop-order-list'))
+
 
 def shop_order_cancel(request, pk):
     order = get_object_or_404(Order, pk=pk)
     if order.shop.user == request.user and order.status == 1:
         order.status = 4
         order.save()
-        messages.success(request, "Заказ успешно отменен. Покупателю отправлено уведомление.")
+        messages.success(
+            request, "Заказ успешно отменен. Покупателю отправлено уведомление.")
     else:
         messages.error(request, "Ошибка.")
     return HttpResponseRedirect(reverse('shop-order-list'))
@@ -819,7 +867,8 @@ def shop_order_received(request, pk):
     if order.user_id == request.user.id and order.status == 2:
         order.status = 3
         order.save()
-        messages.success(request, "Заказ успешно завершен. Мы уведомили магазин об успешном получении товара.")
+        messages.success(
+            request, "Заказ успешно завершен. Мы уведомили магазин об успешном получении товара.")
     else:
         messages.error(request, "Ошибка.")
     return HttpResponseRedirect(reverse('user-order-list'))
@@ -845,6 +894,7 @@ class ShopOrderDetail(DetailView):
 
         data['order_status_string'] = order_status_string
         return data
+
 
 class UserOrderDetail(DetailView):
     model = Order

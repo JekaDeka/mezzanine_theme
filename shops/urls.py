@@ -7,7 +7,10 @@ urlpatterns = [
     url(r'^settings/products/(?P<pk>[0-9]+)/edit/$', views.ProductImageUpdate.as_view(), name='product-update'),
     url(r'^settings/products/(?P<pk>[0-9]+)/delete/$', views.ProductDelete.as_view(), name='product-delete'),
 
+    url(r'^product/(?P<slug>[\w-]+)/reviews/$', views.ProductReviewList.as_view(), name='product-reviews'),
     url(r'^product/(?P<slug>.*)/$', views.ProductDetailView.as_view(), name='product-detail'),
+
+
 
 
     # url(r'^shop/create/$', views.ShopDeliveryOptionCreate.as_view(), name="shop_create"),

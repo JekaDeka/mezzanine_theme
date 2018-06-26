@@ -5878,10 +5878,11 @@ ul.product-list li {
     color: #FFC741;
 }
 */
+span.reviews-counter > a,
 span.reviews-counter {
   position: relative;
   display: block;
-  margin: -7px 0 0 0;
+  margin: -5px 0 0 0;
   color: #a0a0a0;
   float: right;
 }
