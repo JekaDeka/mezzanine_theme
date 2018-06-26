@@ -22,4 +22,4 @@ def update_product_rating(sender, instance, **kwargs):
     # _sum = sum(ratings)
     # average = _sum / count if count > 0 else 0
 
-    # print('PRODUCT_RATING_UPDATE')
+    print('PRODUCT_RATING_UPDATE')

@@ -217,7 +217,7 @@ class ShopProduct(models.Model):
         _("Изображение"), max_length=255, blank=True, default="")
 
     keywords = KeywordsField()
-    reviews_count = models.IntegerField(default=0, editable=False)
+    reviews_count = models.IntegerField(default=0, editable=True)
     reviews_sum = models.IntegerField(default=0, editable=False)
     reviews_average = models.FloatField(default=0, editable=False)
     # comments = CommentsField()
