@@ -48,8 +48,6 @@ ul.top-bar-menu li i {
   margin-bottom: 15px;
 }
 
-
-
 #logo {
     margin-top: 34px;
 }
@@ -5471,12 +5469,17 @@ a.img-caption {
     position: relative;
 }
 
+.orders .order,
 .products .product {
     margin-top: 20px;
     position: relative;
     -webkit-box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
     -moz-box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
     box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
+}
+
+.order {
+  background-color: #fff;
 }
 
 .products a {
@@ -8058,6 +8061,7 @@ html[xmlns] .slides {
     padding: 25px 30px;
     margin: 0;
 }
+
 .object-content {
   background-color: #fff;
   text-align: left;
@@ -8088,6 +8092,7 @@ html[xmlns] .slides {
     margin: 0;
 }
 
+.order-content a:hover h2,
 .the-team-content a:hover h5,
 .object-content a:hover h5,
 .from-the-blog-content a:hover h5 {

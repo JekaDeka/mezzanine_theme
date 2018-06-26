@@ -25,8 +25,8 @@ def order_list(request, tag=None, year=None, month=None, username=None,
                category=None, template="ordertable/order_list.html",
                extra_context=None):
     templates = []
-    orders = OrderTableItem.objects.filter(
-        performer=None).select_related('author')
+    orders = OrderTableItem.objects.filter(available=True).filter(
+        performer=None)
     # author = request.user
     order_categories = OrderTableItemCategory.objects.all()
     if category is not None:

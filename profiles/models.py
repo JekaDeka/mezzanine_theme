@@ -114,7 +114,7 @@ class UserProfile(models.Model):
         auto_choose=True,
         sort=True, verbose_name=("Город"))
 
-    bio = RichTextField(default="", verbose_name=("О себе"), blank=True)
+    bio = models.TextField(default="", verbose_name=("О себе"), blank=True)
 
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)

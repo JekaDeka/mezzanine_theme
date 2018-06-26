@@ -56,7 +56,7 @@ class UserShop(models.Model):
     shopname = models.CharField(max_length=255, blank=False, unique=True,
                                 verbose_name=("Название магазина"))
     slug = models.URLField(editable=False, default='')
-    bio = RichTextField(default="", verbose_name=("Описание"), blank=True,
+    bio = models.TextField(default="", verbose_name=("Описание"), blank=True,
                         help_text="Расскажите миру о Вашем творчестве, опишите свой продукт. \
                         Ваш бренд и то, что вы создаете своим трудом, являются единственными в своем роде - скажите, почему! \
                         Расскажите о себе, чем вы были воодушевлены, когда начали заниматься своим делом, что повлияло на ваш выбор, как развивается ваше творчество сейчас. \
@@ -66,7 +66,7 @@ class UserShop(models.Model):
 
     delivery_options = models.ManyToManyField(
         'UserShopDelivery', through='UserShopDeliveryOption')
-    delivery_other = RichTextField(default="", blank=True,
+    delivery_other = models.TextField(default="", blank=True,
                                    verbose_name=(
                                        "Дополнительная информация о доставке"),
                                    help_text="Адреса, по которым покупатель сможет забрать товар самостоятельно. Любые другие нюансы и условия по доставке.")
@@ -74,12 +74,12 @@ class UserShop(models.Model):
     payment_options = models.ManyToManyField(
         'UserShopPayment', verbose_name=_("Способы оплаты"), help_text="")
 
-    payment_other = RichTextField(default="", blank=True,
+    payment_other = models.TextField(default="", blank=True,
                                   verbose_name=(
                                       "Дополнительная информация об оплате"),
                                   help_text="Опишите любые другие условия и важные моменты по оплате — покупателю будет проще принять решение о покупке в вашем магазине.")
 
-    rules = RichTextField(default="", blank=True,
+    rules = models.TextField(default="", blank=True,
                           verbose_name=(
                               "Правила возврата и обмена"),
                           help_text="Обозначьте условия возврата товаров. В течение какого времени после получения товара покупатель может обратиться? \
@@ -204,7 +204,7 @@ class ShopProduct(models.Model):
                                 help_text="В точности как на бирке")
     size = models.CharField(_("Размер"), max_length=255, blank=True, default="",
                             help_text="Укажите размеры товара")
-    description = RichTextField(
+    description = models.TextField(
         default="", verbose_name=("Описание"),
         help_text="Как можно более подробно опишите товар.")
     condition = models.IntegerField(

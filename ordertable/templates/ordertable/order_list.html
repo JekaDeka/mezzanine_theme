@@ -1,7 +1,10 @@
-{% extends "base.html" %}
+{% extends "pages/page.html" %}
 {% load i18n mezzanine_tags blog_tags pages_tags keyword_tags disqus_tags theme_tags %}
 
-{% block meta_title %}{% if page %}{{ page.meta_title }}{% else %}Стол заказов{% endif %}{% endblock %}
+{% block meta_title %}
+{% if page %}{{ page.meta_title }}
+{% else %}Стол заказов{% endif %}
+{% endblock %}
 
 {% block meta_keywords %}{% metablock %}
 {% keywords_for page as keywords %}
@@ -17,6 +20,9 @@
 {% endmetablock %}
 {% endblock %}
 
+
+{% block breadcrumbs_class %}shadow{% endblock %}
+
 {% block breadcrumbs_title %}
 	<h2>Стол заказов</h2>
 {% endblock breadcrumbs_title %}
@@ -27,80 +33,101 @@
 {% endif %}
 {% endblock %}
 
+{% block main_containter %}
+<div class="flat-background">
+	<div class="flat-row">
+			{{ block.super }}
+	</div>
+	<div class="margin-top-50">	</div>
+</div>
+{% endblock %}
+
 {% block leftsidebar %}
-<div class="four columns">
-	{% block order_categories %}
+<div class="four adjust-left columns">
+	<a class="toggle-filter-button" href="#">Показать фильтры <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
+	<div class="filter-panel">
 		{% if order_categories %}
-		<div class="widget margin-top-10">
-			<h3 class="headline">Виды работ </h3><span class="line"></span><div class="clearfix"></div>
+		<div class="widget margin-top-0">
+			<h3 class="headline">Виды работ </h3><span class="line"></span>
+			<div class="clearfix"></div>
 			<nav class="categories">
 				<ul>
-				<li>
-					{% url 'order_list' as main_url %}
-					<a href="{{ main_url }}" {% if main_url == request.get_full_path %}class="active"{% endif %}>Любой</a>
-				</li>
-				{% for category in order_categories %}
-					{% url 'order_list_category' category.slug as category_url %}
-					<li><a href="{{ category_url }}"{% if category_url in request.get_full_path %}class="active"{% endif %}>{{ category }}</a></li>
-				{% endfor %}
+					<li>
+						{% url 'order_list' as main_url %}
+						<a href="{{ main_url }}" {% if main_url == request.get_full_path %}class="active" {% endif %}>Любой</a>
+					</li>
+					{% for category in order_categories %} {% url 'order_list_category' category.slug as category_url %}
+					<li><a href="{{ category_url }}" {% if category_url in request.get_full_path %}class="active" {% endif %}>{{ category }}</a></li>
+					{% endfor %}
 				</ul>
 			</nav>
 		</div>
 		{% endif %}
-	{% endblock %}
-<div class="widget margin-top-10">
-    <h3 class="headline">Регион</h3><span class="line"></span>
-    <div class="clearfix"></div>
-    <form method="GET">
-	    <label class="control control--checkbox">
-			<input {% if request.GET.region %}checked="checked"{% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user.profile.region.id }}" onChange="this.form.submit()">
-			Только мой регион
-			<div class="control__indicator"></div>
-		</label>
-	</form>
-</div>
+		<div class="widget margin-top-10">
+			<h3 class="headline">Регион</h3><span class="line"></span>
+			<div class="clearfix"></div>
+			<form method="GET">
+				<label class="control control--checkbox">
+				<input {% if request.GET.region %}checked="checked"{% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user.profile.region.id }}" onChange="this.form.submit()">
+				Только мой регион
+				<div class="control__indicator"></div>
+			</label>
+			</form>
+		</div>
+	</div>
 </div>
 {% endblock %}
 
 {% block main %}
-<div class="twelve columns">
+<div class="twelve adjust-right columns orders" id="masonry-wrapper">
 {% if orders %}
 	{% for order in orders.object_list %}
-	<div class="order-container margin-bottom-15">
-		<div class="three alpha columns margin-top-10">
-			{% if order_images.first %}
-		    	<a href="{{ order.get_absolute_url }}">
-					<img  src="{{ MEDIA_URL }}{% thumbnail order.images.first 300 300 %}" alt="no-image" style="margin: auto;" />
-				</a>
+	<div class="order masonry-item">
+		<div class="order-image columns">
+			<a href="{{ order.get_absolute_url }}">
+			{% if order.main_image %}
+				<img src="{{ MEDIA_URL }}{% thumbnail order.main_image 250 250 %}" alt="{{ order.title }}" />
 			{% else %}
-				<a href="{{ order.get_absolute_url }}">
-					<img src="{{ STATIC_URL }}{% thumbnail 'images/no-order-image.jpg' 0 0 %}" alt="no-image" style="margin: auto;">
-				</a>
+				<img src="{{ STATIC_URL }}{% thumbnail 'images/no-order.jpg' 0 0 %}" alt="{{ order.title|capfirst }}" />
 			{% endif %}
+			</a>
 		</div>
-		<div class="nine omega columns">
-		    <h2><a href="{{ order.get_absolute_url }}">{{ order.title|capfirst }}</a></h2>
-		    <div class="meta">
-		        <span><i class="fa fa-calendar-plus-o" aria-hidden="true"></i>Добавлено: {{ order.created }}</span>
-		        <br>
-		        <span><i class="fa fa-hourglass-end" aria-hidden="true"></i>Крайний срок: {{ order.ended|not_none }}</span>
-		        <br>
-		        <span><i class="fa fa-rub" aria-hidden="true"></i>Бюджет: {{ order.price }}</span>
-		        <br>
-		        <span><i class="fa fa-map-marker" aria-hidden="true"></i>Регион: {% if order.lock_in_region %} {{ order.author_profile.region }} {% else %} Любой {% endif %}</span>
-		    </div>
-		    <p>{{ order.description|safe|truncatewords:80 }}</p>
-		        <a href="{{ order.get_absolute_url }}" class="button color" style="float: right;">Подробнее</a>
+		<div class="order-content columns">
+			<a href="{{ order.get_absolute_url }}"><h2>{{ order.title|capfirst }}</h2></a>
+			<div class="order-description">
+				<div>
+					<i class="fa fa-calendar-plus-o" aria-hidden="true"></i> <strong>Добавлено:</strong> {{ order.created|date:"d.m.Y" }}
+				</div>
+				<div>
+					<i class="fa fa-hourglass-end" aria-hidden="true"></i> <strong>Крайний срок:</strong> {{ order.ended|date:"d.m.Y"|not_none }}
+				</div>
+				<div>
+					<i class="fa fa-rub" aria-hidden="true"></i> <strong>Бюджет:</strong> {{ order.price|rub_currency }}
+				</div>
+				<div>
+					<i class="fa fa-map-marker" aria-hidden="true"></i> <strong>Регион:</strong>
+						{% if order.lock_in_region %}{{ order.region }}{% else %} Любой {% endif %}
+				</div>
+			</div>
+			<div class="clearfix"></div>
+			{% if order.description %}
+				<p>{{ order.description|truncatechars:230 }}</p>
+			{% endif %}
+			<a href="{{ order.get_absolute_url }}" class="button color pull-right">Подробнее</a>
 		</div>
+		<div class="clearfix"></div>
 	</div>
-	<div class="clearfix"></div>
-	<div class="margin-top-15"><span class="line"></span><div class="clearfix"></div></div>
 	{% endfor %}
-	{% pagination_for orders %}
-{% else %}
-	<section id="not-found">
-        <p>Заказов по заданным критериям не найдено</p>
-    </section>
-{% endif %}
+	<div class="clearfix"></div>
+	{% if orders.paginator.count != 0 %}
+		{% pagination_for orders %}
+	{% endif %}
 </div>
+{% else %}
+	<div class="twelve adjust-right columns orders">
+		<section id="not-found">
+	        <p>Заказы не найдены</p>
+	    </section>
+	</div>
+	{% endif %}
 {% endblock %}

@@ -10,6 +10,7 @@ from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
+
 from theme.utils import slugify_unicode
 
 from datetime import date
@@ -40,8 +41,8 @@ class OrderTableItem(models.Model):
         _("Дата добавления"), editable=False, default=date.today)
     ended = models.DateField(
         _("Крайний срок"), null=True, editable=True, blank=True, help_text="Оставьте пустым, если срок неограничен.", validators=[validate_today])
-    price = models.DecimalField(
-        _("Бюджет"), max_digits=8, decimal_places=0, default=0, blank=True, null=True,
+    price = models.PositiveIntegerField(
+        _("Бюджет"), default=0, blank=True, null=True,
         help_text="Если Вы не представляете, сколько подобная работа могла бы стоить, оставьте поле незаполненным.", validators=[MinValueValidator(0)])
     count = models.PositiveIntegerField(_("Количество"), default=1, validators=[MinValueValidator(1)])
     # count = models.DecimalField(
@@ -57,7 +58,13 @@ class OrderTableItem(models.Model):
         help_text="Пример: шерсть")
     lock_in_region = models.BooleanField(
         default=False, verbose_name=("Только мой регион"), help_text="Мастера из других регионов не получат уведомление о Вашем заказе")
-    description = RichTextField(
+
+    region = models.ForeignKey("profiles.Region",
+                                   verbose_name=_("Регион"),
+                                   blank=True, null=True,
+                                   editable=True)
+
+    description = models.TextField(
         default="", verbose_name=("Подробное описание"),
         help_text="Как можно более подробно опишите желаемое изделие.")
 
@@ -96,6 +103,9 @@ class OrderTableItem(models.Model):
             self.main_image = img.file
         else:
             self.main_image = ""
+
+        if not self.region:
+            self.region = self.author.profile.region
         super(OrderTableItem, self).save(*args, **kwargs)
 
     @property
