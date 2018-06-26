@@ -27,8 +27,8 @@ def validate_today(value):
 class OrderTableItem(models.Model):
 
     class Meta:
-        verbose_name = _("Заказы")
-        verbose_name_plural = _("Мои заявки")
+        verbose_name = _("Заказ")
+        verbose_name_plural = _("Заказы")
         ordering = ("-created",)
         permissions = (
             ('view_ordertableitem', 'View order item'),
