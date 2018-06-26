@@ -151,9 +151,9 @@
 					<div class="tab-content" id="tab2">
 						{% with payments=product.shop.payment_options.all %}
 						<div class="eight columns alpha">
-							{% if payments %}
 							<h4 class="headline">Оплата</h4><span class="line"></span>
 							<div class="clearfix"></div>
+							{% if payments %}
 							<ul class="list-4 color">
 								{% for payment in payments %}
 									<li>{{ payment }}</li>
@@ -167,9 +167,9 @@
 						{% endwith %}
 						{% with deliveries=product.shop.get_delivery_options %}
 						<div class="eight columns omega">
-							{% if deliveries %}
 							<h4 class="headline">Доставка</h4><span class="line"></span>
 							<div class="clearfix"></div>
+							{% if deliveries %}
 							<ul class="list-4 color">
 								{% for delivery in deliveries %}
 									<li>{{ delivery.label }}: {{ delivery.usershopdeliveryoption__price|rub_currency }}</li>
