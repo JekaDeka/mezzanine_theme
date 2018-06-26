@@ -245,3 +245,8 @@ def get_shop_data(obj, shop_id=None):
 def add_spaces(value):
     values = value.split(',')
     return ", ".join(values)
+
+
+@register.filter
+def get_class_name(value):
+    return value.__class__.__name__

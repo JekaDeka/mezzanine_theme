@@ -15,12 +15,14 @@ from django.contrib.auth import (login as auth_login, authenticate,
                                  logout as auth_logout, get_user_model)
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import Q
 
 from mezzanine.blog.models import BlogPost, BlogCategory
 from cartridge.shop.models import Category
 
 from profiles.models import UserProfile
 from shops.models import UserShop, ShopProduct, ShopProductImage
+from ordertable.models import OrderTableItem
 
 from theme.forms import ContactForm, MessageForm, OrderMessageForm, BlogPostForm
 from theme.models import SliderItem
@@ -43,7 +45,6 @@ def get_keywords(request):
     return JsonResponse(data, safe=False)  # or JsonResponse({'data': data})
 
 
-
 def true_index(request):
     # main_category = Page.objects.get(slug='catalog')
     # categories = main_category.children.all()
@@ -57,17 +58,19 @@ def true_index(request):
     best_products = ShopProduct.objects.filter(
         shop__on_vacation=False, available=True).order_by('-date_added').prefetch_related('images')[:4]
     user_shops = UserShop.objects.filter(on_vacation=False)[:4]
-    masters = UserProfile.objects.select_related('country', 'city', 'user')[:4]  # мастера
+    masters = UserProfile.objects.select_related(
+        'country', 'city', 'user')[:4]  # мастера
 
     blog_posts = BlogPost.objects.published(
         for_user=request.user).select_related(
             'user__profile',
             'user__profile',
-            )[:8]
+    )[:8]
     recent_posts = blog_posts[:4]
     popular_posts = blog_posts[4:]
     comments = None
-    slideshow = SliderItem.objects.all().only('href__id','href__slug', 'featured_image', 'short_description').select_related('href')
+    slideshow = SliderItem.objects.all().only('href__id', 'href__slug',
+                                              'featured_image', 'short_description').select_related('href')
 
     context = {
         'slideshow':  slideshow,
@@ -147,7 +150,6 @@ def get_categories(request):
     return JsonResponse(tree, safe=False, json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
 
-
 @method_decorator(login_required, name='dispatch')
 class BlogPostList(ListView):
     model = BlogPost
@@ -189,11 +191,11 @@ class BlogPostGlobalList(ListView):
             'user__profile__id',
             'user__profile__first_name',
             'user__profile__last_name',
-            ).select_related(
+        ).select_related(
             "user__profile",
-            ).prefetch_related(
-                "keywords__keyword",
-            )
+        ).prefetch_related(
+            "keywords__keyword",
+        )
         tag = self.kwargs.get('tag')
         if tag is not None:
             qs = qs.filter(keywords__keyword__slug=tag)
@@ -205,10 +207,10 @@ class BlogPostGlobalList(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(BlogPostGlobalList, self).get_context_data(**kwargs)
-        qs = BlogPost.objects.filter(status=2).only('id', 'slug', 'featured_image', 'comments_count', 'title', 'publish_date')
+        qs = BlogPost.objects.filter(status=2).only(
+            'id', 'slug', 'featured_image', 'comments_count', 'title', 'publish_date')
         context['recent_posts'] = qs.order_by('-publish_date')[:5]
         context['popular_posts'] = qs.order_by('-comments_count')[:5]
-
 
         tag = self.kwargs.get('tag')
         if tag:
@@ -216,9 +218,11 @@ class BlogPostGlobalList(ListView):
 
         category = self.kwargs.get('category')
         if category:
-            context['category'] = BlogCategory.objects.values('title').get(slug=category)
+            context['category'] = BlogCategory.objects.values(
+                'title').get(slug=category)
 
         return context
+
 
 class BlogPostGlobalDetailView(DetailView):
     model = BlogPost
@@ -244,11 +248,11 @@ class BlogPostGlobalDetailView(DetailView):
             'user__profile__id',
             'user__profile__first_name',
             'user__profile__last_name',
-            ).select_related(
+        ).select_related(
             "user__profile",
-            ).prefetch_related(
-                "keywords__keyword",
-            )
+        ).prefetch_related(
+            "keywords__keyword",
+        )
         tag = self.kwargs.get('tag')
         if tag is not None:
             qs = qs.filter(keywords__keyword__slug=tag)
@@ -259,18 +263,20 @@ class BlogPostGlobalDetailView(DetailView):
         return qs
 
     def get_object(self, queryset=None):
-        obj = super(BlogPostGlobalDetailView, self).get_object(queryset=queryset)
+        obj = super(BlogPostGlobalDetailView,
+                    self).get_object(queryset=queryset)
         if not self.request.user.is_superuser:
             if obj.status == 1 and obj.user != self.request.user:
                 raise Http404()
         return obj
 
     def get_context_data(self, **kwargs):
-        context = super(BlogPostGlobalDetailView, self).get_context_data(**kwargs)
-        qs = BlogPost.objects.filter(status=2).only('id', 'slug', 'featured_image', 'comments_count', 'title', 'publish_date')
+        context = super(BlogPostGlobalDetailView,
+                        self).get_context_data(**kwargs)
+        qs = BlogPost.objects.filter(status=2).only(
+            'id', 'slug', 'featured_image', 'comments_count', 'title', 'publish_date')
         context['recent_posts'] = qs.order_by('-publish_date')[:5]
         context['popular_posts'] = qs.order_by('-comments_count')[:5]
-
 
         tag = self.kwargs.get('tag')
         if tag:
@@ -278,7 +284,8 @@ class BlogPostGlobalDetailView(DetailView):
 
         category = self.kwargs.get('category')
         if category:
-            context['category'] = BlogCategory.objects.values('title').get(slug=category)
+            context['category'] = BlogCategory.objects.values(
+                'title').get(slug=category)
 
         return context
 
@@ -342,17 +349,35 @@ class BlogPostDelete(DeleteView):
 class SearchAll(ListView):
     template_name = "search_results.html"
     context_object_name = 'results'
+    paginate_by = 30
+
+    ### separate search results ????
+
+    ### different template for each search result
 
     def get_queryset(self):
         query = Q()
-        search = self.request.GET.get('q')
-        words = search.split(" ")
-        for word in words:
-            query |= Q(keywords_string__icontains=word)
-            query |= Q(title__icontains=word)
-        products = ShopProduct.objects.filter(query).all()
-        blog_post = BlogPost.objects.filter(query).all()
-        shops = UserShop.objects.filter(shopname__in=words)
+        search = self.request.GET.get('q', None)
+        if search:
+            words = search.split(" ")
+            for word in words:
+                query |= Q(keywords_string__icontains=word)
+                query |= Q(title__icontains=word)
+            products = ShopProduct.objects.filter(query)
+            blog_posts = BlogPost.objects.filter(query).select_related(
+                                                            "user__profile",
+                                                        ).prefetch_related(
+                                                            "keywords__keyword",
+                                                        )
+            shops = UserShop.objects.filter(shopname__icontains=search)
+            orders = OrderTableItem.objects.filter(query)
 
-        result_list = list(chain(products, blog_post, shops))
-        return result_list
+            result_list = list(chain(products, blog_posts, shops, orders))
+            return result_list
+        return list()
+
+    def get_context_data(self, **kwargs):
+        context = super(SearchAll, self).get_context_data(**kwargs)
+        query = self.request.GET.get("q", None)
+        context['query'] = query
+        return context
