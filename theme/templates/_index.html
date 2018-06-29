@@ -152,13 +152,13 @@
             <section class="from-the-blog-content {% if not blog_post.featured_image %}no-img{% endif %}">
               <a href="{{ blog_post.get_absolute_url }}"><h5>{{ blog_post.title|capfirst }}</h5></a>
               <i>{{ blog_post.user.profile.get_full_name }}, {{ blog_post.publish_date|date:"d E Y" }}</i>
-              <span>
+              <div>
                 {% if blog_post.preview_content %}
       						{{ blog_post.preview_content|safe|truncatewords_html:55 }}
       					{% else %}
-      						{{ blog_post.description_from_content|safe }}
+      						{{ blog_post.description_from_content|safe|truncatewords_html:55 }}
       					{% endif %}
-              </span>
+              </div>
               <a href="{{ blog_post.get_absolute_url }}" class="button gray">Подробнее</a>
             </section>
           </article>
