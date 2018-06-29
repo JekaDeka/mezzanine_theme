@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from future.builtins import str
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
@@ -11,6 +12,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.template.defaultfilters import stringfilter
 from django.contrib.auth.models import User
 from theme.models import RulesPage
+from cartridge.shop.models import Category
 import os
 
 
@@ -54,10 +56,10 @@ def rub_currency(value):
 def to_stars(value, max_value, scale):
     return round((value / max_value) * scale, 2)
 
+
 @register.simple_tag
 def page_rules_menu():
     return RulesPage.objects.all()
-
 
 
 MAX_LENGTH_BOOTSTRAP_COLUMN = 12
@@ -149,6 +151,8 @@ def allowed_theme_list(separator=','):
             output += EXTENSIONS[key]
 
     return separator.join(output)
+
+
 register.simple_tag(allowed_theme_list)
 
 
@@ -159,12 +163,14 @@ def not_none(value):
     return value
 
 #
+
+
 @register.filter(is_safe=True, needs_autoescape=True)
 def theme_parent_list(value, autoescape=True):
     if autoescape:
         escaper = conditional_escape
     else:
-        escaper = lambda x: x
+        def escaper(x): return x
 
     def walk_items(item_list):
         item_iterator = iter(item_list)
@@ -201,8 +207,6 @@ def theme_parent_list(value, autoescape=True):
     return mark_safe(list_formatter(value))
 
 
-
-
 @register.simple_tag
 def active(request, pattern):
     import re
@@ -211,8 +215,7 @@ def active(request, pattern):
     return ''
 
 
-
-@register.filter(is_safe = False)
+@register.filter(is_safe=False)
 @stringfilter
 def rupluralize(value, args):
     try:
@@ -231,9 +234,11 @@ def rupluralize(value, args):
     except (ValueError, TypeError):
         return ''
 
+
 @register.assignment_tag
 def get_shop_items(obj, shop_id=None):
     return obj.get_shop_items(int(shop_id))
+
 
 @register.assignment_tag
 def get_shop_data(obj, shop_id=None):
@@ -247,6 +252,41 @@ def add_spaces(value):
     return ", ".join(values)
 
 
-@register.filter
-def get_class_name(value):
-    return value.__class__.__name__
+# @register.filter
+# def get_class_name(value):
+#     return value.__class__.__name__
+
+
+@register.inclusion_tag("includes/search_form.html", takes_context=True)
+def search_form(context):
+    """
+    Includes the search form with a list of models to use as choices
+    for filtering the search by. Models should be a string with models
+    in the format ``app_label.model_name`` separated by spaces. The
+    string ``all`` can also be used, in which case the models defined
+    by the ``SEARCH_MODEL_CHOICES`` setting will be used.
+    """
+    template_vars = {
+        "request": context["request"],
+    }
+    search_model_names = list(settings.SEARCH_MODEL_CHOICES)
+    search_model_choices = []
+    selected_models = context['request'].GET.getlist('search_type')
+    for model_name in search_model_names:
+        try:
+            model = apps.get_model(*model_name.split(".", 1))
+        except LookupError:
+            pass
+        else:
+            verbose_name = model._meta.verbose_name_plural.capitalize()
+            checked = True if model_name in selected_models else False
+            search_model_choices.append(
+                (verbose_name, model_name, checked))
+
+    template_vars["search_model_choices"] = search_model_choices
+    category_options = Category.objects.only(
+        'id', 'title').filter(
+        parent__slug='catalog'
+    )
+    template_vars["category_options"] = ({'id': str(ct.id), 'title': ct.title} for ct in category_options)
+    return template_vars

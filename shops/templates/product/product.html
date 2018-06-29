@@ -112,138 +112,140 @@
 			</div>
 		</div>
 
-		<div class="container">
-			<div class="sixteen columns">
-				<!-- Tabs Navigation -->
-				<ul class="tabs-nav">
-					<li class="active"><a href="#tab1">Характеристики</a></li>
-					<li><a href="#tab2">Доставка и оплата</a></li>
-					{% if product.shop.rules %}
-					<li><a href="#tab3">Правила возврата и обмена</a></li>
-					{% endif %}
-					<li><a href="#tab4">Отзывы <span class="tab-reviews">({{ product.reviews_count }})</span></a></li>
-				</ul>
+	{% block product_info %}
+	<div class="container">
+		<div class="sixteen columns">
+			<!-- Tabs Navigation -->
+			<ul class="tabs-nav">
+				<li class="active"><a href="#tab1">Характеристики</a></li>
+				<li><a href="#tab2">Доставка и оплата</a></li>
+				{% if product.shop.rules %}
+				<li><a href="#tab3">Правила возврата и обмена</a></li>
+				{% endif %}
+				<li><a href="#tab4">Отзывы <span class="tab-reviews">({{ product.reviews_count }})</span></a></li>
+			</ul>
 
-				<!-- Tabs Content -->
-				<div class="tabs-container margin-bottom-20">
+			<!-- Tabs Content -->
+			<div class="tabs-container margin-bottom-20">
 
-					<div class="tab-content" id="tab1">
-						<table class="basic-table">
-							<tr>
-								<th>Материал</th>
-								<td>{{ product.material|not_none|add_spaces }}</td>
-							</tr>
+				<div class="tab-content" id="tab1">
+					<table class="basic-table">
+						<tr>
+							<th>Материал</th>
+							<td>{{ product.material|not_none|add_spaces }}</td>
+						</tr>
 
-							<tr>
-								<th>Размер</th>
-								<td>{{ product.size|not_none }}</td>
-							</tr>
+						<tr>
+							<th>Размер</th>
+							<td>{{ product.size|not_none }}</td>
+						</tr>
 
-							<tr>
-								<th>Состояние</th>
-								<td>
-									{% if product.condition == 1 %} Представлена полностью готовая работа {% endif %}
-									{% if product.condition == 2 %} Представлена работа под заказ. Для ее выполнения потребуется время {% endif %}
-									{% if product.condition == 3 %} Работа представлена для примера. Повторить работу точь-в-точь невозможно {% endif %}
-								</td>
-							</tr>
-						</table>
+						<tr>
+							<th>Состояние</th>
+							<td>
+								{% if product.condition == 1 %} Представлена полностью готовая работа {% endif %}
+								{% if product.condition == 2 %} Представлена работа под заказ. Для ее выполнения потребуется время {% endif %}
+								{% if product.condition == 3 %} Работа представлена для примера. Повторить работу точь-в-точь невозможно {% endif %}
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<div class="tab-content" id="tab2">
+					{% with payments=product.shop.payment_options.all %}
+					<div class="eight columns alpha">
+						<h4 class="headline">Оплата</h4><span class="line"></span>
+						<div class="clearfix"></div>
+						{% if payments %}
+						<ul class="list-4 color">
+							{% for payment in payments %}
+								<li>{{ payment }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+						{% if product.shop.payment_other %}
+						<p> {{ product.shop.payment_other }} </p>
+						{% endif %}
 					</div>
-
-					<div class="tab-content" id="tab2">
-						{% with payments=product.shop.payment_options.all %}
-						<div class="eight columns alpha">
-							<h4 class="headline">Оплата</h4><span class="line"></span>
-							<div class="clearfix"></div>
-							{% if payments %}
-							<ul class="list-4 color">
-								{% for payment in payments %}
-									<li>{{ payment }}</li>
-								{% endfor %}
-							</ul>
-							{% endif %}
-							{% if product.shop.payment_other %}
-							<p> {{ product.shop.payment_other }} </p>
-							{% endif %}
-						</div>
-						{% endwith %}
-						{% with deliveries=product.shop.get_delivery_options %}
-						<div class="eight columns omega">
-							<h4 class="headline">Доставка</h4><span class="line"></span>
-							<div class="clearfix"></div>
-							{% if deliveries %}
-							<ul class="list-4 color">
-								{% for delivery in deliveries %}
-									<li>{{ delivery.label }}: {{ delivery.usershopdeliveryoption__price|rub_currency }}</li>
-								{% endfor %}
-							</ul>
-							{% endif %}
-							{% if product.shop.delivery_other %}
-							<p> {{ product.shop.delivery_other }} </p>
-							{% endif %}
-						</div>
-						{% endwith %}
+					{% endwith %}
+					{% with deliveries=product.shop.get_delivery_options %}
+					<div class="eight columns omega">
+						<h4 class="headline">Доставка</h4><span class="line"></span>
+						<div class="clearfix"></div>
+						{% if deliveries %}
+						<ul class="list-4 color">
+							{% for delivery in deliveries %}
+								<li>{{ delivery.label }}: {{ delivery.usershopdeliveryoption__price|rub_currency }}</li>
+							{% endfor %}
+						</ul>
+						{% endif %}
+						{% if product.shop.delivery_other %}
+						<p> {{ product.shop.delivery_other }} </p>
+						{% endif %}
 					</div>
-					{% if product.shop.rules %}
-					<div class="tab-content" id="tab3">
-						<p>{{ product.shop.rules }}</p>
-					</div>
-					{% endif %}
+					{% endwith %}
+				</div>
+				{% if product.shop.rules %}
+				<div class="tab-content" id="tab3">
+					<p>{{ product.shop.rules }}</p>
+				</div>
+				{% endif %}
 
-					<div class="tab-content" id="tab4">
-						<section class="comments">
-							{% if reviews %}
-								<ul>
-								{% for review in reviews %}
-									<li>
-										<div class="avatar">
-											{% if review.author__profile__image %}
-												<img src="{{ MEDIA_URL }}{% thumbnail review.author__profile__image 70 70 %}" alt="">
-											{% else %}
-												<img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="">
-											{% endif %}
-										</div>
-										<div class="comment-content">
-											<div class="arrow-comment"></div>
-											<div class="comment-by">
-												<strong>{{ review.author__profile__first_name }} {{ review.author__profile__last_name }}</strong>
-												<span class="date"> {{ review.created_at|date:"d E Y" }} </span>
-												<div>
-													{% include "includes/star_widget.html" with value=review.rating %}
-												</div>
+				<div class="tab-content" id="tab4">
+					<section class="comments">
+						{% if reviews %}
+							<ul>
+							{% for review in reviews %}
+								<li>
+									<div class="avatar">
+										{% if review.author__profile__image %}
+											<img src="{{ MEDIA_URL }}{% thumbnail review.author__profile__image 70 70 %}" alt="">
+										{% else %}
+											<img src="http://www.gravatar.com/avatar/00000000000000000000000000000000?d=mm&amp;s=70" alt="">
+										{% endif %}
+									</div>
+									<div class="comment-content">
+										<div class="arrow-comment"></div>
+										<div class="comment-by">
+											<strong>{{ review.author__profile__first_name }} {{ review.author__profile__last_name }}</strong>
+											<span class="date"> {{ review.created_at|date:"d E Y" }} </span>
+											<div>
+												{% include "includes/star_widget.html" with value=review.rating %}
 											</div>
-											<p> {{ review.content }} </p>
 										</div>
-									</li>
-								{% endfor %}
-							</ul>
-							{% else %}
-							<p class="margin-bottom-10">Отзывов ещё нет — ваш может стать первым.</p>
-							{% endif %}
-							{% if request.user.is_authenticated %}
-							<a href="#small-dialog" class="popup-with-zoom-anim button color {% if not reviews %}margin-left-0{% endif %}">Добавить отзыв</a>
-							{% if product.reviews_count > 5 %}
-								<a href="{% url 'product-reviews' product.slug %}" class="pull-right">Смотреть все отзывы</a>
-							{% endif %}
+										<p> {{ review.content }} </p>
+									</div>
+								</li>
+							{% endfor %}
+						</ul>
+						{% else %}
+						<p class="margin-bottom-10">Отзывов ещё нет — ваш может стать первым.</p>
+						{% endif %}
+						{% if request.user.is_authenticated %}
+						<a href="#small-dialog" class="popup-with-zoom-anim button color {% if not reviews %}margin-left-0{% endif %}">Добавить отзыв</a>
+						{% if product.reviews_count > 5 %}
+							<a href="{% url 'product-reviews' product.slug %}" class="pull-right">Смотреть все отзывы</a>
+						{% endif %}
 
-							<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
-								<h3 class="headline">Добавить отзыв</h3><span class="line margin-bottom-25"></span>
+						<div id="small-dialog" class="zoom-anim-dialog mfp-hide">
+							<h3 class="headline">Добавить отзыв</h3><span class="line margin-bottom-25"></span>
+							<div class="clearfix"></div>
+
+							<!-- Form -->
+							<form id="add-comment" class="add-comment" action="" method="POST">
+								{% csrf_token %}
+								{{ review_form }}
+								<input type="submit" class="button" value="Добавить отзыв"/>
 								<div class="clearfix"></div>
-
-								<!-- Form -->
-								<form id="add-comment" class="add-comment" action="" method="POST">
-									{% csrf_token %}
-									{{ review_form }}
-									<input type="submit" class="button" value="Добавить отзыв"/>
-									<div class="clearfix"></div>
-								</form>
-							</div>
-							{% endif %}
-					</section>
-					</div>
+							</form>
+						</div>
+						{% endif %}
+				</section>
 				</div>
 			</div>
 		</div>
+	</div>
+	{% endblock %}
 	</div>
 </div>
 {% endblock %}
@@ -251,9 +253,19 @@
 {% block extra_content %}
 <div class="flat-background">
 	<div class="flat-row">
-		<div class="margin-top-25"></div>
-		{% include "includes/additional_products.html" with related_products=product.shop.get_related_products limited=True %}
-	<div class="margin-top-10"></div>
+		<div class="container">
+		  <div class="sixteen columns">
+		    <h3 class="headline-flat">Товары магазина</h3><span class="line-flat margin-bottom-0"></span>
+		  </div>
+		</div>
+		<div class="container">
+			{% include "includes/additional_shopproducts.html" with products=related_products %}
+			<div class="sixteen columns text-center margin-top-30">
+				<a href="{{ product.shop.get_absolute_url }}" class="gray-color">Смотреть все товары магазина</a>
+			</div>
+			<div class="margin-top-10"></div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 

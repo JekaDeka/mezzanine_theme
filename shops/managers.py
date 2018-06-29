@@ -14,6 +14,8 @@ from django.template.loader import render_to_string
 
 from mezzanine.conf import settings
 from mezzanine.utils.email import send_verification_mail
+from mezzanine.core.managers import SearchableManager, SearchableQuerySet, search_fields_to_dict
+
 
 class CartManager(Manager):
 
@@ -35,12 +37,10 @@ class CartManager(Manager):
             del request.session["cart_id"]
             cart_id = None
 
-
         # This is a cheeky way to save a database call: since Cart only has
         # two fields and we know both of their values, we can simply create
         # a cart instance without taking a trip to the database via the ORM.
         return self.model(id=cart_id, last_updated=last_updated)
-
 
     # def get_or_create_from_request(self, request):
     #     if not request.user.is_authenticated():
@@ -94,3 +94,30 @@ class CartManager(Manager):
         Expired carts.
         """
         return self.filter(last_updated__lt=self.expiry_time())
+
+
+class ShopProductManager(SearchableManager):
+
+    def published(self, for_user=None):
+        """
+        For non-staff users, return available items
+        """
+        if for_user is not None and for_user.is_staff:
+            return self.all()
+        return self.filter(Q(available=True))
+
+    def search(self, *args, **kwargs):
+        categories = kwargs.pop("categories", None)
+        user = kwargs.pop("for_user", None)
+        all_results = []
+        try:
+            queryset = self.model.objects.published(for_user=user)
+        except AttributeError:
+            queryset = self.model.objects.get_queryset()
+
+        if categories:
+            queryset = queryset.filter(categories__id__in=categories)
+
+        all_results.extend(
+            queryset.search(*args, **kwargs).select_related('shop').prefetch_related('images'))
+        return sorted(all_results, key=lambda r: r.result_count, reverse=True)

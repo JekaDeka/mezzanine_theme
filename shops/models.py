@@ -14,13 +14,14 @@ from mezzanine.conf import settings
 from mezzanine.utils.models import AdminThumbMixin, upload_to
 from mezzanine.utils.urls import unique_slug
 from mezzanine.core.fields import FileField, RichTextField
+from mezzanine.core.managers import SearchableManager
 from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
 
 from cartridge.shop.models import Category
 
 from theme.utils import slugify_unicode
 
-from shops import managers
+from shops.managers import CartManager, ShopProductManager
 
 from profiles.models import UserProfile, Country, Region, City
 from smart_selects.db_fields import ChainedForeignKey, GroupedForeignKey
@@ -41,7 +42,10 @@ class UserShop(models.Model):
     """docstring for UserShop"""
     class Meta:
         verbose_name = "Магазин"
-        verbose_name_plural = _("Все магазины")
+        verbose_name_plural = _("Магазины")
+
+    objects = SearchableManager()
+    search_fields = ("shopname", "bio")
 
     user = models.OneToOneField(
         "auth.User", related_name="shop", verbose_name="Владелец", on_delete=models.CASCADE)
@@ -110,7 +114,7 @@ class UserShop(models.Model):
         return slugify_unicode(self.shopname)
 
     def get_products_count(self):
-        return self.products.count()
+        return self.products.filter(available=True).count()
 
     def get_last_product(self):
         return self.products.last()
@@ -127,8 +131,7 @@ class UserShop(models.Model):
             'shop__id',
             'condition',
             'title',
-
-        ).filter(available=True).prefetch_related('images')[:settings.SHOP_MAX_RELATED_PRODUCTS]
+        ).filter(available=True).prefetch_related('images')
 
     def get_delivery_options(self):
         return self.delivery_options.values('label', 'usershopdeliveryoption__price').all()
@@ -189,6 +192,9 @@ class ShopProduct(models.Model):
         verbose_name = "Товар"
         verbose_name_plural = _("Товары")
 
+    objects = ShopProductManager()
+    search_fields = ("title", "description", "keywords_string")
+
     shop = models.ForeignKey(UserShop, on_delete=models.CASCADE,
                              related_name="products", verbose_name=("Магазин"))
 
@@ -222,9 +228,6 @@ class ShopProduct(models.Model):
     reviews_average = models.FloatField(default=0, editable=False)
     # comments = CommentsField()
     # rating = RatingField()
-    # objects = SearchableManager()
-    # search_fields = ("title", "description")
-
     # like fields
 
     slug = models.URLField(editable=False, default='', unique=True)
@@ -447,7 +450,7 @@ class Cart(models.Model):
     created_at = models.DateTimeField(_("Created at"), auto_now_add=True)
     user = models.ForeignKey(
         "auth.User", related_name="cart", verbose_name="Покупатель", null=True)
-    objects = managers.CartManager()
+    objects = CartManager()
 
     def __iter__(self):
         """

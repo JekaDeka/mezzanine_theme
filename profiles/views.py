@@ -233,7 +233,8 @@ class ProfileDetailView(DetailView):
     queryset = User.objects.select_related(
         "profile",
         "profile__country",
-        "profile__city").prefetch_related('master_reviews', 'blogposts', 'blogposts__keywords')
+        "profile__city")
+        # "profile__city").prefetch_related('master_reviews', 'blogposts', 'blogposts__keywords')
 
     def get_object(self, queryset=None):
         obj = super(ProfileDetailView, self).get_object(queryset=queryset)
@@ -245,20 +246,9 @@ class ProfileDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProfileDetailView, self).get_context_data(**kwargs)
-        reviews = self.queryset.filter(pk=self.object.pk).values(
-            'master_reviews__mastery',
-            'master_reviews__punctuality',
-            'master_reviews__responsibility',
-            'master_reviews__avg_rating'
-        ).aggregate(
-            Avg('master_reviews__mastery'),
-            Avg('master_reviews__punctuality'),
-            Avg('master_reviews__responsibility'),
-            Avg('master_reviews__avg_rating'),
-            Count('master_reviews')
-        )
-
-        context["reviews"] = reviews
+        # context['blogposts'] = blogposts
+        # context['masterreviews'] = masterreviews
+        # paginate ??? look for all posts?
         return context
 
     # def get_queryset(self):

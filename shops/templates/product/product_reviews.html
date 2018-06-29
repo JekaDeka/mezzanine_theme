@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "product/product.html" %}
 {% load staticfiles mezzanine_tags theme_tags pages_tags crispy_forms_tags %}
 
 {% block meta_title %} {{ product.title|capfirst }} {% endblock %}
@@ -26,92 +26,7 @@
 <li>{{ product.title|capfirst }}</li>
 {% endblock %}
 
-{% block main_containter %}
-<div class="row-tmp">
-	<div class="container fullwidth-element row-shadow">
-		<div class="container">
-			{% with images=product.images.all %} {% if images %}
-			<div class="eight columns">
-				<div class="slider-padding">
-					<div id="product-slider" class="royalSlider rsDefault">
-						{% for image in images %}
-						<a href="{{ MEDIA_URL }}{% thumbnail image.file 800 0 True 80 %}" class="mfp-gallery" title="{{product.title}}">
-						<img class="rsImg" src="{{ MEDIA_URL }}{% thumbnail image.file 450 450 True 80 %}"
-						data-rsTmb="{{ MEDIA_URL }}{% thumbnail image.file 96 96 True 80 %}" alt="{{ product.title|capfirst }}" />
-					</a> {% endfor %}
-					</div>
-					<div class="clearfix"></div>
-				</div>
-			</div>
-			{% endif %}
-
-			<div class="{% if images %}eight{% else %}sixteen{% endif %} columns">
-				{% endwith %}
-				<div class="product-page">
-					<section class="title">
-						<h2>{{ product.title|capfirst }}</h2>
-						<span class="product-price">{{ product.price|rub_currency }}</span>
-						{% include "includes/star_widget.html" with value=product.reviews_average %}
-						<br>
-						<span class="reviews-counter">
-							<a href="{% url 'product-reviews' product.slug %}">{{ product.reviews_count|rupluralize:"отзыв,отзыва,отзывов" }}</a>
-						</span>
-						<div class="clearfix"></div>
-					</section>
-
-					<section>
-						<p class="margin-reset">
-							{% if product.description %} {{ product.description }} {% else %} Описание отсутствует. {% endif %}
-						</p>
-					</section>
-
-					<section class="linking">
-						<form class="add-to-cart-form" action="{% url 'get_cart' %}" method="post">
-							{{ add_to_cart_form }}
-							<a href="{% url 'shop-cart' %}" class="button adc add-to-cart">В корзину</a>
-						</form>
-
-
-						<div class="clearfix"></div>
-					</section>
-
-					{% with tags=product.keywords.all %}
-					{% if tags %}
-					<div class="widget margin-top-10">
-						<h3 class="headline">Теги</h3><span class="line"></span>
-						<div class="clearfix"></div>
-						<nav class="tags">
-							{% for tag in tags %}
-								<a href="/{{ tag.keyword.slug }}" class="tag">{{ tag }}</a>
-							{% endfor %}
-						</nav>
-					</div>
-					{% endif %}
-					{% endwith %}
-
-					<div class="widget margin-top-10 margin-bottom-10">
-						<h3 class="headline">Магазин</h3><span class="line"></span>
-						<div class="clearfix"></div>
-						<div class="widget-content">
-							<div class="image-content pull-left">
-								<a href="{{ product.shop.get_absolute_url }}">
-							<img src="{{ MEDIA_URL}}{% thumbnail product.shop.image 100 100 %}" alt="{{ product.shop.shopname }}" class="shop-image">
-						</a>
-							</div>
-							<div class="text-content pull-left">
-								<h2><a href="{{ product.shop.get_absolute_url }}">
-							{{ product.shop.shopname }}
-						</a></h2>
-								<span>{{ product.shop.user.profile.get_location }}</span>
-							</div>
-
-							<div class="clearfix"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-
+{% block product_info %}
 		<div class="container">
 			<div class="sixteen columns">
 				<div class="widget margin-top-10 margin-bottom-10">
@@ -193,17 +108,6 @@
 				</div>
 			</div>
 		</div>
-	</div>
-</div>
-{% endblock %}
-
-{% block extra_content %}
-<div class="flat-background">
-	<div class="flat-row">
-		<div class="margin-top-25"></div>
-		{% include "includes/additional_products.html" with related_products=product.shop.get_related_products limited=True %}
-	<div class="margin-top-10"></div>
-</div>
 {% endblock %}
 
 

@@ -61,19 +61,22 @@
 								<a href="{% url 'ordertableitem-update' ordertableitem.pk %}"><h5> {{ ordertableitem.title|capfirst }} </h5></a>
 								<i>Добавлено: {{ ordertableitem.created|date:"d.m.Y"  }}</i>
 								<p><strong>Статус:</strong>
-									{% if ordertableitem.active %}
-									открыта
-									{% else %}
-									закрыта
-									{% endif %}</p>
+									{{ ordertableitem.get_status_display }}
+								</p>
 								<p><strong>Кол-во откликов: </strong>
 									{{ ordertableitem.order_requests.count }}
 								</p>
 								<p><strong>Исполнитель: </strong>
 									{% if ordertableitem.performer.id %}
-									<a href="#">{{ ordertableitem.performer.profile.get_full_name }}</a>
+									<a href="{{ ordertableitem.performer.profile.get_absolute_url }}">
+										{{ ordertableitem.performer.profile.get_full_name }}
+									</a>
 									{% else %}
 									не назначен
+									{% if ordertableitem.order_requests.count > 0 %}
+									<br>
+										<a href="{% url 'ordertableitemrequest-list' ordertableitem.pk %}" class="green-color"><i class="fa fa-user-o" aria-hidden="true"></i> Выбрать исполнителя</a>
+									{% endif %}
 									{% endif %}
 								</p>
 								<p>

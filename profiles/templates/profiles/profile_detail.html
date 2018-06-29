@@ -32,26 +32,32 @@
           <span class="profile-details green">{{ user.profile.get_status_display }}</span>
       </h2>
       <p>{{ user.profile.bio|truncatewords:30 }}</p>
-      <span class="profile-details"><i class="fa fa-phone" aria-hidden="true"></i>{{ user.profile.phone }}</span>
+      {% if user.profile.phone %}
+        <span class="profile-details"><i class="fa fa-phone" aria-hidden="true"></i>{{ user.profile.phone }}</span>
+      {% endif %}
       <span class="profile-details"><i class="fa fa-map-marker" aria-hidden="true"></i>{{ user.profile.get_location }}</span>
     </div>
     <div class="four columns margin-bottom-10">
       <div class="data-widget">
-        <div><span>Отзывов: </span><span class="pull-right">{{ reviews.master_reviews__count }}</span></div>
+        {% to_stars user.profile.reviews_rating_avg 10 5 as user_rating_avg %}
+        {% to_stars user.profile.reviews_mastery_avg 10 5 as user_mastery_avg %}
+        {% to_stars user.profile.reviews_punctuality_avg 10 5 as user_punctuality_avg %}
+        {% to_stars user.profile.reviews_responsibility_avg 10 5 as user_responsibility_avg %}
+        <div><span>Отзывов: </span><span class="pull-right">{{ user.profile.reviews_count|default:0 }}</span></div>
         <div><span>Мастерство: </span>
-          <span class="pull-right">{{ reviews.master_reviews__mastery__avg|floatformat:1|default:"0" }}</span>
+          <span class="pull-right">{{ user_mastery_avg }}</span>
         </div>
         <div><span>Пунктуальность: </span>
-          <span class="pull-right">{{ reviews.master_reviews__punctuality__avg|floatformat:1|default:"0" }}</span>
+          <span class="pull-right">{{ user_punctuality_avg }}</span>
         </div>
         <div><span>Ответственность: </span>
-          <span class="pull-right">{{ reviews.master_reviews__responsibility__avg|floatformat:1|default:"0" }}</span>
+          <span class="pull-right">{{ user_responsibility_avg }}</span>
         </div>
         <div><span>Рейтинг мастера: </span>
-          <span class="pull-right">{{ reviews.master_reviews__avg_rating__avg|floatformat:1|default:"0" }}</span>
+          <span class="pull-right">{{ user_rating_avg }}</span>
         </div>
         <div class="margin-bottom-30">
-          {% include "includes/star_widget.html" with value=9 %}
+          {% include "includes/star_widget.html" with value=user.profile.reviews_rating_avg %}
           <div class="clearfix"></div>
         </div>
       </div>
@@ -68,10 +74,10 @@
 
 {% block leftsidebar %}
 {% if user.shop %}
-<div class="four columns">
+<div class="four columns margin-bottom-30">
   <div class="user-shop-div text-center">
     <div class="widget-inner-title margin-bottom-15">Магазин</div>
-    <div class="margin-bottom-20">
+    <div>
       <a href="{{ user.shop.get_absolute_url }}"><img src="{{ MEDIA_URL }}{% thumbnail user.shop.image 150 150 %}" class="shop-image" style="display: inherit;" width="150" height="150"></a>
     </div>
     <div class="shop-title-name margin-bottom-5">
@@ -82,7 +88,7 @@
     <div class="shop-stats">
       <div><i class="fa fa-heartbeat"></i>Понравилось: <span class="pull-right">117</span></div>
       <div><i class="fa fa-comment"></i>Отзывы: <span class="pull-right">3</span></div>
-      <div><i class="fa fa-briefcase"></i>Всего товаров: <span class="pull-right">7</span></div>
+      <div><i class="fa fa-briefcase"></i>Всего товаров: <span class="pull-right">{{ user.shop.get_products_count }}</span></div>
     </div>
   </div>
 </div>
@@ -105,11 +111,11 @@
       </tr>
       <tr>
         <th>Выполнено работ</th>
-        <td>22</td>
+        <td>{{ user.profile.orders_done }}</td>
       </tr>
       <tr>
         <th>О себе</th>
-        <td>{{ user.profile.bio|safe }}</td>
+        <td>{{ user.profile.bio }}</td>
       </tr>
     </tbody>
   </table>
@@ -232,7 +238,6 @@
 </section>
 </div>
 {% endif %}
-
 {% endblock %}
 
 {% block extra_js %}

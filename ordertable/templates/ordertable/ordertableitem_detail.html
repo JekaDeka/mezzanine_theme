@@ -49,19 +49,15 @@
 			<section class="project-section">
 				<table class="basic-table">
 					<tr>
-						<th>Статус заказа</th>
+						<th>Статус заявки</th>
 						<td>
-							{% if order.active %}
-								Открыт
-							{% else %}
-								Закрыт
-							{% endif %}
+							{{ order.get_status_display }}
 						</td>
 					</tr>
 					<tr>
 						<th><i class="fa fa-user"></i> Заказчик</th>
 						<td>
-							<a href="{% url "profile" order.author %}">{{ order.author.profile.get_full_name }}</a>
+							<a href="{{ order.author.profile.get_absolute_url }}" class="green-color">{{ order.author.profile.get_full_name }}</a>
 						</td>
 					</tr>
 					<tr>
@@ -143,10 +139,10 @@
 				{% if order.description %}
 				<p>{{ order.description|safe }}</p>
 				{% endif %}
-				{% if request.user.is_authenticated %}
-					{% if order.active %}
+
+					{% if order.status == 1 %}
 					<div class="margin-top-10">
-					    <a class="popup-with-zoom-anim button color pull-right" href="#small-dialog">Откликнуться</a>
+					    <a class="popup-with-zoom-anim button color pull-right" href="{% if request.user.is_authenticated %}#small-dialog	{% else %}{% url 'login' %}?next={{ order.get_absolute_url }}{% endif %}">Откликнуться</a>
 					    <div id="small-dialog" class="zoom-anim-dialog mfp-hide">
 					        <h2 class="margin-bottom-10">Отправьте дополнительное сообщение заказчику</h2>
 					        <form action="" method="POST">
@@ -159,9 +155,6 @@
 						<a class="button color pull-right disabled" href="#small-dialog">Откликнуться</a>
 					{% endif %}
 
-				{% else %}
-					<a class="button color pull-right" href="{% url 'login' %}?next={{ order.get_absolute_url }}">Откликнуться</a>
-				{% endif %}
 				<div class="clearfix"></div>
 			</section>
 		</div>

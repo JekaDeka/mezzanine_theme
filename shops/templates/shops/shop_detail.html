@@ -72,24 +72,30 @@
     {# </div> #}
     <div class="clearfix"></div>
 	</div>
-	<div class="user-shop-div text-center margin-top-30">
-    <div class="widget-inner-title margin-bottom-15">Владелец</div>
-    <div class="margin-bottom-20">
+	<div class="user-shop-div text-center margin-top-30 margin-bottom-10">
+    <div class="widget-inner-title margin-bottom-15">Владелец магазина</div>
+    <div>
       <a href="{{ shop.user.profile.get_absolute_url }}">
 				<img src="{{ MEDIA_URL }}{% thumbnail shop.user.profile.image 150 150 %}" class="shop-image"
 				style="display: inherit;" width="150" height="150"></a>
     </div>
     <div class="shop-title-name margin-bottom-5">
-      <a href="{{ user.shop.get_absolute_url }}">{{ user.profile.get_full_name }}</a>
+      <a href="{{ shop.user.profile.get_absolute_url }}">{{ shop.user.profile.get_full_name }}</a>
       <br>
-      <small>{{user.profile.get_location}}</small>
+      <small>{{ shop.user.profile.get_location}}</small>
 			<br>
-			<small>{% if user.profile.status == 1 %} мастер {% endif %}</small>
+			<small>{% if shop.user.profile.status == 1 %} Мастер {% endif %} </small>
     </div>
-    <div class="shop-stats">
-      <div><i class="fa fa-comment"></i>Отзывов: <span class="pull-right">3</span></div>
-      <div><i class="fa fa-briefcase"></i>Выполнено работ: <span class="pull-right">7</span></div>
+    {% if shop.user.profile.status == 1 %}
+		<div class="shop-stats">
+      <div><i class="fa fa-comment"></i>Отзывов:
+							<span class="pull-right">{{ shop.user.profile.reviews_count }}</span>
+			</div>
+      <div><i class="fa fa-briefcase"></i>Выполнено работ:
+							<span class="pull-right">{{ shop.user.profile.orders_done }}</span>
+			</div>
     </div>
+		{% endif %}
   </div>
 
     <a class="popup-with-zoom-anim button color" href="#small-dialog">Задать вопрос</a>
@@ -111,9 +117,16 @@
 {% block extra_content %}
 <div class="flat-background">
 	<div class="flat-row">
-		<div class="margin-top-25"></div>
-		{% include "includes/additional_products.html" with related_products=shop.get_related_products limited=False %}
-	<div class="margin-top-10"></div>
+		<div class="container">
+		  <div class="sixteen columns">
+		    <h3 class="headline-flat">Товары магазина</h3><span class="line-flat margin-bottom-0"></span>
+		  </div>
+		</div>
+		<div class="container">
+			{% include "includes/additional_shopproducts.html" with products=related_products %}
+			<div class="margin-top-10"></div>
+		</div>
+	</div>
 </div>
 {% endblock %}
 

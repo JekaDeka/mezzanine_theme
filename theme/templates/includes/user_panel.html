@@ -1,24 +1,24 @@
-{% load mezzanine_tags %}
+{% load theme_tags %}
 <div class="twelve columns">
 		<div class="additional-menu">
 			<ul>
 				<li><a href="https://www.facebook.com/groups/803193513100186"><i class="fa fa-facebook-official" aria-hidden="true"></i></a></li>
 				<li><a href="https://www.instagram.com/handmakertop/"><i class="fa fa-instagram" aria-hidden="true"></i></a></li>
-				<!--<li><a href="#"><i class="fa fa-vk" aria-hidden="true"></i></a></li>-->
+				{# <!--<li><a href="#"><i class="fa fa-vk" aria-hidden="true"></i></a></li>--> #}
 			</ul>
 		</div>
 	</div>
-{% ifinstalled shops %}
+{# {% ifinstalled shops %} #}
 <div class="twelve columns">
 	<div id="cart">
 		{% include "shops/includes/user_panel.html" %}
 	</div>
-	{% search_form "all" %}
+	{% search_form %}
 </div>
-{% endifinstalled %}
+{# {% endifinstalled %} #}
 
-{% ifinstalled mezzanine.accounts %}
+{# {% ifinstalled mezzanine.accounts %} #}
 <div class="twelve columns">
 	{% include "accounts/includes/user_panel.html" %}
 </div>
-{% endifinstalled %}
+{# {% endifinstalled %} #}

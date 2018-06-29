@@ -21,159 +21,36 @@
 	<div class="flat-row">
 			{{ block.super }}
 	</div>
-	<div class="margin-top-50">	</div>
+	<div class="margin-top-50"></div>
 </div>
 {% endblock %}
 
 {% block main %}
-<div class="twelve adjust-right columns orders">
-{% if results %}
-  <div class="extra-padding products" id="masonry-wrapper">
-    {% for object in results %}
-      {# ####################### #}
-      {# result for blog post #}
-      {# ####################### #}
-      {% if object|get_class_name == 'BlogPost' %}
-      <article class="post masonry-item">
-  			<figure class="post-img">
-  				<a href="{{ object.get_absolute_url }}">
-  					{% if object.featured_image %}
-  						<img src="{{ MEDIA_URL }}{% thumbnail object.featured_image 860 250 %}" alt="{{ object.title|capfirst }}"/>
-  					{% endif %}
-  					<div class="hover-icon"></div>
-  				</a>
-  			</figure>
-  			<section class="date">
-  				<span class="day">{{ object.publish_date|date:"d" }}</span>
-  				<span class="month">{{ object.publish_date|date:"E" }}</span>
-  			</section>
-  			<section class="post-content">
-  				<header class="meta">
-  					<h2><a href="{{ object.get_absolute_url }}">{{ object.title|capfirst }}</a></h2>
-  					<span><i class="fa fa-user"></i>
-  						<a href="{{ object.user.profile.get_absolute_url }}">
-  						{{ object.user.profile.get_full_name }}</a></span>
-  						{% with tags=blog_post.keywords.all %}
-  						{% if tags %}
-  						<span><i class="fa fa-tag"></i>
-  							{% for tag in tags %}
-  							 <a href="{% url "object-list-tag" tag.keyword.slug %}" class="tag">{{ tag }}</a>
-  							 {% if not forloop.last %}, {% endif %}
-  							 {% endfor %}
-  						</span>
-  						{% endif %}
-  						{% endwith %}
-  					{% if object.allow_comments %}
-  					<span><i class="fa fa-comment"></i>
-  						<a href="{{ object.get_absolute_url }}#comment">{{ object.comments_count|rupluralize:"комментарий,комментария,комментариев" }}</a>
-  					</span>
-  					{% endif %}
-  				</header>
-  				{% if object.preview_content %}
-  					{{ object.preview_content|safe }}
-  				{% else %}
-  					<p>{{ object.description_from_content|safe }}</p>
-  				{% endif %}
-  				<br>
-  				<a href="{{ object.get_absolute_url }}" class="button color">Читать далее</a>
-  			</section>
-  		</article>
-      {% endif %}
-      {# ####################### #}
-      {# end result for blog post #}
-      {# ####################### #}
-
-      {# ####################### #}
-      {# result for shop product #}
-      {# ####################### #}
-      {% if object|get_class_name == 'ShopProduct' %}
-      <div class="adjust-product columns">
-  			<figure class="product">
-  				{% if object.condition != 1 %}
-  				<div class="badge type-{{ object.condition }}">
-  					{{ object.get_condition_display }}
-  				</div>
-  				{% endif %}
-  				{% with object.images.all as images %}
-  				<div class="mediaholder {% if not images or images.count == 1 %}no-anim{%endif%}">
-  				<a href="{{ object.get_absolute_url }}">
-  					{% if images %}
-  						<img src="{{ MEDIA_URL }}{% thumbnail images.0 250 330 %}" alt="{{ object.title|capfirst }}" />
-  							{% if object.images.count != 1 %}
-  							<div class="cover">
-  									<img src="{{ MEDIA_URL }}{% thumbnail images.1 300 380 %}" alt="{{ object.title|capfirst }}" />
-  							</div>
-  							{% endif %}
-  					{% else %}
-  						<img src="{{ STATIC_URL }}{% thumbnail 'images/no-image.jpg' 250 330 %}" alt="{{ object.title|capfirst }}" />
-  					{% endif %}
-  				</a>
-  				<a href="#" product-id="{{ object.id }}" class="product-button">
-  					<i class="fa fa-shopping-cart"></i></i>В корзину
-  				</a>
-  				</div>
-  				{% endwith %}
-  					<section>
-  						<a href="{{ object.get_absolute_url }}"><h5>{{ object.title|capfirst|truncatechars:34 }}</h5></a>
-  						<a href="{{ object.shop.get_absolute_url }}" class="shopname">{{ object.shop.shopname }}</a>
-  						<span class="product-price">{{ object.price|rub_currency }} </span>
-  					</section>
-  			</figure>
-  		</div>
-      {% endif %}
-      {# ####################### #}
-      {# end result for blog post #}
-      {# ####################### #}
-    {% endfor %}
-  </div>
-  {% if is_paginated %}
-      <div class="pagination-container masonry">
-          <nav class="pagination">
-              <ul>
-                  {% for i in page_obj.paginator.page_range %}
-                    {% if page_obj.number == i %}
-                      <li><a href="#" class="current-page">{{ i }}</a></li>
-                    {% else %}
-                      <li><a href="?q={{ query }}&page={{ i }}">{{ i }}</a></li>
-                    {% endif %}
-                  {% endfor %}
-              </ul>
-          </nav>
-          <nav class="pagination-next-prev full-width">
-              <ul>
-                  {% if page_obj.has_previous %}
-                      <li><a href="?q={{ query }}&page={{ page_obj.previous_page_number }}" class="prev"></a></li>
-                  {% endif %}
-                  {% if page_obj.has_next %}
-                      <li><a href="?q={{ query }}&page={{ page_obj.next_page_number }}" class="next"></a></li>
-                  {% endif %}
-              </ul>
-          </nav>
-      </div>
-  {% endif %}
+	{% if results %}
+		{% for list in results %}
+			{% if list.total_count > 0 %}
+				<div class="container">
+				  <div class="sixteen columns">
+				    <h3 class="headline-flat">Найдено {{ list.total_count }} {{ list.model_name }}</h3><span class="line-flat margin-bottom-0"></span>
+				  </div>
+				</div>
+				<div class="container">
+					<div class="sixteen columns">
+						Показано: {{ list.showing_count }}
+					</div>
+					{% include list.template_name with products=list.objects %}
+					<div class="sixteen columns text-center margin-top-30">
+						<a href="#" class="gray-color">Смотреть все найденные {{ list.model_name }}</a>
+					</div>
+					<div class="margin-top-10"></div>
+				</div>
+			{% endif %}
+		{% endfor %}
 {% else %}
-<section id="not-found">
-    <p>Ничего не найдено</p>
-</section>
+<div class="sixteen columns">
+	<section id="not-found">
+		<p>Ничего не найдено</p>
+	</section>
+</div>
 {% endif %}
-</div>
-{% endblock %}
-
-{% block rightsidebar %}
-<div class="four adjust-left columns">
-	<a class="toggle-filter-button" href="#">Показать фильтры <i class="fa fa-chevron-down" aria-hidden="true"></i></a>
-	<div class="filter-panel">
-		<div class="widget margin-top-10">
-			<h3 class="headline">Фильтры</h3><span class="line"></span>
-			<div class="clearfix"></div>
-			<form method="GET">
-				<label class="control control--checkbox">
-				<input {% if request.GET.region %}checked="checked"{% endif %} id="id_region" name="region" type="checkbox" value="{{ request.user.profile.region.id }}" onChange="this.form.submit()">
-				Только мой регион
-				<div class="control__indicator"></div>
-			</label>
-			</form>
-		</div>
-	</div>
-</div>
 {% endblock %}

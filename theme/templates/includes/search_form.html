@@ -1,7 +1,58 @@
 {% load mezzanine_tags i18n %}
 <nav class="top-search">
-    <form action="{% url "search-all" %}">
+    <form action="{% url "search-all" %}" id="search-form">
         <button><i class="fa fa-search"></i></button>
-        <input class="search-field" placeholder="Поиск" type="text" name="q" value="{{ request.REQUEST.q }}" />
+        <a href="#" class="advanced-search-btn button">
+          <i class="fa fa-caret-down"></i>
+        </a>
+
+    		<div class="woo-search-elements native-shadow clearfix">
+          <p>Искать: </p>
+    			<section class="variables">
+            {% if search_model_choices %}
+              {% for verbose_name, model, checked in search_model_choices %}
+                {% if model == 'shops.ShopProduct' %}
+                  <div>
+                    <label class="control control--checkbox">
+                      <input id="id_{{ model }}" name="search_type" type="checkbox" value="{{ model }}"
+                      {% if checked %}checked="checked"{% endif %}>
+        				      {{ verbose_name }}
+        				      <div class="control__indicator"></div>
+                    </label>
+                  </div>
+                    <select id="id_category" name="category">
+            					<option value="">Во всех категориях</option>
+                      {% for category in category_options %}
+                        <option value="{{ category.id }}" {% if category.id == request.GET.category %}selected{% endif %}>
+                          {{ category.title }}
+                        </option>
+                      {% endfor %}
+            				</select>
+                {% else %}
+                  <label class="control control--checkbox">
+                    <input id="id_{{ model }}" name="search_type" type="checkbox" value="{{ model }}"
+                    {% if checked %}checked="checked"{% endif %}>
+                    {{ verbose_name }}
+                    <div class="control__indicator"></div>
+                  </label>
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+    			</section>
+    			<div class="clearfix"></div>
+          <a href="#" class="button advanced-search-btn-procced">Искать</a>
+    		</div>
+        {# {% if search_model_choices %} #}
+          {# <select class="form-control" name="type"> #}
+              {# <option value="">{% trans "Everything" %}</option> #}
+              {# {% for verbose_name, model in search_model_choices %} #}
+              {# <option value="{{ model }}" #}
+                  {# {% if model == request.GET.type  %}selected{% endif %}> #}
+                  {# {{ verbose_name }} #}
+              {# </option> #}
+              {# {% endfor %} #}
+          {# </select> #}
+      {# {% endif %} #}
+        <input class="search-field" placeholder="Поиск" type="text" name="q" value="{{ request.GET.q }}" />
     </form>
 </nav>

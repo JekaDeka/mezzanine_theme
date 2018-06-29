@@ -11,7 +11,36 @@
     };
     makeBSS('.bss-slides', opts);
 
+    $('a.advanced-search-btn').click(function(e) {
+      e.preventDefault();
+      $('.woo-search-elements').toggleClass('active');
+    });
+    $('a.advanced-search-btn-procced').click(function(e) {
+      e.preventDefault();
+      $('#search-form').submit();
+    });
+    $('.top-search button').hover(function(e) {
+      $('.advanced-search-btn').toggleClass('hover');
+    })
 
+    $("#id_category").on('change', function() {
+      $("#id_products").prop('checked', true);
+    });
+
+    // $(".variables select").each(function() {
+    //   if (!isMobile) {
+    //     var sb = new SelectBox({
+    //       selectbox: $(this)
+    //     });
+    //     void(sb);
+    //   }
+    // });
+    // var isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? true : false;
+    // if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+    //   $(".variables select").css({
+    //     'display': 'block'
+    //   });
+    // }
 
     $("#cart").hoverIntent({
       sensitivity: 3,
@@ -32,7 +61,7 @@
       e.preventDefault();
       return false;
     });
-    $(".toggle-filter-button").on('click touch', function (e) {
+    $(".toggle-filter-button").on('click touch', function(e) {
       e.preventDefault();
       $(this).next('.filter-panel').toggleClass('visible');
       // var panel = $(this).next('.filter-panel');
@@ -47,13 +76,13 @@
       //      $(panel).addClass('visible');
       //   });
       //   }
-        return false;
+      return false;
     });
 
     $(".parallax-banner").pureparallax({
-        overlayBackgroundColor: '#000',
-        overlayOpacity: '0.45',
-        timeout: 0
+      overlayBackgroundColor: '#000',
+      overlayOpacity: '0.45',
+      timeout: 0
     });
 
     // $("#slider-range").slider({

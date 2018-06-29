@@ -54,8 +54,10 @@
 						<div class="dropdown-content">
 							<a href="{% url 'ordertableitem-add' %}">Добавить новую заявку</a>
 							<a href="{{ ordertableitem_list }}">Список моих заявок</a>
-							<a href="#">Список входящих откликов</a>
-							<a href="#">Список исходящих откликов</a>
+							{% if user.profile.status == 1 %}
+								<a href="#">Список исходящих откликов</a>
+								<a href="#">Список персональных заявок</a>
+							{% endif %}
 						</div>
 					</div>
 					<div class="dropdown">
@@ -123,17 +125,21 @@
 					<div class="left-side">
 						<div class="widget-card-content">
 							<ul class="strong">
-								<li>Рейтинг мастера: <span> {{ reviews.avg_rating|floatformat:1|default:0 }} </span> </li>
-								<li>Количество отзывов: <span> <a href="#"> 0 </a> </span> </li>
+								{% to_stars user.profile.reviews_rating_avg 10 5 as user_rating_avg %}
+								{% to_stars user.profile.reviews_mastery_avg 10 5 as user_mastery_avg %}
+								{% to_stars user.profile.reviews_punctuality_avg 10 5 as user_punctuality_avg %}
+								{% to_stars user.profile.reviews_responsibility_avg 10 5 as user_responsibility_avg %}
+								<li>Рейтинг мастера: <span> {{ user_rating_avg }}</span> </li>
+								<li>Количество отзывов: <span> <a href="#"> {{ user.profile.reviews_count|default:0 }} </a> </span> </li>
 							</ul>
 						</div>
 					</div>
 					<div class="right-side">
 						<div class="widget-card-content">
 							<ul>
-								<li>Мастерство: <span> {{ reviews.mastery|floatformat:1|default:0  }} </span> </li>
-								<li>Пунктуальность: <span> {{ reviews.punctuality|floatformat:1|default:0  }} </span> </li>
-								<li>Ответственность: <span> {{ reviews.responsibility|floatformat:1|default:0  }} </span> </li>
+								<li>Мастерство: <span> {{ user_mastery_avg }} </span> </li>
+								<li>Пунктуальность: <span> {{user_punctuality_avg }} </span> </li>
+								<li>Ответственность: <span> {{ user_responsibility_avg }} </span> </li>
 							</ul>
 						</div>
 					</div>

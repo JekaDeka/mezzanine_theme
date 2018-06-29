@@ -3,13 +3,17 @@ from mezzanine.utils.models import AdminThumbMixin, upload_to
 
 from mezzanine.core.models import Slugged, Displayable
 from mezzanine.core.fields import FileField, RichTextField
+from mezzanine.core.managers import SearchableManager
 from mezzanine.generic.fields import KeywordsField, CommentsField, RatingField
+from mezzanine.conf import settings
 
 from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 
+
+from ordertable.managers import OrderTableItemManager
 
 from theme.utils import slugify_unicode
 
@@ -34,9 +38,18 @@ class OrderTableItem(models.Model):
             ('view_ordertableitem', 'View order item'),
         )
 
+    objects = OrderTableItemManager()
+    search_fields = ("title", "description", "keywords_string")
+
     title = models.CharField(_("Название"), max_length=500, null=False)
     available = models.BooleanField(_("Отображать на сайте"), default=False)
-    active = models.BooleanField(_("Открыт"), default=True, editable=False)
+
+    status = models.IntegerField(
+        _("Состояние"),
+        choices=settings.ORDER_TABLE_STATUS_CHOICES,
+        default=settings.ORDER_TABLE_STATUS_CHOICES[0][0],
+        editable=False)
+
     created = models.DateField(
         _("Дата добавления"), editable=False, default=date.today)
     ended = models.DateField(
@@ -106,6 +119,20 @@ class OrderTableItem(models.Model):
 
         if not self.region:
             self.region = self.author.profile.region
+
+        if self.performer:
+            self.status = settings.ORDER_TABLE_STATUS_CHOICES[1][0]
+        else:
+            self.status = settings.ORDER_TABLE_STATUS_CHOICES[0][0]
+
+        if self.status == 3:
+            ## if order completed
+            ### rework
+            ### TODO:
+            ### проработать вариант отметы заказа
+            ### запретить после выполнения???
+            self.performer.profile.orders_done += 1
+            
         super(OrderTableItem, self).save(*args, **kwargs)
 
     @property
@@ -147,9 +174,9 @@ class OrderTableItemRequest(models.Model):
         unique_together = ('order', 'performer',)
 
     order = models.ForeignKey(
-        OrderTableItem, on_delete=models.CASCADE, related_name="order_requests", verbose_name=("Заказы"))
+        OrderTableItem, on_delete=models.CASCADE, related_name="order_requests", verbose_name=("Заказ"))
     performer = models.ForeignKey(
-        'auth.User', on_delete=models.CASCADE, related_name="order_performers", verbose_name=("Исполнители"))
+        'auth.User', on_delete=models.CASCADE, related_name="order_performers", verbose_name=("Исполнитель"))
 
     # def __str__(self):
     #     return performer.profile.get_full_name()

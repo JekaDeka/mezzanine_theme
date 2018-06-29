@@ -3,10 +3,12 @@ from future.builtins import str, int
 
 from django.shortcuts import render
 from django.contrib import messages
+from django.apps import apps
 from django.contrib.auth import get_user_model
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.paginator import Paginator
 from django.core.mail import EmailMessage, EmailMultiAlternatives
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.decorators import method_decorator
@@ -27,7 +29,7 @@ from ordertable.models import OrderTableItem
 from theme.forms import ContactForm, MessageForm, OrderMessageForm, BlogPostForm
 from theme.models import SliderItem
 
-from mezzanine.conf import settings
+from django.conf import settings
 from mezzanine.generic.models import Keyword, AssignedKeyword
 from django.contrib.auth.models import Group
 from django.views.decorators.csrf import csrf_protect
@@ -349,32 +351,53 @@ class BlogPostDelete(DeleteView):
 class SearchAll(ListView):
     template_name = "search_results.html"
     context_object_name = 'results'
-    paginate_by = 30
-
-    ### separate search results ????
-
-    ### different template for each search result
+    # paginate_by = 30
 
     def get_queryset(self):
-        query = Q()
-        search = self.request.GET.get('q', None)
-        if search:
-            words = search.split(" ")
-            for word in words:
-                query |= Q(keywords_string__icontains=word)
-                query |= Q(title__icontains=word)
-            products = ShopProduct.objects.filter(query)
-            blog_posts = BlogPost.objects.filter(query).select_related(
-                                                            "user__profile",
-                                                        ).prefetch_related(
-                                                            "keywords__keyword",
-                                                        )
-            shops = UserShop.objects.filter(shopname__icontains=search)
-            orders = OrderTableItem.objects.filter(query)
+        query = self.request.GET.get('q', None)
+        if query:
+            search_model_names = self.request.GET.getlist('search_type', None)
+            flat_search = False  # no additional filters provided
+            result_list = list()
 
-            result_list = list(chain(products, blog_posts, shops, orders))
+            if not search_model_names:
+                flat_search = True
+                search_model_names = list(
+                    settings.SEARCH_MODEL_CHOICES)
+
+            for model_name in search_model_names:
+                try:
+                    model = apps.get_model(*model_name.split(".", 1))
+                except LookupError:
+                    pass
+                else:
+                    # if selected category => make serach inside this category only
+                    categories = self.request.GET.getlist('category', None)
+
+                    for category in categories:
+                        try:
+                            int(category)
+                        except Exception as e:
+                            categories.remove(category)
+
+                    if categories and model_name == 'shops.ShopProduct' and not flat_search:
+                        result = model.objects.search(
+                            query=query, categories=categories)
+                    else:
+                        result = model.objects.search(query=query)
+
+                    total_count = len(result)
+                    if total_count > 0:
+                        showing_count = settings.SEARCH_LIMIT if total_count > settings.SEARCH_LIMIT else total_count
+                        data = {'total_count': total_count,
+                                'showing_count': showing_count,
+                                'objects': result[:settings.SEARCH_LIMIT],
+                                'model_name': model_name.split(".", 1)[1],
+                                'template_name': "includes/additional_%ss.html" % model_name.split(".", 1)[1].lower()}
+                        result_list.append(data)
             return result_list
-        return list()
+
+        return ShopProduct.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super(SearchAll, self).get_context_data(**kwargs)

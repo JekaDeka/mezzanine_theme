@@ -2,8 +2,18 @@
 @import url("responsive.css");
 @import url("font-awesome.css");
 @import url("http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,800");
+
+a.gray-color i,
+a.gray-color,
 a:visited {
     color: #888;
+}
+
+a.green-color:hover,
+a.green-color:hover i,
+a.gray-color:hover,
+a.gray-color:hover i {
+  color: #444;
 }
 h2 {
     /* font-weight: 600; */
@@ -1691,7 +1701,7 @@ span.skill-title i {
 }
 
 .top-search button {
-    background: #c0c0c0;
+    background: #3acf87;
     border: none;
     cursor: pointer;
     color: #fff;
@@ -1708,14 +1718,26 @@ span.skill-title i {
     -o-transition: background-color 0.2s ease-in-out;
     transition: background-color 0.2s ease-in-out;
 }
-
+.top-search a.advanced-search-btn {
+  background: #37c37f;
+  padding: 8px 12px;
+}
+.top-search a.advanced-search-btn-procced {
+  width: 50%;
+  margin-left: 25%;
+  text-align: center;
+}
+.top-search a.advanced-search-btn:hover,
+.top-search a.advanced-search-btn.hover {
+  background: #5a5a5a;
+}
 .apply-coupon a {
     display: block;
     float: left;
 }
 
 .top-search button:hover {
-    background-color: #808080;
+    background-color: #606060!important;
 }
 
 .top-search button i {
@@ -2815,7 +2837,7 @@ li.dropdown ul li a:hover {
     height: 25px;
 }
 
-.woo-search .advanced-search-btn {
+/* .woo-search .advanced-search-btn {
     text-transform: uppercase;
     padding: 0px 0px 0px 18px;
     margin-top: 10px;
@@ -2832,15 +2854,16 @@ li.dropdown ul li a:hover {
     margin: 0px;
     margin-left: 15px;
     height: 14px;
-}
+} */
 
 .woo-search-elements {
+    right: 10px;
     margin-top: -7px;
     font-size: 14px;
     font-weight: 600;
     position: absolute;
-    z-index: 9999;
-    width: 612px;
+    z-index: -9999;
+    width: 400px;
     border-bottom: 1px solid #eaeaea;
     background: #fff;
     padding: 20px 10px 10px 10px;
@@ -2852,6 +2875,7 @@ li.dropdown ul li a:hover {
 .woo-search-elements.active {
     opacity: 1;
     visibility: visible;
+    z-index: 9999;
 }
 
 .woo-search-elements button {
@@ -2859,7 +2883,7 @@ li.dropdown ul li a:hover {
     padding: 20px;
     outline: none;
 }
-
+/*
 .woo-search .advanced-search-btn {
     text-transform: uppercase;
     padding: 0px 0px 0px 18px;
@@ -2877,9 +2901,9 @@ li.dropdown ul li a:hover {
     margin: 0px;
     margin-left: 15px;
     height: 14px;
-}
+} */
 
-.woo-search-elements .variables .customSelect {
+/* .woo-search-elements .variables .customSelect {
     flex: 3;
     margin: 0 10px;
 }
@@ -2891,7 +2915,7 @@ li.dropdown ul li a:hover {
 .woo-search-elements #price-range {
     padding: 0 10px;
     margin-bottom: 40px;
-}
+} */
 
 .parallax-banner {
     position: relative;
@@ -3079,7 +3103,7 @@ a.button.color:hover {
     width: 100%;
 }
 
-.titlebar span {
+.titlebar h2 > span {
     font-weight: 300;
     color: #aaa;
 }
@@ -7039,13 +7063,17 @@ img.rsImg {
     font-size: 13px;
 }
 
-.variables select {
+ /* .variables select {
     display: none;
-}
+} */
 
 .variables select {
-    width: 100%;
+    width: 65%;
     padding: 9px;
+    margin-bottom: 10px;
+    margin-left: 20px;
+    display: inline-block;
+
 }
 
 .variables label {
@@ -7054,7 +7082,11 @@ img.rsImg {
 }
 
 section.variables {
-    padding-bottom: 28px;
+    padding-bottom: 10px;
+}
+
+section.variables > div {
+  display: inline-block;
 }
 
 .customSelect {
@@ -8711,15 +8743,19 @@ html[xmlns] .slides {
         width: 100%;
     }
     .woo-search-elements {
-        padding: 40px 30px 10px 10px;
-        width: calc(100% - 100px);
+        padding: 10px;
+        width: 300px;
+        right: 1px;
+        /* width: calc(100% - 100px); */
     }
     .woo-search-elements .variables {
         display: inline-block;
         width: 100%;
     }
-    .woo-search-elements .variables .customSelect {
-        margin-bottom: 8px;
+    .variables select {
+      width: 100%;
+      margin-left: 0;
+      display: block;
     }
 }
 

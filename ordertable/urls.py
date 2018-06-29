@@ -19,8 +19,11 @@ urlpatterns = [
     url(r'settings/ordertable/add/$', views.OrderTableItemImageCreate.as_view(), name='ordertableitem-add'),
     url(r'settings/ordertable/(?P<pk>[0-9]+)/edit/$', views.OrderTableItemImageUpdate.as_view(), name='ordertableitem-update'),
     url(r'settings/ordertable/(?P<pk>[0-9]+)/delete/$', views.OrderTableItemDelete.as_view(), name='ordertableitem-delete'),
-    url(r'^settings/ordertable/requests/in/$', views.OrderTableIncomeRequestList.as_view(), name='ordertableitemrequest-list'),
-    url(r'^settings/ordertable/requests/out/$', views.OrderTableOutcomeRequestList.as_view(), name='ordertableitemoutrequest-list'),
+
+    url(r'settings/ordertable/(?P<pk>[0-9]+)/request/assign/$', views.OrderTableRequestAssignList.as_view(), name='ordertableitemrequest-list'),
+
+    # url(r'^settings/ordertable/requests/in/$', views.OrderTableIncomeRequestList.as_view(), name='ordertableitemrequest-list'),
+    # url(r'^settings/ordertable/requests/out/$', views.OrderTableOutcomeRequestList.as_view(), name='ordertableitemoutrequest-list'),
 ]
 
 # urlpatterns += router.urls

@@ -1460,6 +1460,7 @@ textarea, input[type="text"], input[type="submit"], input[type="password"], [typ
   box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
 }
 
+.native-shadow,
 .content-box {
   -webkit-box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
   -moz-box-shadow: 0 2px 8px 0 rgba(174, 174, 174, 0.5);
@@ -1633,8 +1634,8 @@ span.big-green>span>i {
 
 .shop-stats {
   text-align: left;
-  margin: 0 auto 10px auto;
-  padding: 5px 20px 20px 20px;
+  /* margin: 0 auto 10px auto; */
+  padding: 0 20px 20px 20px;
   line-height: 26px;
 }
 

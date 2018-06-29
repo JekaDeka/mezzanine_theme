@@ -2,6 +2,7 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User, Group
 from django.utils import timezone
 
@@ -54,10 +55,7 @@ class City(models.Model):
         return str(self.name)
 
 
-USER_PROFILE_STATUS_CHOICES = (
-    (0, "Покупатель"),
-    (1, "Мастер"),
-)
+
 
 
 class UserProfile(models.Model):
@@ -90,9 +88,9 @@ class UserProfile(models.Model):
 
     status = models.IntegerField(
         _("Тип профиля"),
-        choices=USER_PROFILE_STATUS_CHOICES,
+        choices=settings.USER_PROFILE_STATUS_CHOICES,
         blank=False,
-        default=USER_PROFILE_STATUS_CHOICES[0][0], help_text="Будучи мастером вы сможете получать персональные заказ")
+        default=settings.USER_PROFILE_STATUS_CHOICES[0][0], help_text="Будучи мастером вы сможете получать персональные заказ")
 
     country = models.ForeignKey(Country, verbose_name=("Страна"))
 
@@ -116,6 +114,28 @@ class UserProfile(models.Model):
 
     bio = models.TextField(default="", verbose_name=("О себе"), blank=True)
 
+
+    ### meta fields ###
+
+    orders_done = models.IntegerField(default=0, editable=False)
+
+    reviews_count = models.IntegerField(default=0, editable=False)
+
+    reviews_mastery_sum = models.IntegerField(default=0, editable=False)
+    reviews_mastery_avg = models.FloatField(default=0, editable=False)
+
+    reviews_mastery_sum = models.IntegerField(default=0, editable=False)
+    reviews_mastery_avg = models.FloatField(default=0, editable=False)
+
+    reviews_punctuality_sum = models.IntegerField(default=0, editable=False)
+    reviews_punctuality_avg = models.FloatField(default=0, editable=False)
+
+    reviews_responsibility_sum = models.IntegerField(default=0, editable=False)
+    reviews_responsibility_avg = models.FloatField(default=0, editable=False)
+
+    reviews_rating_sum = models.IntegerField(default=0, editable=False)
+    reviews_rating_avg = models.FloatField(default=0, editable=False)
+
     def get_full_name(self):
         full_name = '%s %s' % (self.first_name, self.last_name)
         return full_name.strip()
@@ -129,11 +149,13 @@ class UserProfile(models.Model):
         kwargs = {"slug": self.user.username}
         return reverse(url_name, kwargs=kwargs)
 
+    # def get_reviews_count(self):
+    #     return self.
+
     # def get_truncated_bio(self):
     #     return Truncator(self.bio).words(20, truncate='<a href="#">Подробнее</a>', html=True)
     def __str__(self):              # __unicode__ on Python 2
         return '%s %s' % (self.first_name, self.last_name)
-
 
 
 class MasterReview(models.Model):
@@ -151,12 +173,12 @@ class MasterReview(models.Model):
     responsibility = models.IntegerField(verbose_name=(
         "Ответственность"), choices=settings.RATING_CHOICES, default=settings.RATING_CHOICES[0][0])
 
-    avg_rating = models.FloatField(verbose_name=("Средний рейтинг"), default=0)
+    avg_rating = models.FloatField(verbose_name=("Средний рейтинг"), default=0, editable=False)
 
     content = models.TextField(verbose_name=("Отзыв"))
 
     author = models.ForeignKey("auth.User", on_delete=models.CASCADE,
-                             related_name="author_master_reviews", verbose_name=("Автор"))
+                               related_name="author_master_reviews", verbose_name=("Автор"))
 
     master = models.ForeignKey("auth.User", on_delete=models.CASCADE,
                                related_name="master_reviews", verbose_name=("Мастер"))
@@ -173,7 +195,40 @@ class MasterReview(models.Model):
     def save(self, *args, **kwargs):
         self.avg_rating = (int(self.mastery) +
                            int(self.punctuality) + int(self.responsibility)) / 3
+        if self.master.profile.status != 1:
+            raise ValidationError(
+                _('%(user)s не является мастером'),
+                params={'user': self.master},
+            )
         super(MasterReview, self).save(*args, **kwargs)
+        reviews = [[r.mastery, r.punctuality, r.responsibility, r.avg_rating]
+                   for r in MasterReview.objects.filter(master=self.master, approved=True)]
+
+        count = len(reviews)
+        if count > 0:
+            cols = len(reviews[0])
+            totals = cols * [0.0]
+            for line in reviews:
+                for i in range(cols):
+                    totals[i] += line[i]
+            averages = [total / count for total in totals]
+
+            self.master.profile.reviews_count = count
+
+            self.master.profile.reviews_mastery_sum = totals[0]
+            self.master.profile.reviews_mastery_avg = averages[0]
+
+            self.master.profile.reviews_punctuality_sum = totals[1]
+            self.master.profile.reviews_punctuality_avg = averages[1]
+
+            self.master.profile.reviews_responsibility_sum = totals[2]
+            self.master.profile.reviews_responsibility_avg = averages[2]
+
+            self.master.profile.reviews_rating_sum = totals[3]
+            self.master.profile.reviews_rating_avg = averages[3]
+
+
+            self.master.profile.save()
 
     def __str__(self):              # __unicode__ on Python 2
         return 'Отзыв_%s о мастере %s' % (self.id, self.master)

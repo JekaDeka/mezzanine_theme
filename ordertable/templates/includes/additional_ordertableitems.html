@@ -1,11 +1,7 @@
 {% load mezzanine_tags theme_tags %}
-<div class="container">
-  <div class="sixteen columns">
-    <h3 class="headline-flat">Товары магазина</h3><span class="line-flat margin-bottom-0"></span>
-  </div>
-  {% if related_products %}
+{% if products %}
   <div class="products">
-    {% for product in related_products %}
+    {% for product in products %}
     <div class="four columns half-columns">
       <figure class="product">
         {% if product.condition != 1 %}
@@ -43,11 +39,4 @@
     </div>
     {% endfor %}
   </div>
-  <div class="sixteen columns text-center margin-top-30">
-    {% if limited %}
-      <a href="{{ product.shop.get_absolute_url }}" class="">Смотреть все товары</a>
-    {% endif %}
-  </div>
-  {% endif %}
-</div>
-</div>
+{% endif %}

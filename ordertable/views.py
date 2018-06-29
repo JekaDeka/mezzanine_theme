@@ -153,7 +153,7 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
         messages.success(
             request, "Исполнитель успешно назначен. Ему отправлено уведомление.")
 
-    return redirect(reverse_lazy('ordertableitemrequest-list'))
+    return redirect(reverse_lazy('ordertableitem-list'))
 
 
 @login_required
@@ -168,7 +168,7 @@ def order_request_delete(request, order_pk, performer_pk, extra_context=None):
         else:
             messages.success(request, "Отклик успешно отклонен.")
 
-    return redirect(reverse_lazy('ordertableitemrequest-list'))
+    return redirect(reverse_lazy('ordertableitem-list'))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -180,11 +180,11 @@ class OrderTableItemList(ListView):
     def get_queryset(self):
         return OrderTableItem.objects.filter(
             author=self.request.user
-            ).prefetch_related(
-                'order_requests','images'
-                ).select_related(
-                    'categories', 'performer', 'performer__profile'
-                    )
+        ).prefetch_related(
+            'order_requests', 'images'
+        ).select_related(
+            'categories', 'performer', 'performer__profile'
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -324,16 +324,26 @@ class OrderTableItemDetail(DetailView):
     def post(self, request, *args, **kwargs):
         form = MessageForm(request.POST)
         obj = self.get_object()
-        if form.is_valid():
-            context = {
-                'request': request,
-                'order': obj,
-                'performer': request.user,
-                'message': form.cleaned_data['message'],
-            }
-            email = form.create_email(context, obj, request.user)
-            if order_request_add(request, obj.pk):
-                email.send(fail_silently=True)
+        try:
+            user_profile = request.user.profile
+        except Exception as e:
+            messages.error(request, 'Сперва заполните свой профиль.')
+            return redirect(reverse_lazy('profile-settings'))
+        else:
+            if user_profile.status != 1:
+                messages.error(request, 'Для того, чтобы выполнять заказы необходимо стать мастером')
+                return redirect(reverse_lazy('profile-settings'))
+
+            if form.is_valid() and request.user.is_authenticated():
+                context = {
+                    'request': request,
+                    'order': obj,
+                    'performer': request.user,
+                    'message': form.cleaned_data['message'],
+                }
+                email = form.create_email(context, obj, request.user)
+                if order_request_add(request, obj.pk):
+                    email.send(fail_silently=True)
 
         return redirect(obj.get_absolute_url())
 
@@ -351,28 +361,27 @@ class OrderTableItemDetail(DetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class OrderTableIncomeRequestList(ListView):
+class OrderTableRequestAssignList(ListView):
     model = OrderTableItemRequest
-    # template_name = "ordertable/ordertableitem_request.html"
-    context_object_name = "ordertableitemrequest_list"
+    template_name = "ordertable/ordertableitem_request.html"
+    context_object_name = "ordertableitemrequests"
 
     def get_queryset(self):
-        orders = self.request.user.orders_as_author.all().prefetch_related('images')
-        return OrderTableItemRequest.objects.filter(order__in=orders).select_related('performer', 'order')
+        # orders = self.request.user.orders_as_author.all().prefetch_related('images')
+        return OrderTableItemRequest.objects.filter(order=self.kwargs['pk']).select_related('performer__profile', 'order')
 
     def get_context_data(self, **kwargs):
-        data = super(OrderTableIncomeRequestList,
+        data = super(OrderTableRequestAssignList,
                      self).get_context_data(**kwargs)
-        data['ordertableitems'] = self.request.user.orders_as_author.all(
-        ).prefetch_related('images')
+        data['order'] = OrderTableItem.objects.get(pk=self.kwargs['pk'])
         return data
 
 
-@method_decorator(login_required, name='dispatch')
-class OrderTableOutcomeRequestList(ListView):
-    model = OrderTableItemRequest
-    # template_name = "orders/ordertableitem_request_outcome.html"
-    context_object_name = "ordertableitemrequest_list"
-
-    def get_queryset(self):
-        return OrderTableItemRequest.objects.filter(performer=self.request.user).prefetch_related('order__images')
+# @method_decorator(login_required, name='dispatch')
+# class OrderTableOutcomeRequestList(ListView):
+#     model = OrderTableItemRequest
+#     # template_name = "orders/ordertableitem_request_outcome.html"
+#     context_object_name = "ordertableitemrequest_list"
+#
+#     def get_queryset(self):
+#         return OrderTableItemRequest.objects.filter(performer=self.request.user).prefetch_related('order__images')

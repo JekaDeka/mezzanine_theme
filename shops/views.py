@@ -348,6 +348,7 @@ class ProductDetailView(DetailView):
             'author__profile__last_name',
         )
         data['reviews'] = reviews[:5]
+        data['related_products'] = self.object.shop.get_related_products().exclude(id=self.object.id)
         return data
 
     def post(self, request, *args, **kwargs):
@@ -579,8 +580,8 @@ class ShopDetailView(DetailView):
     model = UserShop
     template_name = "shops/shop_detail.html"
     context_object_name = 'shop'
-    queryset = UserShop.objects.prefetch_related(
-        'products', 'products__images')
+    # queryset = UserShop.objects.prefetch_related(
+    #     'products', 'products__images')
 
     def post(self, request, *args, **kwargs):
         form = MessageForm(data=request.POST)
@@ -615,6 +616,7 @@ class ShopDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         data = super(ShopDetailView, self).get_context_data(**kwargs)
+        data['related_products'] = self.object.get_related_products()
         if self.request.POST:
             data['form'] = MessageForm(self.request.POST)
         else:

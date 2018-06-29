@@ -1,84 +1,87 @@
-{% extends "base.html" %} {% load i18n mezzanine_tags pages_tags staticfiles %}
+{% extends "profiles/profile_settings.html" %} {% load i18n mezzanine_tags pages_tags staticfiles %}
+{% block meta_title %} Отклики на заявку: {{ order }} {% endblock %}
 {% block breadcrumbs_title %}
 <h2>Стол заказов</h2>
 {% endblock breadcrumbs_title %}
+
 {% block breadcrumb_element %}
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
-<li>Отклики на мои заявки</li>
+<li><a href="{% url 'ordertableitem-list' %}">Список моих заявок</a></li>
+<li>Отклики на заявку: {{ order }}</li>
 {% endblock %}
-{% block main %}
-{% if ordertableitemrequest_list %}
-<div id="masonry-wrapper">
-    {% for ordertableitem in ordertableitems %}
-        <div class="object-list columns masonry-item">
-            <article class="from-the-blog">
-                {% if settings.BLOG_USE_FEATURED_IMAGE %}
-                    {% if ordertableitem.images.all.0 %}
-                    <figure class="from-the-blog-image">
-                        <a href="{{ ordertableitem.get_absolute_url }}">
-                            <img class="img-thumbnail pull-left" src="{{ MEDIA_URL }}{% thumbnail ordertableitem.images.all.0 300 200 %}" alt="{{ ordertableitem.title|capfirst }}" />
-                        </a>
-                        <div class="hover-icon"></div>
-                    </figure>
-                    {% else %}
-                    <div class="post-quote">
-                        <a href="{{ ordertableitem.get_absolute_url }}">
-                        <blockquote>
-                            <i class="fa fa-camera-retro"></i>
-                        </blockquote>
-                        </a>
-                    </div>
-                    {% endif %}
-                {% endif %}
-                <section class="from-the-blog-content">
-                    <a href="{{ ordertableitem.get_absolute_url }}"><h5>{{ ordertableitem.title|capfirst }}</h5></a>
-                    {% if ordertableitem.preview_content %}
-                        {{ ordertableitem.preview_content|safe|truncatewords_html:55 }}
-                    {% else %}
-                        {{ ordertableitem.description_from_content|safe }}
-                    {% endif %}
-                <div class="clearfix"></div>
-                {% for req in ordertableitemrequest_list %}
-                    {% if req.order == ordertableitem %}
-                        {{ req.performer }}
-                    {% endif %}
-                {% endfor %}
-                <a href="{% url 'ordertableitem-update' ordertableitem.pk %}" class="button gray margin-top-5">Редактировать</a>
-                <a href="{% url 'ordertableitem-delete' ordertableitem.pk %}" class="button gray margin-top-5">Удалить</a>
-                </section>
 
-            </article>
-        </div>
-    {% endfor %}
+{% block extra_content %}
+<div class="flat-background">
+	<div class="flat-row list-header">
+		<div class="container">
+			<div class="margin-top-20 margin-bottom-15">
+				<div class="ten columns">
+					<h2> Всего откликов на &laquo;{{ order }}&raquo;: {{ ordertableitemrequests.count }} </h2>
+				</div>
+				{# <hr> #}
+	      <div class="clearfix"></div>
+			</div>
+		</div>
+	</div>
+	<div class="flat-row">
+		<div class="container">
+			{% if ordertableitemrequests %}
+			<div id="masonry-wrapper">
+			    {% for orderitemrequest in ordertableitemrequests %}
+						<div class="object-list columns masonry-item">
+							<figure class="object-image">
+								<a href="{{ orderitemrequest.performer.profile.get_absolute_url }}">
+										<img src="{{ MEDIA_URL }}{% thumbnail orderitemrequest.performer.profile.image 300 200 %}" alt="{{ orderitemrequest.performer.profile.first_name }}">
+								</a>
+								<div class="hover-icon"></div>
+							</figure>
+							<section class="object-content">
+								<a href="#"><h5> {{ orderitemrequest.performer.profile.get_full_name }} </h5></a>
+								<i>{{ orderitemrequest.performer.profile.get_status_display }}</i>
+								<p><strong>Выполнено работ: </strong>
+									{{ orderitemrequest.performer.profile.orders_done }}
+								</p>
+								<p><strong>На сайте: </strong>
+									{{ orderitemrequest.performer.date_joined|timesince  }}
+								</p>
+								<p>{{ orderitemrequest.performer.profile.bio|truncatewords:20|truncatechars:200 }}</p>
+								<a href="#" class="button outline"><i class="fa fa-check" aria-hidden="true"></i> Принять</a>
+                <a href="#" class="button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Отказать</a>
+							</section>
+						</div>
+			    {% endfor %}
+			</div>
+			{% else %}
+			<section id="not-found">
+			    <p>Отклики на заявку пока отсутствуют</p>
+			</section>
+			{% endif %}
+			{% if is_paginated %}
+	        <div class="pagination-container masonry">
+	            <nav class="pagination">
+	                <ul>
+	                    {% for i in page_obj.paginator.page_range %}
+	                      {% if page_obj.number == i %}
+	                        <li><a href="#" class="current-page">{{ i }}</a></li>
+	                      {% else %}
+	                        <li><a href="?page={{ i }}">{{ i }}</a></li>
+	                      {% endif %}
+	                    {% endfor %}
+	                </ul>
+	            </nav>
+	            <nav class="pagination-next-prev full-width">
+	                <ul>
+	                    {% if page_obj.has_previous %}
+	                        <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
+	                    {% endif %}
+	                    {% if page_obj.has_next %}
+	                        <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
+	                    {% endif %}
+	                </ul>
+	            </nav>
+	        </div>
+	    {% endif %}
+		</div>
+	</div>
 </div>
-{% else %}
-<section id="not-found">
-    <p>Заявки пока отсутствуют</p>
-</section>
-{% endif %}
-    {% if is_paginated %}
-        <div class="pagination-container masonry">
-            <nav class="pagination">
-                <ul>
-                    {% for i in page_obj.paginator.page_range %}
-                      {% if page_obj.number == i %}
-                        <li><a href="#" class="current-page">{{ i }}</a></li>
-                      {% else %}
-                        <li><a href="?page={{ i }}">{{ i }}</a></li>
-                      {% endif %}
-                    {% endfor %}
-                </ul>
-            </nav>
-            <nav class="pagination-next-prev full-width">
-                <ul>
-                    {% if page_obj.has_previous %}
-                        <li><a href="?page={{ page_obj.previous_page_number }}" class="prev"></a></li>
-                    {% endif %}
-                    {% if page_obj.has_next %}
-                        <li><a href="?page={{ page_obj.next_page_number }}" class="next"></a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        </div>
-    {% endif %}
-{% endblock main %}
+{% endblock %}

@@ -148,3 +148,4 @@ class OrderTableAdmin(admin.ModelAdmin):
 
 # admin.site.register(OrderTableItem, OrderTableAdmin)
 admin.site.register(OrderTableItemCategory)
+admin.site.register(OrderTableItemRequest)
