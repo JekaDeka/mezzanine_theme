@@ -36,7 +36,7 @@ urlpatterns = [
     # url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/assign/$',
     #     views.order_request_assign, name="order_request_assign"),
     # url(r'^ordertable/(?P<order_pk>[0-9]+)-(?P<performer_pk>[0-9]+)/delete/$',
-    #     views.order_request_delete, name="order_request_delete"),
+    #     views.order_request_refuse, name="order_request_refuse"),
 
 
     # url(r'^profile_view/$',

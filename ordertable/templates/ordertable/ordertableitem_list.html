@@ -64,7 +64,7 @@
 									{{ ordertableitem.get_status_display }}
 								</p>
 								<p><strong>Кол-во откликов: </strong>
-									{{ ordertableitem.order_requests.count }}
+									{{ ordertableitem.active_requests|length }}
 								</p>
 								<p><strong>Исполнитель: </strong>
 									{% if ordertableitem.performer.id %}
@@ -73,7 +73,7 @@
 									</a>
 									{% else %}
 									не назначен
-									{% if ordertableitem.order_requests.count > 0 %}
+									{% if ordertableitem.active_requests %}
 									<br>
 										<a href="{% url 'ordertableitemrequest-list' ordertableitem.pk %}" class="green-color"><i class="fa fa-user-o" aria-hidden="true"></i> Выбрать исполнителя</a>
 									{% endif %}
@@ -89,8 +89,15 @@
 								</p>
 								<p>{{ ordertableitem.description|truncatewords:20|truncatechars:200 }}</p>
 								<a href="{% url 'ordertableitem-update' ordertableitem.pk %}" class="button outline"><i class="fa fa-pencil" aria-hidden="true"></i> Изменить</a>
-								<a href="{% url 'ordertableitem-delete' ordertableitem.pk %}" class="button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</a>
+								<a href="#delete-object-{{ ordertableitem.pk }}" class="popup-with-zoom-anim button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</a>
 							</section>
+						</div>
+						<div id="delete-object-{{ ordertableitem.pk }}" class="zoom-anim-dialog mfp-hide modal-dialog">
+								<h2 class="margin-bottom-10">Вы точно хотите удалить &laquo;{{ ordertableitem.title }}&raquo;?</h2>
+								<form action="{% url 'ordertableitem-delete' ordertableitem.pk %}" method="POST">
+										{% csrf_token %}
+								<button class="button color pull" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</button>
+								</form>
 						</div>
 			    {% endfor %}
 			</div>

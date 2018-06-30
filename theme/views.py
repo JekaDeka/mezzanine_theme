@@ -339,6 +339,7 @@ class BlogPostUpdate(UpdateView):
 class BlogPostDelete(DeleteView):
     model = BlogPost
     success_url = reverse_lazy('blogpost-list')
+    success_message = "Запись в блоге успешно удалена"
 
     def get_object(self, queryset=None):
         """ Hook to ensure object is owned by request.user. """
@@ -346,6 +347,10 @@ class BlogPostDelete(DeleteView):
         if not obj.user == self.request.user:
             raise Http404
         return obj
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, self.success_message)
+        return super(BlogPostDelete, self).delete(request, *args, **kwargs)
 
 
 class SearchAll(ListView):

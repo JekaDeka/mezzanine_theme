@@ -63,14 +63,6 @@
 							<section class="object-content">
 								<a href="{% url 'blogpost-update' blogpost.pk %}"><h5> {{ blogpost.title|capfirst }} </h5></a>
 								<i>Добавлено: {{ blogpost.publish_date|date:"d.m.Y"  }}</i>
-								<br>
-								{# <i>Статус: #}
-									{# {% if blogpost.status == 1 %} #}
-									{# Проверяется модератором #}
-									{# {% else %} #}
-									{# Опубликовано #}
-									{# {% endif %} #}
-								{# </i> #}
 								<p>
 									{% if blogpost.preview_content %}
 										{{ blogpost.preview_content|safe|truncatewords_html:55 }}
@@ -78,8 +70,15 @@
 										{{ blogpost.description_from_content|safe }}
 									{% endif %}</p>
 								<a href="{% url 'blogpost-update' blogpost.pk %}" class="button outline"><i class="fa fa-pencil" aria-hidden="true"></i> Изменить</a>
-								<a href="{% url 'blogpost-delete' blogpost.pk %}" class="button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</a>
+								<a href="#delete-object-{{ blogpost.pk }}" class="popup-with-zoom-anim button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</a>
 							</section>
+						</div>
+						<div id="delete-object-{{ blogpost.pk }}" class="zoom-anim-dialog mfp-hide modal-dialog">
+								<h2 class="margin-bottom-10">Вы точно хотите удалить &laquo;{{ blogpost.title }}&raquo;?</h2>
+								<form action="{% url 'blogpost-delete' blogpost.pk %}" method="POST">
+										{% csrf_token %}
+								<button class="button color pull" type="submit"><i class="fa fa-trash-o" aria-hidden="true"></i> Удалить</button>
+								</form>
 						</div>
 			    {% endfor %}
 			</div>

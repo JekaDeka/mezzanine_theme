@@ -132,7 +132,7 @@ class OrderTableItem(models.Model):
             ### проработать вариант отметы заказа
             ### запретить после выполнения???
             self.performer.profile.orders_done += 1
-            
+
         super(OrderTableItem, self).save(*args, **kwargs)
 
     @property
@@ -178,8 +178,14 @@ class OrderTableItemRequest(models.Model):
     performer = models.ForeignKey(
         'auth.User', on_delete=models.CASCADE, related_name="order_performers", verbose_name=("Исполнитель"))
 
-    # def __str__(self):
-    #     return performer.profile.get_full_name()
+    active = models.BooleanField(
+        default=True,
+        verbose_name=("Заявка в рассмотрении"),)
+    created = models.DateField(
+        _("Дата отклика"), editable=False, default=date.today)
+
+    def __str__(self):
+        return "Отклик %d на заявку %s"%(self.id, self.order)
 
 
 class OrderTableItemCategory(Slugged):

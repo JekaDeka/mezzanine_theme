@@ -2,16 +2,16 @@
 {% load mezzanine_tags staticfiles theme_tags crispy_forms_tags %}
 
 {% block meta_title %}
-Заказы магазина
+Исходящие отклики
 {% endblock %}
 
 {% block breadcrumbs_title %}
-<h2>Покупки</h2>
+<h2>Исходящие отклики</h2>
 {% endblock breadcrumbs_title %}
 
 {% block breadcrumb_element %}
 <li><a href="{% url 'profile-settings' %}">Личный кабинет</a></li>
-<li>Мои покупки</li>
+<li>Исходящие отклики</li>
 {% endblock %}
 
 
@@ -26,19 +26,21 @@
 						<nav class="categories">
 							<ul>
 								<li><a href="{% url 'user-order-list' %}" class="{% if not status %}active{% endif %}">Все</a></li>
-								{% for choice in order_status_choice.items  %}
-									<li>
-										<a href="{% url 'user-order-list' %}?status={{ choice.1.value }}" class="{% if choice.1.active %}active{% endif %}">
-											{{ choice.1.label|capfirst }}
-										</a>
-									</li>
-								{% endfor %}
+								<li><a href="#" class="">Активные</a></li>
+								<li><a href="#" class="">Отмененные</a></li>
+								{# {% for choice in order_status_choice.items  %} #}
+									{# <li> #}
+										{# <a href="{% url 'user-order-list' %}?status={{ choice.1.value }}" class="{% if choice.1.active %}active{% endif %}"> #}
+											{# {{ choice.1.label|capfirst }} #}
+										{# </a> #}
+									{# </li> #}
+								{# {% endfor %} #}
 							</ul>
 						</nav>
 					</div>
 				</div>
 			</div>
-			{% if order_list %}
+			{% if ordertableitemrequests %}
 				<div class="twelve columns">
 					<div class="shadow-panel margin-top-20">
 						{# <div class="limiter"> #}
@@ -47,34 +49,40 @@
 								<table class="table-responsive cart-table widget-table" role="table">
 									<thead class="rowgroup" role="rowgroup">
 										<tr class="row" role="row">
-											<th class="columnheader" role="columnheader">Дата</th>
-											<th class="columnheader" role="columnheader">Номер заказа</th>
-											<th class="columnheader" role="columnheader">Магазин</th>
-											<th class="columnheader" role="columnheader">Доставка</th>
-											<th class="columnheader" role="columnheader">Сумма заказа</th>
+											<th class="columnheader" role="columnheader">Дата отклика</th>
+											<th class="columnheader" role="columnheader">Заявка</th>
+											<th class="columnheader" role="columnheader">Крайний срок заявки</th>
+											<th class="columnheader" role="columnheader">Бюджет</th>
+											<th class="columnheader" role="columnheader">Заказчик</th>
 											<th class="columnheader" role="columnheader">Статус</th>
 										</tr>
 									</thead>
 									<tbody class="rowgroup body-row" role="rowgroup">
-										{% for order in order_list %}
+										{% for ordertableitemrequest in ordertableitemrequests %}
 										<tr class="row" role="row">
 											<td class="cell" data-title="Дата" role="cell">
-												{{ order.time|date:"d.m.Y" }}
+												{{ ordertableitemrequest.created|date:"d.m.Y" }}
 											</td>
-											<td class="cell" data-title="Номер заказа" role="cell">
-												<a href="{% url 'user-order-detail' order.pk %}">{{ order.number }}</a>
+											<td class="cell" data-title="Заявка" role="cell">
+												<a href="{{ ordertableitemrequest.order.get_absolute_url }}">{{ ordertableitemrequest.order.title }}</a>
 											</td>
-											<td class="cell" data-title="Магазин" role="cell">
-												{{ order.shop.shopname }}
+											<td class="cell" data-title="Крайний срок" role="cell">
+												{{ ordertableitemrequest.order.ended|date:"d.m.Y" }}
 											</td>
-											<td class="cell" data-title="Доставка" role="cell">
-												{{ order.shipping_type }}
+											<td class="cell" data-title="Бюджет" role="cell">
+												{{ ordertableitemrequest.order.price|rub_currency }}
 											</td>
-											<td class="cell" data-title="Сумма заказа" role="cell">
-												{{ order.total|rub_currency }}
+											<td class="cell" data-title="Заказчик" role="cell">
+												<a href="{{ ordertableitemrequest.performer.profile.get_absolute_url }}">
+													{{ ordertableitemrequest.performer.profile.get_full_name }}
+												</a>
 											</td>
 											<td class="cell" data-title="Дата" role="Статус">
-												{{ order.get_status_display }}
+												{% if ordertableitemrequest.active %}
+												Рассматривается
+												{% else %}
+												Отказано
+												{% endif %}
 											</td>
 										</tr>
 						        {% endfor %}
@@ -84,8 +92,8 @@
 							{# </div> #}
 						{# </div> #}
 						<div class="divider">
-							<span>Всего покупок:
-								{% if is_paginated %} {{ page_obj.paginator.count }} {% else %} {{ order_list.count }} {% endif %}
+							<span>Всего откликов:
+								{% if is_paginated %} {{ page_obj.paginator.count }} {% else %} {{ ordertableitemrequests.count }} {% endif %}
 							</span>
 						</div>
 					</div>
@@ -119,7 +127,7 @@
 			<div class="twelve columns">
 				<div class="shadow-panel margin-top-20">
 					<section id="orders-not-found">
-		        <p>Заказы не найдены</p>
+		        <p>Вы еще не откликнулись ни на одну заявку</p>
 					</section>
 				</div>
 			</div>

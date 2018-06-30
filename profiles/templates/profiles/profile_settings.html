@@ -55,7 +55,7 @@
 							<a href="{% url 'ordertableitem-add' %}">Добавить новую заявку</a>
 							<a href="{{ ordertableitem_list }}">Список моих заявок</a>
 							{% if user.profile.status == 1 %}
-								<a href="#">Список исходящих откликов</a>
+								<a href="{% url 'ordertableitemrequestout-list' %}">Список исходящих откликов</a>
 								<a href="#">Список персональных заявок</a>
 							{% endif %}
 						</div>

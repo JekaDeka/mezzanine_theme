@@ -45,9 +45,23 @@
 									{{ orderitemrequest.performer.date_joined|timesince  }}
 								</p>
 								<p>{{ orderitemrequest.performer.profile.bio|truncatewords:20|truncatechars:200 }}</p>
-								<a href="#" class="button outline"><i class="fa fa-check" aria-hidden="true"></i> Принять</a>
-                <a href="#" class="button outline"><i class="fa fa-trash-o" aria-hidden="true"></i> Отказать</a>
+								<a href="#accept-object-{{ orderitemrequest.pk }}" class="popup-with-zoom-anim button outline"><i class="fa fa-check" aria-hidden="true"></i> Принять</a>
+                <a href="#refuse-object-{{ orderitemrequest.pk }}" class="popup-with-zoom-anim button outline"><i class="fa fa-times" aria-hidden="true"></i> Отказать</a>
 							</section>
+						</div>
+						<div id="refuse-object-{{ orderitemrequest.pk }}" class="zoom-anim-dialog mfp-hide modal-dialog">
+								<h2 class="margin-bottom-10">Вы точно хотите отказать {{ orderitemrequest.performer.profile.get_full_name }} в исполнении заказа?</h2>
+								<form action="{% url 'order_request_refuse' order_pk=order.pk performer_pk=orderitemrequest.performer.pk %}" method="POST">
+										{% csrf_token %}
+								<button class="button color pull" type="submit"><i class="fa fa-times" aria-hidden="true"></i> Отказать</button>
+								</form>
+						</div>
+						<div id="accept-object-{{ orderitemrequest.pk }}" class="zoom-anim-dialog mfp-hide modal-dialog">
+								<h2 class="margin-bottom-10">Вы точно хотите назначить {{ orderitemrequest.performer.profile.get_full_name }} исполнителем заказа?</h2>
+								<form action="{% url 'order_request_assign' order_pk=order.pk performer_pk=orderitemrequest.performer.pk %}" method="POST">
+										{% csrf_token %}
+								<button class="button color pull" type="submit"><i class="fa fa-check" aria-hidden="true"></i> Назначить</button>
+								</form>
 						</div>
 			    {% endfor %}
 			</div>

@@ -45,7 +45,7 @@ class OrderTableAdmin(admin.ModelAdmin):
             reverse('order_request_assign', args=[
                     order_request.order.id, order_request.performer.id]),
             order_request.performer.profile.get_absolute_url(),
-            reverse('order_request_delete', args=[
+            reverse('order_request_refuse', args=[
                     order_request.order.id, order_request.performer.id]),
         )
 
@@ -131,7 +131,7 @@ class OrderTableAdmin(admin.ModelAdmin):
     #         reverse('order_request_assign', args=[
     #                 order.order.id, order.performer.id]),
     #         reverse('profile', args=[order.performer]),
-    #         reverse('order_request_delete', args=[
+    #         reverse('order_request_refuse', args=[
     #                 order.order.id, order.performer.id]),
     #     )
     #

@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse, reverse_lazy
 from django.core.mail import EmailMessage
 from django.db import transaction
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Prefetch
 from django.shortcuts import get_object_or_404, redirect, render_to_response
 from django.template.response import TemplateResponse
 from django.template.loader import get_template, render_to_string
@@ -124,7 +124,6 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
         order = OrderTableItem.objects.get(pk=order_pk)
         performer = User.objects.get(pk=performer_pk)
         order.performer = performer
-        order.active = False
         order.save()
 
         ###
@@ -157,18 +156,20 @@ def order_request_assign(request, order_pk, performer_pk, extra_context=None):
 
 
 @login_required
-def order_request_delete(request, order_pk, performer_pk, extra_context=None):
-    if request.user.has_perm('theme.change_ordertableitemrequest'):
-        try:
-            order = OrderTableItemRequest.objects.get(
-                order=order_pk, performer=performer_pk)
-            order.delete()
-        except Exception as e:
-            messages.error(request, e.args[0])
-        else:
-            messages.success(request, "Отклик успешно отклонен.")
+def order_request_refuse(request, order_pk, performer_pk, extra_context=None):
+    # if request.user.has_perm('theme.change_ordertableitemrequest'):
+    try:
+        order = OrderTableItemRequest.objects.get(
+            order=order_pk, performer=performer_pk)
+        order.active = False
+        order.save()
+    except Exception as e:
+        messages.error(request, e.args[0])
+    else:
+        messages.success(request, "Отклик успешно отклонен.")
 
-    return redirect(reverse_lazy('ordertableitem-list'))
+    return redirect(reverse_lazy('ordertableitemrequest-list',
+                                 kwargs={'pk': order_pk}))
 
 
 @method_decorator(login_required, name='dispatch')
@@ -181,7 +182,12 @@ class OrderTableItemList(ListView):
         return OrderTableItem.objects.filter(
             author=self.request.user
         ).prefetch_related(
-            'order_requests', 'images'
+            Prefetch(
+                "order_requests",
+                queryset=OrderTableItemRequest.objects.filter(active=True),
+                to_attr="active_requests"
+            ),
+            'images'
         ).select_related(
             'categories', 'performer', 'performer__profile'
         )
@@ -331,7 +337,8 @@ class OrderTableItemDetail(DetailView):
             return redirect(reverse_lazy('profile-settings'))
         else:
             if user_profile.status != 1:
-                messages.error(request, 'Для того, чтобы выполнять заказы необходимо стать мастером')
+                messages.error(
+                    request, 'Для того, чтобы выполнять заказы необходимо стать мастером')
                 return redirect(reverse_lazy('profile-settings'))
 
             if form.is_valid() and request.user.is_authenticated():
@@ -363,12 +370,12 @@ class OrderTableItemDetail(DetailView):
 @method_decorator(login_required, name='dispatch')
 class OrderTableRequestAssignList(ListView):
     model = OrderTableItemRequest
-    template_name = "ordertable/ordertableitem_request.html"
+    template_name = "ordertable/ordertableitem_request_assign_list.html"
     context_object_name = "ordertableitemrequests"
 
     def get_queryset(self):
         # orders = self.request.user.orders_as_author.all().prefetch_related('images')
-        return OrderTableItemRequest.objects.filter(order=self.kwargs['pk']).select_related('performer__profile', 'order')
+        return OrderTableItemRequest.objects.filter(order=self.kwargs['pk']).filter(active=True).select_related('performer__profile', 'order')
 
     def get_context_data(self, **kwargs):
         data = super(OrderTableRequestAssignList,
@@ -376,6 +383,26 @@ class OrderTableRequestAssignList(ListView):
         data['order'] = OrderTableItem.objects.get(pk=self.kwargs['pk'])
         return data
 
+
+@method_decorator(login_required, name='dispatch')
+class OrderTableRequestOutList(ListView):
+    model = OrderTableItemRequest
+    template_name = "ordertable/ordertableitem_request_out_list.html"
+    context_object_name = "ordertableitemrequests"
+    paginate_by = 30
+
+    def get_queryset(self):
+        return OrderTableItemRequest.objects.filter(performer=self.request.user).select_related('order', 'performer__profile')
+
+    def get_context_data(self, **kwargs):
+        data = super(OrderTableRequestOutList,
+                     self).get_context_data(**kwargs)
+        # orders_status_choice = (
+        #     {'value': 1, 'label': 'Принятые', 'active': False},
+        #     {'value': 2, 'label': 'Отказ', 'active': False}
+        # )
+        # data['order_status_choice'] = orders_status_choice
+        return data
 
 # @method_decorator(login_required, name='dispatch')
 # class OrderTableOutcomeRequestList(ListView):
