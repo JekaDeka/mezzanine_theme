@@ -37,7 +37,8 @@ from django.views.generic import CreateView, UpdateView, DeleteView, ListView, D
 
 
 from itertools import chain
-
+###
+import pymorphy2
 
 User = get_user_model()
 
@@ -364,6 +365,7 @@ class SearchAll(ListView):
             search_model_names = self.request.GET.getlist('search_type', None)
             flat_search = False  # no additional filters provided
             result_list = list()
+            morph = pymorphy2.MorphAnalyzer()
 
             if not search_model_names:
                 flat_search = True
@@ -394,10 +396,16 @@ class SearchAll(ListView):
                     total_count = len(result)
                     if total_count > 0:
                         showing_count = settings.SEARCH_LIMIT if total_count > settings.SEARCH_LIMIT else total_count
+                        model_meta_name = model._meta.verbose_name_plural.lower()
+                        model_name_morph = morph.parse(model_meta_name)[0]
+                        model_name_morph_for_total = model_name_morph.make_agree_with_number(total_count).word
+                        model_name_morph_for_showing = model_name_morph.make_agree_with_number(showing_count).word
                         data = {'total_count': total_count,
                                 'showing_count': showing_count,
                                 'objects': result[:settings.SEARCH_LIMIT],
-                                'model_name': model_name.split(".", 1)[1],
+                                'model_name_morph_for_total': model_name_morph_for_total,
+                                'model_name_morph_for_showing': model_name_morph_for_showing,
+                                'model_name': model_meta_name,
                                 'template_name': "includes/additional_%ss.html" % model_name.split(".", 1)[1].lower()}
                         result_list.append(data)
             return result_list

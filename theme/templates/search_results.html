@@ -31,16 +31,23 @@
 			{% if list.total_count > 0 %}
 				<div class="container">
 				  <div class="sixteen columns">
-				    <h3 class="headline-flat">Найдено {{ list.total_count }} {{ list.model_name }}</h3><span class="line-flat margin-bottom-0"></span>
+				    <h3 class="headline-flat">
+							{% if list.total_count == 1 %}Найден{% else %}Найдено{% endif %}
+							{{ list.total_count }} {{ list.model_name_morph_for_total }}
+						</h3><span class="line-flat margin-bottom-0"></span>
 				  </div>
 				</div>
 				<div class="container">
+					{% if list.total_count > list.showing_count %}
 					<div class="sixteen columns">
-						Показано: {{ list.showing_count }}
+						Показано: {{ list.showing_count }} {{ list.model_name_morph_for_showing }}
 					</div>
+					{% endif %}
 					{% include list.template_name with products=list.objects %}
 					<div class="sixteen columns text-center margin-top-30">
-						<a href="#" class="gray-color">Смотреть все найденные {{ list.model_name }}</a>
+						{% if list.total_count > list.showing_count %}
+							<a href="#" class="gray-color">Смотреть все найденные {{ list.model_name }}</a>
+						{% endif %}
 					</div>
 					<div class="margin-top-10"></div>
 				</div>
